@@ -1,6 +1,9 @@
 if !has('gui_running')
 	let b:did_pyflakes_plugin = 1	" disable pyflakes (looks horrible in term)
 endif
+if !exists('A8_EMBEDDED')
+	let g:confirm_quit = 1
+endif
 call pathogen#infect()
 set sw=4 ts=4 sts=4 noexpandtab
 set modeline
