@@ -1,8 +1,8 @@
 if !has('gui_running')
-	let b:did_pyflakes_plugin = 1	" disable pyflakes (looks horrible in term)
+    let b:did_pyflakes_plugin = 1   " disable pyflakes (looks horrible in term)
 endif
 if !exists('A8_EMBEDDED')
-	let g:confirm_quit = 1
+    let g:confirm_quit = 1
 endif
 call pathogen#infect()
 set sw=4 ts=4 sts=4 noexpandtab
@@ -13,15 +13,15 @@ filetype plugin on
 colorscheme slate
 
 function ToggleFoldIndent()
-	if &foldmethod == 'indent'
-		set foldlevel=999
-		set foldmethod=manual
-	else
-		set foldmethod=indent
-		set foldminlines=5
-		set foldnestmax=3
-		set foldlevel=0
-	endif
+    if &foldmethod == 'indent'
+        set foldlevel=999
+        set foldmethod=manual
+    else
+        set foldmethod=indent
+        set foldminlines=5
+        set foldnestmax=3
+        set foldlevel=0
+    endif
 endfunction
 
 nmap <F8> :call ToggleFoldIndent()<CR>
