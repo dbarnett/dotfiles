@@ -2,12 +2,14 @@ if !has('gui_running')
     let b:did_pyflakes_plugin = 1   " disable pyflakes (looks horrible in term)
 endif
 if !exists('A8_EMBEDDED')
-    let g:confirm_quit = 1
+    let g:confirm_quit = 1  " confirm quit only in a8
 endif
+let g:gundo_preview_bottom = 1
 call pathogen#infect()
 set sw=4 ts=4 sts=4 noexpandtab
 set modeline
 set modelines=5
+syntax on
 filetype on
 filetype plugin on
 colorscheme slate
@@ -24,6 +26,8 @@ function ToggleFoldIndent()
     endif
 endfunction
 
+nnoremap <F5> :GundoToggle<CR>
+nmap <F3> :NERDTreeToggle<CR>
 nmap <F8> :call ToggleFoldIndent()<CR>
 "nnoremap <silent> <F8> :TlistToggle<CR>
 
