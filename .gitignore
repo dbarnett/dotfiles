@@ -1,0 +1,4 @@
+.*.sw[a-p]
+.sw[a-p]
+.fuse_hidden*
+/tags

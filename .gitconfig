@@ -1,0 +1,8 @@
+[user]
+    name = David Barnett
+    email = davidbarnett2@gmail.com
+[core]
+    excludesfile = ~/.gitignore
+    editor = vim
+[color]
+    ui = auto
