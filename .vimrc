@@ -6,7 +6,6 @@ if !exists('A8_EMBEDDED')
 endif
 let g:gundo_preview_bottom = 1
 call pathogen#infect()
-set sw=4 ts=4 sts=4 noexpandtab
 set modeline
 set modelines=5
 syntax on

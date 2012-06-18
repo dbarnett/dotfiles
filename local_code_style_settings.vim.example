@@ -1,0 +1,6 @@
+" store this in .vim/local_code_style_settings.vim with per-machine settings
+set sw=4 ts=4 sts=4 expandtab
+
+" per-directory settings
+" Add settings here for different project directories
+au BufRead,BufEnter /home/david/FOO/* set noexpandtab
