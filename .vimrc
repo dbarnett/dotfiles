@@ -14,7 +14,7 @@ filetype on
 filetype plugin on
 colorscheme slate
 
-function ToggleFoldIndent()
+function! ToggleFoldIndent()
     if &foldmethod == 'indent'
         set foldlevel=999
         set foldmethod=manual
