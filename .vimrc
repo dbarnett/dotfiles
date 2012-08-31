@@ -8,6 +8,7 @@ let g:gundo_preview_bottom = 1
 call pathogen#infect()
 set modeline
 set modelines=5
+set wildmode=longest,list
 syntax on
 filetype on
 filetype plugin on
