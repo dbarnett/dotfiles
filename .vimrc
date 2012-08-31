@@ -26,6 +26,9 @@ function! ToggleFoldIndent()
     endif
 endfunction
 
+set directory=~/.vim/swaps
+set backupdir=~/.vim/backups
+
 nnoremap <F5> :GundoToggle<CR>
 nmap <F3> :NERDTreeToggle<CR>
 nmap <F8> :call ToggleFoldIndent()<CR>
