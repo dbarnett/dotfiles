@@ -20,5 +20,5 @@ print_pre_prompt() {
     PS1L_exp=$(eval echo '"'$PS1L_exp'"')
     PS1L_clean=$(eval echo -e $PS1L_clean)
     title $PS1L_clean
-    printf "%b%$(($COLUMNS-${#PS1L_clean}))b" "$PS1L_exp" "$PS1R"
+    printf "%b%$(($COLUMNS-${#PS1L_clean}))b\n" "$PS1L_exp" "$PS1R"
 }
