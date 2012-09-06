@@ -14,6 +14,11 @@ filetype on
 filetype plugin on
 colorscheme slate
 
+au BufNewFile,BufRead *.py setlocal formatoptions=crql
+au BufNewFile,BufRead *.c setlocal formatoptions=crql
+au BufNewFile,BufRead *.cpp setlocal formatoptions=crql
+au BufNewFile,BufRead *.java setlocal formatoptions=crql
+
 function! ToggleFoldIndent()
     if &foldmethod == 'indent'
         set foldlevel=999
