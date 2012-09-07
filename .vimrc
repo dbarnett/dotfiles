@@ -5,6 +5,10 @@ if !exists('A8_EMBEDDED')
     let g:confirm_quit = 1  " confirm quit only in a8
 endif
 let g:gundo_preview_bottom = 1
+
+let g:localvimrc_sandbox=0
+" g:localvimrc_whitelist defined in local_code_style_settings.vim
+
 call pathogen#infect()
 set modeline
 set modelines=5
