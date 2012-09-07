@@ -8,17 +8,35 @@ function title {
     esac
 }
 
-print_pre_prompt() {
-    PS1R=$(date)
-    PS1L_exp="${PS1L//\\u/$USER}"
-    PS1L_exp="${PS1L_exp//\\h/$HOSTNAME}"
-    SHORT_PWD=${PWD/$HOME/~}
-    PS1L_exp="${PS1L_exp//\\w/$SHORT_PWD}"
-    PS1L_clean="$(sed -r 's:\\\[([^\\]|\\[^]])*\\\]::g' <<<$PS1L_exp)"
-    PS1L_exp=${PS1L_exp//\\\[/}
-    PS1L_exp=${PS1L_exp//\\\]/}
-    PS1L_exp=$(eval echo '"'$PS1L_exp'"')
-    PS1L_clean=$(eval echo -e $PS1L_clean)
+function expand_psvar {
+    local expanded=$1
+    expanded="${expanded//\\u/$USER}"
+    expanded="${expanded//\\h/$HOSTNAME}"
+    local SHORT_PWD=${PWD/$HOME/~}
+    expanded="${expanded//\\w/$SHORTPWD}"
+    # remove \[ and \], keep everything between
+    expanded=${expanded//'\['/}     # ']} appease vim syntax highlighting
+    expanded=${expanded//'\]'/}
+    expanded=$(eval echo '"'$expanded'"')
+    echo -n $expanded
+}
+
+function clean_psvar {
+    local cleaned=$1
+    cleaned="${cleaned//\\u/$USER}"
+    cleaned="${cleaned//\\h/$HOSTNAME}"
+    local SHORT_PWD=${PWD/$HOME/~}
+    cleaned="${cleaned//\\w/$SHORT_PWD}"
+    # remove \[ and \] and everything between
+    cleaned="$(sed -r 's:\\\[([^\\]|\\[^]])*\\\]::g' <<<$cleaned)"
+    cleaned=$(eval echo -e $cleaned)
+    echo -n $cleaned
+}
+
+function print_pre_prompt {
+    local PS1L_exp=$(expand_psvar $PS1L)
+    local PS1L_clean=$(clean_psvar $PS1L)
+    local PS1R_exp=$(expand_psvar $PS1R)
     title $PS1L_clean
-    printf "%b%$(($COLUMNS-${#PS1L_clean}))b\n" "$PS1L_exp" "$PS1R"
+    printf "%b%$(($COLUMNS-${#PS1L_clean}))b\n" "$PS1L_exp" "$PS1R_exp"
 }
