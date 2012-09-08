@@ -6,7 +6,6 @@ if !exists('A8_EMBEDDED')
 endif
 let g:gundo_preview_bottom = 1
 
-let g:localvimrc_sandbox=0
 " g:localvimrc_whitelist defined in local_code_style_settings.vim
 
 call pathogen#infect()
