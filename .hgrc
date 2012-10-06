@@ -1,0 +1,13 @@
+[ui]
+username = David Barnett
+ignore.david = ~/.hgignore
+
+[pager]
+pager = LESS='FRSX' less
+
+[extensions]
+mq =
+hgk =
+transplant =
+pager =
+color =
