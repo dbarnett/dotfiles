@@ -1,3 +1,7 @@
 syntax:glob
 .*.sw[a-p]
 .sw[a-p]
+.a8/
+
+syntax:regexp
+^tags$
