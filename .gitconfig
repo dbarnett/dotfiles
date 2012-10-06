@@ -2,6 +2,7 @@
     name = David Barnett
     email = davidbarnett2@gmail.com
 [core]
+    autocrlf = input
     excludesfile = ~/.gitignore
     editor = vim
 [color]
