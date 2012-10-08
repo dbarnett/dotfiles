@@ -6,6 +6,7 @@ ignore.david = ~/.hgignore
 pager = LESS='FRSX' less
 
 [extensions]
+bisect =
 mq =
 hgk =
 transplant =
