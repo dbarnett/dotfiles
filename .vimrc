@@ -21,6 +21,7 @@ au BufNewFile,BufRead *.py setlocal formatoptions=crql
 au BufNewFile,BufRead *.c setlocal formatoptions=crql
 au BufNewFile,BufRead *.cpp setlocal formatoptions=crql
 au BufNewFile,BufRead *.java setlocal formatoptions=crql
+au BufNewFile,BufRead * setlocal formatoptions-=o
 
 function! ToggleFoldIndent()
     if &foldmethod == 'indent'
