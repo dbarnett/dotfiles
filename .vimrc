@@ -6,6 +6,10 @@ if !exists('A8_EMBEDDED')
 endif
 let g:gundo_preview_bottom = 1
 
+let g:syntastic_mode_map = {
+    \ 'mode': 'passive',
+    \ 'active_filetypes': ['python'] }
+
 " g:localvimrc_whitelist defined in local_code_style_settings.vim
 
 call pathogen#infect()
