@@ -21,8 +21,8 @@ filetype on
 filetype plugin on
 colorscheme slate
 
-au FileType python setlocal formatoptions=crql
-au BufNewFile,BufRead * setlocal formatoptions-=o
+au FileType python,html setlocal formatoptions=crql
+au BufNewFile,BufRead * setlocal formatoptions+=l formatoptions-=o
 
 function! ToggleFoldIndent()
     if &foldmethod == 'indent'
