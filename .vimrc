@@ -20,6 +20,8 @@ syntax on
 filetype on
 filetype plugin on
 colorscheme slate
+set listchars=tab:»\ ,extends:@,precedes:^
+set list
 
 au FileType python,html setlocal formatoptions=crql
 au BufNewFile,BufRead * setlocal formatoptions+=l formatoptions-=o
