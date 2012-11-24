@@ -25,6 +25,8 @@ filetype plugin on
 colorscheme slate
 set listchars=tab:»\ ,extends:@,precedes:^
 set list
+" Allow '@' in filenames (for gf and such)
+set isfname+=@-@
 
 au FileType python,html setlocal formatoptions=crql
 au BufNewFile,BufRead * setlocal formatoptions+=l formatoptions-=o
