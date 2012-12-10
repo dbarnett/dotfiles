@@ -14,6 +14,7 @@ let g:syntastic_mode_map = {
 " g:localvimrc_whitelist defined in local_code_style_settings.vim
 
 let g:UltiSnipsEditSplit='vertical'
+let g:VCSCommandSplit = 'vertical'
 
 call pathogen#infect()
 set modeline
