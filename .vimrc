@@ -29,8 +29,10 @@ set list
 " Allow '@' in filenames (for gf and such)
 set isfname+=@-@
 
-au FileType python,html setlocal formatoptions=crql
-au BufNewFile,BufRead * setlocal formatoptions+=l formatoptions-=o
+au BufNewFile,BufRead * setlocal formatoptions-=o fo+=l
+" These are sane settings for any structured filetype
+" See http://stackoverflow.com/questions/12983409/ on programming filetypes
+au FileType * if &ft !=# 'text' | setlocal formatoptions-=t fo+=crq | endif
 
 function! ToggleFoldIndent()
     if &foldmethod == 'indent'
