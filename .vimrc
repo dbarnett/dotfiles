@@ -26,6 +26,7 @@ filetype plugin on
 colorscheme slate
 set listchars=tab:»\ ,extends:@,precedes:^
 set list
+set incsearch
 " Allow '@' in filenames (for gf and such)
 set isfname+=@-@
 
