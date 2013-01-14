@@ -27,6 +27,7 @@ colorscheme slate
 set listchars=tab:»\ ,extends:@,precedes:^
 set list
 set incsearch
+set colorcolumn=+1
 " Allow '@' in filenames (for gf and such)
 set isfname+=@-@
 
