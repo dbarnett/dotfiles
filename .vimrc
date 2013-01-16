@@ -20,6 +20,7 @@ call pathogen#infect()
 set modeline
 set modelines=5
 set wildmode=longest,list
+set autoindent
 syntax on
 filetype on
 filetype plugin on
