@@ -35,7 +35,7 @@ set isfname+=@-@
 au BufNewFile,BufRead * setlocal formatoptions-=o fo+=l
 " These are sane settings for any structured filetype
 " See http://stackoverflow.com/questions/12983409/ on programming filetypes
-au FileType * if &ft !=# 'text' | setlocal formatoptions-=t fo+=crq | endif
+au FileType * if &ft !=# 'text' && &ft !=# 'gitcommit' | setlocal formatoptions-=t fo+=crq | endif
 
 function! ToggleFoldIndent()
     if &foldmethod == 'indent'
