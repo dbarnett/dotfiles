@@ -2,4 +2,4 @@ toolbar: false
 session_type: local
 #terminal_window: true
 terminal:
-    scrollback_lines: 4096
+    scrollback_lines: 8192
