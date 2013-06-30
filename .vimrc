@@ -28,6 +28,7 @@ colorscheme slate
 set listchars=tab:»\ ,extends:@,precedes:^
 set list
 set incsearch
+set hlsearch
 set colorcolumn=+1
 highlight ColorColumn ctermbg=5 guibg=DarkSlateGray
 " Allow '@' in filenames (for gf and such)
