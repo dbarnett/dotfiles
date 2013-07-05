@@ -16,6 +16,8 @@ let g:syntastic_mode_map = {
 let g:UltiSnipsEditSplit='vertical'
 let g:VCSCommandSplit = 'vertical'
 
+let g:VCSCommandDisableMappings = 1
+
 call pathogen#infect()
 set modeline
 set modelines=5
