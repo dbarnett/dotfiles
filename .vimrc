@@ -41,6 +41,17 @@ au BufNewFile,BufRead * setlocal formatoptions-=o fo+=l
 " See http://stackoverflow.com/questions/12983409/ on programming filetypes
 au FileType * if &ft !=# 'text' && &ft !=# 'gitcommit' | setlocal formatoptions-=t fo+=crq | endif
 
+command -nargs=1 VC  call ExecuteVimCommandAndViewOutput(<q-args>)
+
+function ExecuteVimCommandAndViewOutput(cmd)
+    redir @v
+    silent execute a:cmd
+    redir END
+    new
+    set buftype=nofile
+    put v
+endfunction
+
 function! ToggleFoldIndent()
     if &foldmethod == 'indent'
         set foldlevel=999
