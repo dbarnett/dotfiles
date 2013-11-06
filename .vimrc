@@ -18,6 +18,7 @@ let g:VCSCommandSplit = 'vertical'
 
 let g:VCSCommandDisableMappings = 1
 
+let g:mapleader = ','
 call pathogen#infect()
 set modeline
 set modelines=5
@@ -33,8 +34,11 @@ set incsearch
 set hlsearch
 set colorcolumn=+1
 highlight ColorColumn ctermbg=5 guibg=DarkSlateGray
+" Looks better on dark backgrounds
+highlight Search ctermbg=4
 " Allow '@' in filenames (for gf and such)
 set isfname+=@-@
+set nojoinspaces
 
 au BufNewFile,BufRead * setlocal formatoptions-=o fo+=l
 " These are sane settings for any structured filetype
