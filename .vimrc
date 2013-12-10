@@ -21,6 +21,9 @@ let g:VCSCommandDisableMappings = 1
 
 let g:mapleader = ','
 call pathogen#infect()
+
+call glaive#Install()
+
 set modeline
 set modelines=5
 set wildmode=longest,list
