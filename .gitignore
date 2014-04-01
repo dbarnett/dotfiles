@@ -1,5 +1,6 @@
 .*.sw[a-p]
 .sw[a-p]
+*.pyc
 .fuse_hidden*
 /tags
 .lvimrc
