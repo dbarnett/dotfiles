@@ -7,6 +7,7 @@ endif
 let g:gundo_preview_bottom = 1
 
 let g:syntastic_check_on_open = 1
+let g:syntastic_python_checkers = ['pyflakes']
 let g:syntastic_mode_map = {
     \ 'mode': 'passive',
     \ 'active_filetypes': ['python'] }
