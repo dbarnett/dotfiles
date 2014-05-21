@@ -1,6 +1,3 @@
-if !has('gui_running')
-    let b:did_pyflakes_plugin = 1   " disable pyflakes (looks horrible in term)
-endif
 if !exists('A8_EMBEDDED')
     let g:confirm_quit = 1  " confirm quit only in a8
 endif
