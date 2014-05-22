@@ -25,8 +25,8 @@ set modeline
 set modelines=5
 set wildmode=longest,list
 set autoindent
+set scrolloff=2
 syntax on
-filetype on
 filetype plugin indent on
 set listchars=tab:»\ ,extends:@,precedes:^
 set list
