@@ -28,13 +28,15 @@ set autoindent
 syntax on
 filetype on
 filetype plugin indent on
-colorscheme slate
 set listchars=tab:»\ ,extends:@,precedes:^
 set list
 set incsearch
 set hlsearch
 set colorcolumn=+1
-highlight ColorColumn ctermbg=5 guibg=DarkSlateGray
+augroup color_tweak
+  autocmd ColorScheme * highlight ColorColumn ctermbg=5 guibg=DarkSlateGray
+augroup END
+colorscheme slate
 " Looks better on dark backgrounds
 highlight Search ctermbg=4
 " Allow '@' in filenames (for gf and such)
