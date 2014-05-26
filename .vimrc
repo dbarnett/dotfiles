@@ -1,3 +1,10 @@
+set nocompatible
+
+set runtimepath+=~/.vim/vim-addons/vim-addon-manager
+call vam#ActivateAddons([])
+VAMActivate maktaba abolish glaive localvimrc scriptease snippets Syntastic
+    \ unimpaired UltiSnips vcscommand vim-signify github:google/vim-ft.vroom
+
 if !exists('A8_EMBEDDED')
     let g:confirm_quit = 1  " confirm quit only in a8
 endif
