@@ -18,6 +18,21 @@ let g:VCSCommandSplit = 'vertical'
 
 let g:VCSCommandDisableMappings = 1
 
+let g:projectiles = {
+    \ 'plugin/*.vim|autoload/**/*.vim|addon-info.json': {
+    \     'addon-info.json': {
+    \         'command': 'meta',
+    \         'template': ['{', '  "description": "",', '  "dependencies": {}', '}'],
+    \     },
+    \     'plugin/*.vim': {'command': 'plugin'},
+    \     'instant/*.vim': {'command': 'instant'},
+    \     'autoload/*.vim': {'command': 'autoload'},
+    \     'doc/*.txt': {'command': 'doc'},
+    \     'README.(markdown|md)': {'command': 'doc'},
+    \     'vroom/*.vroom': {'command': 'test'}
+    \     },
+    \ }
+
 let g:mapleader = ','
 
 set runtimepath+=~/.vim/vim-addons/vim-addon-manager
@@ -27,6 +42,7 @@ VAMActivate
     \ abolish
     \ glaive
     \ localvimrc
+    \ projectionist
     \ scriptease
     \ vim-snippets
     \ Syntastic
