@@ -40,6 +40,7 @@ call vam#ActivateAddons([])
 VAMActivate
     \ maktaba
     \ abolish
+    \ dart
     \ glaive
     \ localvimrc
     \ projectionist
