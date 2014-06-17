@@ -22,8 +22,19 @@ let g:mapleader = ','
 
 set runtimepath+=~/.vim/vim-addons/vim-addon-manager
 call vam#ActivateAddons([])
-VAMActivate maktaba abolish glaive localvimrc scriptease vim-snippets
-    \ Syntastic unimpaired UltiSnips vcscommand vim-signify vim-soy
+VAMActivate
+    \ maktaba
+    \ abolish
+    \ glaive
+    \ localvimrc
+    \ scriptease
+    \ vim-snippets
+    \ Syntastic
+    \ unimpaired
+    \ UltiSnips
+    \ vcscommand
+    \ vim-signify
+    \ vim-soy
     \ github:google/vim-ft.vroom
 
 call pathogen#infect()
