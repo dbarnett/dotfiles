@@ -11,3 +11,5 @@
     tool = meld
 [mergetool]
     keepBackup = false
+[diff]
+    algorithm = patience
