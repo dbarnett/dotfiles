@@ -48,11 +48,13 @@ VAMActivate
     \ vim-snippets
     \ Syntastic
     \ unimpaired
-    \ UltiSnips
     \ vcscommand
     \ vim-signify
     \ vim-soy
     \ github:google/vim-ft.vroom
+if has('python')
+  VAMActivate UltiSnips
+endif
 
 call pathogen#infect()
 
