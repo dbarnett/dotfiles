@@ -4,8 +4,6 @@ if !exists('A8_EMBEDDED')
     let g:confirm_quit = 1  " confirm quit only in a8
 endif
 
-" g:localvimrc_whitelist defined in local_code_style_settings.vim
-
 let g:mapleader = ','
 
 set runtimepath+=~/.vim/vim-addons/vim-addon-manager
@@ -20,6 +18,7 @@ VAMActivate Gundo
 let g:gundo_preview_bottom = 1
 nnoremap <F5> :GundoToggle<CR>
 VAMActivate localvimrc
+" g:localvimrc_whitelist defined in local_code_style_settings.vim
 VAMActivate projectionist
 let g:projectiles = {
     \ 'plugin/*.vim|autoload/**/*.vim|addon-info.json': {
