@@ -49,6 +49,7 @@ let g:syntastic_python_checkers = ['pyflakes']
 let g:syntastic_mode_map = {
     \ 'mode': 'passive',
     \ 'active_filetypes': ['python'] }
+VAMActivate tmux
 VAMActivate unimpaired
 VAMActivate vcscommand
 let g:VCSCommandSplit = 'vertical'
@@ -121,6 +122,14 @@ set backupdir=~/.vim/backups
 
 nmap <F8> :call ToggleFoldIndent()<CR>
 "nnoremap <silent> <F8> :TlistToggle<CR>
+
+if &term =~ '^screen'
+    " tmux will send xterm-style keys when its xterm-keys option is on
+    execute "set <xUp>=\e[1;*A"
+    execute "set <xDown>=\e[1;*B"
+    execute "set <xRight>=\e[1;*C"
+    execute "set <xLeft>=\e[1;*D"
+endif
 
 " set up project code style settings for local project dirs
 source ~/.vim/local_code_style_settings.vim
