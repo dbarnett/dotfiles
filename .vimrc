@@ -18,6 +18,7 @@ VAMActivate maktaba
 VAMActivate abolish
 VAMActivate github:ConradIrwin/vim-bracketed-paste
 VAMActivate dart
+VAMActivate dispatch
 VAMActivate glaive
 call glaive#Install()
 VAMActivate Gundo
@@ -57,6 +58,7 @@ let g:VCSCommandDisableMappings = 1
 VAMActivate vtd
 VAMActivate vim-signify
 VAMActivate vim-soy
+VAMActivate vinegar
 if has('python')
   VAMActivate UltiSnips
   let g:UltiSnipsEditSplit='vertical'
