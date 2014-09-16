@@ -64,8 +64,6 @@ if has('python')
   let g:UltiSnipsEditSplit='vertical'
 endif
 
-call pathogen#infect()
-
 set modeline
 set modelines=5
 set wildmode=longest,list
