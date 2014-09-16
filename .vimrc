@@ -1,5 +1,10 @@
 set nocompatible
 
+if has('neovim')
+  let s:python_host_init = 'python -c "import neovim; neovim.start_host()"'
+  let &initpython = s:python_host_init
+endif
+
 if !exists('A8_EMBEDDED')
     let g:confirm_quit = 1  " confirm quit only in a8
 endif
