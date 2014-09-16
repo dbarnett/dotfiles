@@ -11,6 +11,7 @@ call vam#ActivateAddons([])
 
 VAMActivate maktaba
 VAMActivate abolish
+VAMActivate github:ConradIrwin/vim-bracketed-paste
 VAMActivate dart
 VAMActivate glaive
 call glaive#Install()
@@ -35,6 +36,7 @@ let g:projectiles = {
     \     },
     \ }
 VAMActivate scriptease
+VAMActivate sleuth
 VAMActivate vim-snippets
 VAMActivate Syntastic
 let g:syntastic_check_on_open = 1
