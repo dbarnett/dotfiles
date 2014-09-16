@@ -48,7 +48,6 @@ let g:VCSCommandSplit = 'vertical'
 let g:VCSCommandDisableMappings = 1
 VAMActivate vim-signify
 VAMActivate vim-soy
-VAMActivate github:google/vim-ft.vroom
 if has('python')
   VAMActivate UltiSnips
   let g:UltiSnipsEditSplit='vertical'
