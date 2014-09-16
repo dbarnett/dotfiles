@@ -48,6 +48,7 @@ VAMActivate unimpaired
 VAMActivate vcscommand
 let g:VCSCommandSplit = 'vertical'
 let g:VCSCommandDisableMappings = 1
+VAMActivate vtd
 VAMActivate vim-signify
 VAMActivate vim-soy
 if has('python')
