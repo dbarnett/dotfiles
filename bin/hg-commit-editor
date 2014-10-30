@@ -1,0 +1,5 @@
+#!/bin/sh
+(hg status --unknown;
+echo;
+hg diff) | sed -e 's|^|HG: |' >> $1
+editor $1

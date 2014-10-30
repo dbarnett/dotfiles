@@ -1,6 +1,7 @@
 [ui]
 username = David Barnett
 ignore.david = ~/.hgignore
+editor = hg-commit-editor
 
 [pager]
 pager = LESS='FRSX' less
