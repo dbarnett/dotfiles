@@ -1,8 +1,7 @@
 set nocompatible
 
-if has('neovim')
-  let s:python_host_init = 'python -c "import neovim; neovim.start_host()"'
-  let &initpython = s:python_host_init
+if has('nvim')
+  runtime! python_setup.vim
 endif
 
 if !exists('A8_EMBEDDED')
