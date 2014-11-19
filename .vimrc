@@ -84,6 +84,7 @@ highlight Search ctermbg=4
 " Allow '@' in filenames (for gf and such)
 set isfname+=@-@
 set nojoinspaces
+set spell
 
 au BufNewFile,BufRead * setlocal formatoptions-=o fo+=l
 au FileType * setlocal formatoptions-=o fo+=l
