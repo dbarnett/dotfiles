@@ -29,6 +29,7 @@ E716
 EmptyValue
 ErrorMsg
 FileReadable
+FileType
 FileWritable
 FromExpr
 GetCommand
@@ -79,6 +80,7 @@ StripLeading
 StripTrailing
 StripTrailingSlash
 TODO
+This
 TryCommand
 TypeMatches
 TypeMatchesOneOf
@@ -88,6 +90,7 @@ Unescaped
 VAM
 VerifyIsJSON
 Vroom
+WIP
 WarningMsg
 WithArgs
 WithContext
@@ -105,6 +108,7 @@ arglist
 args
 augroup
 augroups
+autocmd
 autocmds
 autocommands
 autoload
@@ -132,6 +136,9 @@ deserialize
 deserializes
 destructures
 destructuring
+dev
+devs
+devtools
 dict
 dicts
 difflib
@@ -172,6 +179,7 @@ flagname
 fmtargs
 fn
 fnamemodify
+foldlevel
 foo
 frontend
 frontslash
@@ -183,7 +191,9 @@ funcdicts
 funcref
 funcrefs
 g
+gf
 github
+glaive
 google
 grep
 h
@@ -261,6 +271,8 @@ sfile
 shellescape
 shellslash
 smartcase
+someval
+src
 stackoverflow
 startline
 stderr
@@ -294,6 +306,8 @@ vim
 vim's
 vim73
 vimfiles
+vimintro
+vimlint
 vimrc
 vimscript
 vimscript's
