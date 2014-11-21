@@ -13,6 +13,8 @@ let g:mapleader = ','
 
 set runtimepath+=~/.vim/vim-addons/vim-addon-manager
 call vam#ActivateAddons([])
+let g:vim_addon_manager = get(g:, 'vim_addon_manager', {})
+let g:vim_addon_manager.rtp_list_hook = 'vam#ForceUsersAfterDirectoriesToBeLast'
 
 VAMActivate maktaba
 VAMActivate abolish
