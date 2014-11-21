@@ -48,7 +48,7 @@ let g:syntastic_check_on_open = 1
 let g:syntastic_python_checkers = ['pyflakes']
 let g:syntastic_mode_map = {
     \ 'mode': 'passive',
-    \ 'active_filetypes': ['python'] }
+    \ 'active_filetypes': ['python', 'vim'] }
 VAMActivate tmux
 VAMActivate unimpaired
 VAMActivate vcscommand
@@ -57,6 +57,8 @@ let g:VCSCommandDisableMappings = 1
 VAMActivate vtd
 VAMActivate vim-signify
 VAMActivate vim-soy
+VAMActivate github:syngan/vim-vimlint
+VAMActivate github:ynkdir/vim-vimlparser
 VAMActivate vinegar
 if has('python')
   VAMActivate UltiSnips
