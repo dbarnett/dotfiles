@@ -1,3 +1,4 @@
+.csv
 ABCDEF
 API
 APIs
@@ -31,6 +32,7 @@ ErrorMsg
 FileReadable
 FileType
 FileWritable
+FlagNotFound
 FromExpr
 GetCommand
 GetCopy
@@ -58,6 +60,7 @@ MakeRelative
 Maktaba
 Maktaba's
 MapPrefix
+NeoBundle
 Neovim
 NotALibrary
 NotAuthorized
@@ -90,6 +93,7 @@ Unescaped
 VAM
 VerifyIsJSON
 Vroom
+Vundle
 WIP
 WarningMsg
 WithArgs
@@ -101,8 +105,11 @@ XDG
 a
 a8
 addon
+addons
 affector
 alnum
+appengine
+apps
 arg
 arglist
 args
@@ -114,6 +121,7 @@ autocommands
 autoload
 autoloadable
 autoloaded
+autoloading
 b
 backtick
 backticks
@@ -126,12 +134,14 @@ cfile
 cmd
 cmds
 config
+contrib
 cword
 d
 deconstruct
 deconstructed
 deepcopy
 defaultoff
+defs
 deserialize
 deserializes
 destructures
@@ -146,6 +156,7 @@ dir
 dirname
 dirs
 distros
+django
 droids
 e
 echoerr
@@ -181,6 +192,7 @@ fn
 fnamemodify
 foldlevel
 foo
+forceload
 frontend
 frontslash
 ftdetect
@@ -204,6 +216,7 @@ helpfiles
 helptags
 i
 ignorecase
+inline
 instantloaded
 isdirectory
 j
@@ -223,6 +236,7 @@ maktaba
 mapleader
 memoable
 metadata
+middleware
 mkdir
 modularplugin
 myplugin
@@ -258,11 +272,13 @@ refired
 regex
 regexes
 repopath
+repos
 rootparts
 rtp
 runtimepath
 runtimepaths
 s
+scriptencoding
 scrollback
 searchdelimiter
 semver
@@ -295,9 +311,12 @@ unescaping
 unix
 unlet
 unletting
+unscoped
+urls
 usecase
 username
 usr
+util
 v
 vam
 vararg
