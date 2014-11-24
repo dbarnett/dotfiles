@@ -21,6 +21,7 @@ VAMActivate abolish
 VAMActivate github:ConradIrwin/vim-bracketed-paste
 VAMActivate dart
 VAMActivate dispatch
+VAMActivate github:google/vim-ft-vroom
 VAMActivate glaive
 call glaive#Install()
 VAMActivate Gundo
