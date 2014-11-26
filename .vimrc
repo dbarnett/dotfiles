@@ -61,6 +61,9 @@ let g:VCSCommandDisableMappings = 1
 VAMActivate vtd
 VAMActivate vim-signify
 VAMActivate vim-soy
+VAMActivate github:google/vim-syncopate
+call maktaba#plugin#Detect()
+Glaive syncopate plugin[mappings]
 VAMActivate github:syngan/vim-vimlint
 VAMActivate github:ynkdir/vim-vimlparser
 VAMActivate vinegar
