@@ -54,6 +54,12 @@ let g:syntastic_python_checkers = ['pyflakes']
 let g:syntastic_mode_map = {
     \ 'mode': 'passive',
     \ 'active_filetypes': ['python', 'vim'] }
+function! s:PassiveSyntasticIfLongFile(nlines) abort
+  if line('$') >= a:nlines
+    let b:syntastic_mode = 'passive'
+  endif
+endfunction
+autocmd Filetype vim call s:PassiveSyntasticIfLongFile(1000)
 VAMActivate tmux
 VAMActivate unimpaired
 VAMActivate vcscommand
