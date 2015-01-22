@@ -22,7 +22,7 @@ VAMActivate github:ConradIrwin/vim-bracketed-paste
 VAMActivate dart
 VAMActivate dispatch
 VAMActivate Emmet
-VAMActivate github:google/vim-ft-vroom
+VAMActivate ft-vroom
 VAMActivate glaive
 call glaive#Install()
 VAMActivate Gundo
@@ -68,7 +68,7 @@ let g:VCSCommandDisableMappings = 1
 VAMActivate vtd
 VAMActivate vim-signify
 VAMActivate vim-soy
-VAMActivate github:google/vim-syncopate
+VAMActivate syncopate
 call maktaba#plugin#Detect()
 Glaive syncopate plugin[mappings]
 VAMActivate github:syngan/vim-vimlint
