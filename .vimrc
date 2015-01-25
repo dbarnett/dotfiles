@@ -31,7 +31,7 @@ nnoremap <F5> :GundoToggle<CR>
 VAMActivate localvimrc
 " g:localvimrc_whitelist defined in local_code_style_settings.vim
 VAMActivate projectionist
-let g:projectiles = {
+let g:projectionist_heuristics = {
     \ 'plugin/*.vim|autoload/**/*.vim|addon-info.json': {
     \     'addon-info.json': {
     \         'command': 'meta',
