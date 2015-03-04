@@ -40,6 +40,7 @@ autoload
 autoloadable
 autoloaded
 autoloading
+autopep8
 autoplay
 autowrite
 autowriteall
@@ -65,6 +66,7 @@ BufRead
 builtin
 c
 Callables
+CallAsync
 CallAt
 CallForeground
 CallFunc
@@ -82,8 +84,10 @@ chromecast
 chromecasting
 cl
 clearsilver
+clientserver
 cmd
 cmds
+codefmt
 codefmtlib
 codeline
 codelines
@@ -146,6 +150,10 @@ doctype
 droids
 dtd
 e
+E107
+E117
+E127
+E716
 easymock
 ebuild
 ebuilds
@@ -176,6 +184,7 @@ f
 fakeplugin
 fakeplugins
 fallback
+fallbacks
 favicon
 fg
 fileencoding
@@ -227,6 +236,7 @@ github
 Glaive
 gmail
 gofmt
+goimports
 google
 grep
 gui
@@ -323,6 +333,7 @@ metadata
 middleware
 millis
 misconfigured
+MissingFeature
 mixin
 mixins
 mkdir
@@ -416,6 +427,7 @@ preprocess
 preprocesses
 printf
 prog
+proto
 protobuf
 protos
 px
@@ -428,6 +440,7 @@ quux
 r
 ReadAddonInfo
 readme
+README.md
 readonly
 realtime
 redir
@@ -452,6 +465,7 @@ resharing
 rethrow
 rethrowing
 RGB
+RootComponent
 rootparts
 RPC
 RPCs
@@ -468,6 +482,7 @@ SDK
 searchdelimiter
 sed
 semver
+servername
 servlet
 setl
 setlocal
@@ -508,6 +523,7 @@ svc
 symlinked
 symlinks
 sync'ed
+syntastic
 syscall
 t
 tagline
@@ -585,6 +601,7 @@ W3C
 WarningMsg
 WebKit
 WebKit's
+webmail
 WebP
 whitelist
 whitelisted
