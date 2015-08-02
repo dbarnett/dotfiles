@@ -1,6 +1,9 @@
 scriptencoding utf-8
 set nocompatible
 
+" Disable 'request cursor position' to avoid ^[[2;2R junk.
+set t_u7=
+
 if has('nvim')
   runtime! python_setup.vim
 endif
