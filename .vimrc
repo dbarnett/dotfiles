@@ -19,6 +19,7 @@ let g:vim_addon_manager.rtp_list_hook = 'vam#ForceUsersAfterDirectoriesToBeLast'
 VAMActivate maktaba
 VAMActivate abolish
 VAMActivate github:ConradIrwin/vim-bracketed-paste
+VAMActivate codefmt
 VAMActivate dart
 VAMActivate dispatch
 VAMActivate Emmet
