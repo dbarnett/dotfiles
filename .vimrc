@@ -50,7 +50,12 @@ let g:projectionist_heuristics = {
     \     },
     \ }
 VAMActivate scriptease
+
 VAMActivate sleuth
+" Workaround for https://github.com/tpope/vim-sleuth/issues/29.
+" Define autocmd as early as possible so other autocmds can override.
+runtime! plugin/sleuth.vim
+
 VAMActivate vim-snippets
 VAMActivate Syntastic
 let g:syntastic_check_on_open = 1
