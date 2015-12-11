@@ -14,27 +14,23 @@ endif
 
 let g:mapleader = ','
 
-set runtimepath+=~/.vim/vim-addons/vim-addon-manager
-call vam#ActivateAddons([])
-let g:vim_addon_manager = get(g:, 'vim_addon_manager', {})
-let g:vim_addon_manager.rtp_list_hook = 'vam#ForceUsersAfterDirectoriesToBeLast'
+call plug#begin('~/.vim/plugged')
 
-VAMActivate maktaba
-VAMActivate abolish
-VAMActivate github:ConradIrwin/vim-bracketed-paste
-VAMActivate codefmt
-VAMActivate dart
-VAMActivate dispatch
-VAMActivate Emmet
-VAMActivate ft-vroom
-VAMActivate glaive
-call glaive#Install()
-VAMActivate Gundo
+Plug 'google/vim-maktaba'
+Plug 'tpope/vim-abolish'
+Plug 'ConradIrwin/vim-bracketed-paste'
+Plug 'google/vim-codefmt'
+Plug 'dart-lang/dart-vim-plugin'
+Plug 'tpope/vim-dispatch'
+Plug 'mattn/emmet-vim'
+Plug 'google/vim-ft-vroom'
+Plug 'google/vim-glaive'
+Plug 'sjl/gundo.vim'
 let g:gundo_preview_bottom = 1
 nnoremap <F5> :GundoToggle<CR>
-VAMActivate localvimrc
+Plug 'embear/vim-localvimrc'
 " g:localvimrc_whitelist defined in local_code_style_settings.vim
-VAMActivate projectionist
+Plug 'tpope/vim-projectionist'
 let g:projectionist_heuristics = {
     \ 'plugin/*.vim|autoload/**/*.vim|addon-info.json': {
     \     'addon-info.json': {
@@ -49,15 +45,11 @@ let g:projectionist_heuristics = {
     \     'vroom/*.vroom': {'command': 'test'}
     \     },
     \ }
-VAMActivate scriptease
 
-VAMActivate sleuth
-" Workaround for https://github.com/tpope/vim-sleuth/issues/29.
-" Define autocmd as early as possible so other autocmds can override.
-runtime! plugin/sleuth.vim
-
-VAMActivate vim-snippets
-VAMActivate Syntastic
+Plug 'tpope/vim-scriptease'
+Plug 'tpope/vim-sleuth'
+Plug 'honza/vim-snippets'
+Plug 'scrooloose/syntastic'
 let g:syntastic_check_on_open = 1
 let g:syntastic_python_checkers = ['pyflakes']
 let g:syntastic_mode_map = {
@@ -69,24 +61,33 @@ function! s:PassiveSyntasticIfLongFile(nlines) abort
   endif
 endfunction
 autocmd Filetype vim call s:PassiveSyntasticIfLongFile(1000)
-VAMActivate tmux
-VAMActivate unimpaired
-VAMActivate vcscommand
+Plug 'zaiste/tmux.vim'
+Plug 'tpope/vim-unimpaired'
+Plug 'http://repo.or.cz/vcscommand.git'
 let g:VCSCommandSplit = 'vertical'
 let g:VCSCommandDisableMappings = 1
-VAMActivate vtd
-VAMActivate vim-signify
-VAMActivate vim-soy
-VAMActivate syncopate
-call maktaba#plugin#Detect()
-Glaive syncopate plugin[mappings]
-VAMActivate github:syngan/vim-vimlint
-VAMActivate github:ynkdir/vim-vimlparser
-VAMActivate vinegar
+Plug 'chiphogg/vim-vtd'
+Plug 'mhinz/vim-signify'
+Plug 'duganchen/vim-soy'
+Plug 'google/vim-syncopate'
+Plug 'syngan/vim-vimlint'
+Plug 'ynkdir/vim-vimlparser'
+Plug 'tpope/vim-vinegar'
 if has('python')
-  VAMActivate UltiSnips
-  let g:UltiSnipsEditSplit='vertical'
+  Plug 'SirVer/ultisnips'
+  let g:UltiSnipsEditSplit = 'vertical'
 endif
+
+call plug#end()
+
+" Workaround for https://github.com/tpope/vim-sleuth/issues/29.
+" Define autocmd as early as possible so other autocmds can override.
+runtime! plugin/sleuth.vim
+
+call maktaba#plugin#Detect()
+
+call glaive#Install()
+Glaive syncopate plugin[mappings]
 
 set modeline
 set modelines=5
