@@ -20,10 +20,8 @@ Plug 'google/vim-maktaba'
 Plug 'tpope/vim-abolish'
 Plug 'ConradIrwin/vim-bracketed-paste'
 Plug 'google/vim-codefmt'
-Plug 'dart-lang/dart-vim-plugin'
 Plug 'tpope/vim-dispatch'
 Plug 'mattn/emmet-vim'
-Plug 'google/vim-ft-vroom'
 Plug 'google/vim-glaive'
 Plug 'sjl/gundo.vim'
 let g:gundo_preview_bottom = 1
@@ -68,7 +66,6 @@ let g:VCSCommandSplit = 'vertical'
 let g:VCSCommandDisableMappings = 1
 Plug 'chiphogg/vim-vtd'
 Plug 'mhinz/vim-signify'
-Plug 'duganchen/vim-soy'
 Plug 'google/vim-syncopate'
 Plug 'syngan/vim-vimlint'
 Plug 'ynkdir/vim-vimlparser'
@@ -77,6 +74,12 @@ if has('python')
   Plug 'SirVer/ultisnips'
   let g:UltiSnipsEditSplit = 'vertical'
 endif
+
+" Filetypes
+Plug 'dart-lang/dart-vim-plugin'
+Plug 'google/vim-ft-vroom'
+Plug 'PotatoesMaster/i3-vim-syntax'
+Plug 'duganchen/vim-soy'
 
 call plug#end()
 
