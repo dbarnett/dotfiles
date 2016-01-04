@@ -148,3 +148,19 @@ bindsym $mod+r mode "resize"
 bar {
         status_command i3status
 }
+
+# Bind the Fn+F3/Fn+F4 keys to lock/lock & suspend respectively
+bindsym XF86ScreenSaver exec --no-startup-id i3lock
+bindsym XF86Sleep exec --no-startup-id i3lock && dbus-send --system --dest=org.freedesktop.UPower --type=method_call --print-reply /org/freedesktop/UPower org.freedesktop.UPower.Suspend
+
+# Volume keys
+bindsym XF86AudioRaiseVolume exec pactl set-sink-volume @DEFAULT_SINK@ +5% && killall -SIGUSR1 i3status
+bindsym XF86AudioLowerVolume exec pactl set-sink-volume @DEFAULT_SINK@ -- -5% && killall -SIGUSR1 i3status
+bindsym XF86AudioMute exec pactl set-sink-mute @DEFAULT_SINK@ toggle && killall -SIGUSR1 i3status
+
+# Backlight keys
+bindsym XF86MonBrightnessDown exec --no-startup-id /usr/bin/xbacklight -dec 10
+bindsym XF86MonBrightnessUp exec --no-startup-id /usr/bin/xbacklight -inc 10
+
+# Start the NetworkManager applet for wireless
+exec --no-startup-id nm-applet
