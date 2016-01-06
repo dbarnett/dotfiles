@@ -30,6 +30,8 @@ bindsym $mod+d exec dmenu_run
 # shipping a .desktop file. It is a wrapper around dmenu, so you need that
 # installed.
 bindsym $mod+Shift+d exec --no-startup-id i3-dmenu-desktop
+# Send commands to i3-msg
+bindsym $mod+i exec --no-startup-id i3-msg $(zenity --entry)
 
 # change focus
 bindsym $mod+j focus left
