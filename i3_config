@@ -169,6 +169,9 @@ bindsym XF86MonBrightnessUp exec --no-startup-id /usr/bin/xbacklight -inc 10
 # Lock screen hotkey
 bindsym Mod1+Mod4+l exec gnome-screensaver-command --lock
 
+# Start web browsers with no title bar (most have their own).
+for_window [window_role="browser"] border pixel
+
 # Background
 exec --no-startup-id sh ~/.fehbg
 
