@@ -169,5 +169,8 @@ bindsym XF86MonBrightnessUp exec --no-startup-id /usr/bin/xbacklight -inc 10
 # Lock screen hotkey
 bindsym Mod1+Mod4+l exec gnome-screensaver-command --lock
 
+# Background
+exec --no-startup-id sh ~/.fehbg
+
 # Start the NetworkManager applet for wireless
 exec --no-startup-id nm-applet
