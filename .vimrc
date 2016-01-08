@@ -4,10 +4,6 @@ set nocompatible
 " Disable 'request cursor position' to avoid ^[[2;2R junk.
 set t_u7=
 
-if has('nvim')
-  runtime! python_setup.vim
-endif
-
 if !exists('A8_EMBEDDED')
     let g:confirm_quit = 1  " confirm quit only in a8
 endif
