@@ -69,6 +69,8 @@ Plug 'mhinz/vim-signify'
 Plug 'google/vim-syncopate'
 Plug 'syngan/vim-vimlint'
 Plug 'ynkdir/vim-vimlparser'
+" Workaround for https://github.com/tpope/vim-vinegar/issues/63 (clobbering -).
+nnoremap - -
 Plug 'tpope/vim-vinegar'
 if has('python')
   Plug 'SirVer/ultisnips'
