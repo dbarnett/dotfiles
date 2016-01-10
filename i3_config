@@ -137,6 +137,9 @@ bar {
         status_command i3status
 }
 
+# Screenshot on Print Screen
+bindsym Print exec gnome-screenshot --interactive
+
 # Bind the Fn+F3/Fn+F4 keys to lock/lock & suspend respectively
 bindsym XF86ScreenSaver exec --no-startup-id gnome-screensaver-command --lock
 bindsym XF86Sleep exec --no-startup-id gnome-screensaver-command --lock && dbus-send --system --dest=org.freedesktop.UPower --type=method_call --print-reply /org/freedesktop/UPower org.freedesktop.UPower.Suspend
@@ -161,3 +164,7 @@ exec --no-startup-id sh ~/.fehbg
 
 # Start the NetworkManager applet for wireless
 exec --no-startup-id nm-applet
+
+# Other tray applets
+exec --no-startup-id clipit
+exec --no-startup-id indicator-multiload
