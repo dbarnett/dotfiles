@@ -154,7 +154,8 @@ bindsym XF86MonBrightnessDown exec --no-startup-id /usr/bin/xbacklight -dec 10
 bindsym XF86MonBrightnessUp exec --no-startup-id /usr/bin/xbacklight -inc 10
 
 # Lock screen hotkey
-bindsym Mod1+Mod4+l exec gnome-screensaver-command --lock
+bindsym $mod+l exec "~/bin/fuzzy_lock.sh"
+exec xautolock -time 10 -locker '~/bin/fuzzy_lock.sh' &
 
 # Start web browsers with no title bar (most have their own).
 for_window [window_role="browser"] border pixel
