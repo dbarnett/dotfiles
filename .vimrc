@@ -74,6 +74,7 @@ if has('python')
 endif
 
 " Filetypes
+Plug 'vim-scripts/syntaxconkyrc.vim'
 Plug 'dart-lang/dart-vim-plugin'
 Plug 'google/vim-ft-vroom'
 Plug 'PotatoesMaster/i3-vim-syntax'
