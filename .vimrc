@@ -151,6 +151,9 @@ set backupdir=~/.vim/backups
 nmap <F8> :call ToggleFoldIndent()<CR>
 "nnoremap <silent> <F8> :TlistToggle<CR>
 
+" Clear search highlight with redraw mapping.
+nnoremap <C-L> :nohlsearch<CR><C-L>
+
 if &term =~ '^screen'
     " tmux will send xterm-style keys when its xterm-keys option is on
     execute "set <xUp>=\e[1;*A"
