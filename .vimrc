@@ -55,6 +55,8 @@ function! s:PassiveSyntasticIfLongFile(nlines) abort
   endif
 endfunction
 autocmd Filetype vim call s:PassiveSyntasticIfLongFile(1000)
+Plug 'kana/vim-textobj-user'
+Plug 'Julian/vim-textobj-variable-segment'
 Plug 'zaiste/tmux.vim'
 Plug 'tpope/vim-unimpaired'
 Plug 'http://repo.or.cz/vcscommand.git'
