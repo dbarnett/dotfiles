@@ -14,6 +14,7 @@ call plug#begin('~/.vim/plugged')
 
 Plug 'google/vim-maktaba'
 Plug 'tpope/vim-abolish'
+Plug 'bazelbuild/vim-bazel'
 Plug 'ConradIrwin/vim-bracketed-paste'
 Plug 'google/vim-codefmt'
 Plug 'tpope/vim-dispatch'
@@ -24,6 +25,7 @@ let g:gundo_preview_bottom = 1
 nnoremap <F5> :GundoToggle<CR>
 Plug 'embear/vim-localvimrc'
 " g:localvimrc_whitelist defined in local_code_style_settings.vim
+Plug 'neomake/neomake'
 Plug 'tpope/vim-projectionist'
 let g:projectionist_heuristics = {
     \ 'plugin/*.vim|autoload/**/*.vim|addon-info.json': {
