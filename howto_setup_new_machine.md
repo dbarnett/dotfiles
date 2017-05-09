@@ -18,7 +18,8 @@ https://help.github.com/articles/adding-a-new-ssh-key-to-your-github-account/
 $ git clone git@github.com:dbarnett/dotfiles.git
 $ mkdir ~/projects ~/.local/bin
 $ ln -s dotfiles/bin dotfiles/.* ~/
-# And download corresponding image for .fehbg
+$ mkdir ~/.i3 && ln -s dotfiles/i3_config ~/.i3/config
+$ (cd ~/Downloads && wget https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Black_Holes_-_Monsters_in_Space.jpg/1280px-Black_Holes_-_Monsters_in_Space.jpg)
 ```
 
 ## Other preferences
