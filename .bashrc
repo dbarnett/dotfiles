@@ -67,7 +67,7 @@ unset color_prompt force_color_prompt
 
 source $HOME/dotfiles/right_prompt.sh
 if [ -n "$PROMPT_COMMAND" ]; then
-    PROMPT_COMMAND="${PROMPT_COMMAND};print_pre_prompt"
+    PROMPT_COMMAND="${PROMPT_COMMAND%%;};print_pre_prompt"
 else
     PROMPT_COMMAND="print_pre_prompt"
 fi
