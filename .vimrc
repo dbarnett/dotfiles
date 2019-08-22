@@ -98,6 +98,9 @@ set listchars=tab:»\ ,extends:@,precedes:^
 set list
 set incsearch
 set hlsearch
+if exists('g:gnvim')
+  set guifont=Monospace:h11
+endif
 set colorcolumn=+1
 augroup color_tweak
   autocmd ColorScheme * highlight ColorColumn ctermbg=5 guibg=DarkSlateGray
