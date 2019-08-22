@@ -25,7 +25,7 @@ Plug 'sjl/gundo.vim'
 let g:gundo_preview_bottom = 1
 nnoremap <F5> :GundoToggle<CR>
 Plug 'embear/vim-localvimrc'
-" g:localvimrc_whitelist defined in local_code_style_settings.vim
+" let g:localvimrc_whitelist='/some/path/'
 Plug 'neomake/neomake'
 Plug 'tpope/vim-projectionist'
 let g:projectionist_heuristics = {
@@ -166,6 +166,3 @@ if &term =~ '^screen'
     execute "set <xRight>=\e[1;*C"
     execute "set <xLeft>=\e[1;*D"
 endif
-
-" set up project code style settings for local project dirs
-source ~/.vim/local_code_style_settings.vim
