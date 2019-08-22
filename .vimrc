@@ -14,6 +14,9 @@ call plug#begin('~/.vim/plugged')
 
 Plug 'google/vim-maktaba'
 Plug 'tpope/vim-abolish'
+Plug 'dense-analysis/ale'
+let g:ale_linters = {
+    \ 'python': ['pyflakes']}
 Plug 'bazelbuild/vim-bazel'
 Plug 'ConradIrwin/vim-bracketed-paste'
 Plug 'google/vim-codefmt'
@@ -46,18 +49,6 @@ let g:projectionist_heuristics = {
 Plug 'tpope/vim-scriptease'
 Plug 'tpope/vim-sleuth'
 Plug 'honza/vim-snippets'
-Plug 'scrooloose/syntastic'
-let g:syntastic_check_on_open = 1
-let g:syntastic_python_checkers = ['pyflakes']
-let g:syntastic_mode_map = {
-    \ 'mode': 'passive',
-    \ 'active_filetypes': ['python', 'vim'] }
-function! s:PassiveSyntasticIfLongFile(nlines) abort
-  if line('$') >= a:nlines
-    let b:syntastic_mode = 'passive'
-  endif
-endfunction
-autocmd Filetype vim call s:PassiveSyntasticIfLongFile(1000)
 Plug 'kana/vim-textobj-user'
 Plug 'Julian/vim-textobj-variable-segment'
 Plug 'zaiste/tmux.vim'
