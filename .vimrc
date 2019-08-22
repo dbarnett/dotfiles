@@ -20,6 +20,7 @@ let g:ale_linters = {
 Plug 'bazelbuild/vim-bazel'
 Plug 'ConradIrwin/vim-bracketed-paste'
 Plug 'google/vim-codefmt'
+Plug 'google/vim-codereview'
 Plug 'google/vim-coverage'
 Plug 'tpope/vim-dispatch'
 Plug 'mattn/emmet-vim'
@@ -49,6 +50,8 @@ let g:projectionist_heuristics = {
 Plug 'tpope/vim-scriptease'
 Plug 'tpope/vim-sleuth'
 Plug 'honza/vim-snippets'
+Plug 'janko/vim-test'
+let test#runner_commands = ['Nose']
 Plug 'kana/vim-textobj-user'
 Plug 'Julian/vim-textobj-variable-segment'
 Plug 'zaiste/tmux.vim'
@@ -59,6 +62,9 @@ let g:VCSCommandDisableMappings = 1
 Plug 'chiphogg/vim-vtd'
 Plug 'mhinz/vim-signify'
 Plug 'google/vim-syncopate'
+Plug 'Shougo/vimproc.vim', {'do' : 'make'}
+Plug 'idanarye/vim-vebugger'
+let g:vebugger_leader='<Leader>d'
 Plug 'syngan/vim-vimlint'
 Plug 'ynkdir/vim-vimlparser'
 " Workaround for https://github.com/tpope/vim-vinegar/issues/63 (clobbering -).
@@ -75,6 +81,8 @@ Plug 'dart-lang/dart-vim-plugin'
 Plug 'google/vim-ft-vroom'
 Plug 'PotatoesMaster/i3-vim-syntax'
 Plug 'duganchen/vim-soy'
+Plug 'leafgarland/typescript-vim'
+Plug 'junegunn/vader.vim'
 
 call plug#end()
 
