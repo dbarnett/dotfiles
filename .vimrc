@@ -81,6 +81,7 @@ Plug 'dart-lang/dart-vim-plugin'
 Plug 'google/vim-ft-vroom'
 Plug 'PotatoesMaster/i3-vim-syntax'
 Plug 'duganchen/vim-soy'
+Plug 'cespare/vim-toml'
 Plug 'leafgarland/typescript-vim'
 Plug 'junegunn/vader.vim'
 
