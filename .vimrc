@@ -194,6 +194,14 @@ Plug 'ynkdir/vim-vimlparser'
 " ADVANCED DEVTOOLS (vebugger, LSP) {{{2
 " Extend overall vim functionality.
 
+Plug 'prabirshrestha/async.vim'
+Plug 'prabirshrestha/vim-lsp'
+Plug 'prabirshrestha/asyncomplete.vim'
+Plug 'prabirshrestha/asyncomplete-lsp.vim'
+
+nnoremap gd :LspDefinition<CR>
+nnoremap <F4> :LspReferences<CR>
+
 Plug 'idanarye/vim-vebugger'
 let g:vebugger_leader='<Leader>d'
 
