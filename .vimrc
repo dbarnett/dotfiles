@@ -57,7 +57,7 @@ if !exists('A8_EMBEDDED')
     let g:confirm_quit = 1  " confirm quit only in a8
 endif
 
-" BASIC CONFIGURATION }}}1
+" END BASIC CONFIGURATION }}}1
 
 " MAPPINGS {{{1
 
@@ -66,19 +66,19 @@ let g:mapleader = ','
 " Clear search highlight with redraw mapping.
 nnoremap <C-L> :nohlsearch<CR><C-L>
 
-" MAPPINGS }}}1
+" END MAPPINGS }}}1
 
 " PLUGINS {{{1
 
 call plug#begin('~/.vim/plugged')
 
-" CORE PLUGINS (maktaba, dispatch, glaive) {{{2
+" CORE PLUGINS (maktaba, vimproc.vim) {{{2
 
 Plug 'google/vim-maktaba'
 Plug 'google/vim-glaive'
 Plug 'Shougo/vimproc.vim', {'do' : 'make'}
 
-" CORE PLUGINS }}}2
+" END CORE PLUGINS }}}2
 
 " FILETYPES {{{2
 
@@ -92,7 +92,7 @@ Plug 'cespare/vim-toml'
 Plug 'leafgarland/typescript-vim'
 Plug 'junegunn/vader.vim'
 
-" FILETYPES }}}2
+" END FILETYPES }}}2
 
 " AMENITIES (projectionist, unimpaired) {{{2
 
@@ -122,7 +122,7 @@ let g:projectionist_heuristics = {
 Plug 'tpope/vim-sleuth'
 Plug 'tpope/vim-unimpaired'
 
-" AMENITIES }}}2
+" END AMENITIES }}}2
 
 " EDITOR UTILS (abolish, bracketed-paste) {{{2
 
@@ -132,7 +132,7 @@ Plug 'kana/vim-textobj-user'
 Plug 'Julian/vim-textobj-variable-segment'
 Plug 'google/vim-syncopate'
 
-" }}}2
+" END EDITOR UTILS }}}2
 
 " MODES (vtd, vinegar) {{{2
 
@@ -142,7 +142,7 @@ Plug 'chiphogg/vim-vtd'
 nnoremap - -
 Plug 'tpope/vim-vinegar'
 
-" MODES }}}2
+" END MODES }}}2
 
 " BASIC DEVTOOLS (dispatch, neomake, bazel, snippets) {{{2
 " Provide commands and simple helpers.
@@ -175,7 +175,7 @@ Plug 'mattn/emmet-vim'
 " vimscript
 Plug 'tpope/vim-scriptease'
 
-" BASIC DEVTOOLS }}}2
+" END BASIC DEVTOOLS }}}2
 
 " LINTERS/VISUALIZERS (signify, ale) {{{2
 
@@ -189,7 +189,7 @@ let g:ale_linters = {
 Plug 'syngan/vim-vimlint'
 Plug 'ynkdir/vim-vimlparser'
 
-" LINTERS/VISUALIZERS }}}2
+" END LINTERS/VISUALIZERS }}}2
 
 " ADVANCED DEVTOOLS (vebugger, LSP) {{{2
 " Extend overall vim functionality.
@@ -197,7 +197,7 @@ Plug 'ynkdir/vim-vimlparser'
 Plug 'idanarye/vim-vebugger'
 let g:vebugger_leader='<Leader>d'
 
-" ADVANCED DEVTOOLS }}}2
+" END ADVANCED DEVTOOLS }}}2
 
 call plug#end()
 
@@ -210,7 +210,7 @@ call maktaba#plugin#Detect()
 call glaive#Install()
 Glaive syncopate plugin[mappings]
 
-" PLUGINS }}}1
+" END PLUGINS }}}1
 
 " CUSTOM UTILS / MAPPINGS (VC, ToggleFoldIndent) {{{1
 
@@ -240,6 +240,6 @@ endfunction
 nmap <F8> :call ToggleFoldIndent()<CR>
 "nnoremap <silent> <F8> :TlistToggle<CR>
 
-" CUSTOM UTILS }}}1
+" END CUSTOM UTILS }}}1
 
 " vim:foldmethod=marker:sw=2:sts=2:tw=100
