@@ -196,11 +196,35 @@ Plug 'ynkdir/vim-vimlparser'
 
 Plug 'prabirshrestha/async.vim'
 Plug 'prabirshrestha/vim-lsp'
+Plug 'mattn/vim-lsp-settings'
 Plug 'prabirshrestha/asyncomplete.vim'
 Plug 'prabirshrestha/asyncomplete-lsp.vim'
+Plug 'prabirshrestha/asyncomplete-emoji.vim'
+
+augroup asyncomplete_setup
+  au User asyncomplete_setup call asyncomplete#register_source(asyncomplete#sources#emoji#get_source_options({
+      \ 'name': 'emoji',
+      \ 'whitelist': ['*'],
+      \ 'completor': function('asyncomplete#sources#emoji#completor'),
+      \ }))
+augroup END
+
+augroup lsp_setup
+  if (executable('pyls'))
+    au User lsp_setup call lsp#register_server({
+        \ 'name': 'pyls',
+        \ 'cmd': {server_info->['pyls']},
+        \ 'whitelist': ['python']
+        \ })
+  endif
+augroup END
 
 nnoremap gd :LspDefinition<CR>
 nnoremap <F4> :LspReferences<CR>
+inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
+inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+inoremap <expr> <CR>    pumvisible() ? "\<C-y>" : "\<CR>"
+imap <C-Space> <Plug>(asyncomplete_force_refresh)
 
 Plug 'idanarye/vim-vebugger'
 let g:vebugger_leader='<Leader>d'
