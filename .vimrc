@@ -236,7 +236,7 @@ call plug#end()
 
 " Workaround for https://github.com/tpope/vim-sleuth/issues/29.
 " Define autocmd as early as possible so other autocmds can override.
-runtime! plugin/sleuth.vim
+"runtime! plugin/sleuth.vim
 
 call maktaba#plugin#Detect()
 
