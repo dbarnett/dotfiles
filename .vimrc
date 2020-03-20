@@ -96,12 +96,12 @@ Plug 'junegunn/vader.vim'
 " AMENITIES (projectionist, unimpaired) {{{2
 
 Plug 'ciaranm/securemodelines'
+Plug 'editorconfig/editorconfig-vim'
 
 Plug 'sjl/gundo.vim'
 let g:gundo_preview_bottom = 1
 nnoremap <F5> :GundoToggle<CR>
-
-Plug 'embear/vim-localvimrc'
+"Plug 'embear/vim-localvimrc'
 " let g:localvimrc_whitelist='/some/path/'
 
 Plug 'tpope/vim-projectionist'
@@ -120,7 +120,7 @@ let g:projectionist_heuristics = {
     \     },
     \ }
 
-Plug 'tpope/vim-sleuth'
+"Plug 'tpope/vim-sleuth'
 Plug 'tpope/vim-unimpaired'
 
 " END AMENITIES }}}2
