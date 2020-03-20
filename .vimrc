@@ -6,8 +6,7 @@ set nocompatible
 " Disable 'request cursor position' to avoid ^[[2;2R junk.
 set t_u7=
 
-set modeline
-set modelines=5
+set nomodeline
 set wildmode=longest,list
 set autoindent
 set scrolloff=2
@@ -95,6 +94,8 @@ Plug 'junegunn/vader.vim'
 " END FILETYPES }}}2
 
 " AMENITIES (projectionist, unimpaired) {{{2
+
+Plug 'ciaranm/securemodelines'
 
 Plug 'sjl/gundo.vim'
 let g:gundo_preview_bottom = 1
