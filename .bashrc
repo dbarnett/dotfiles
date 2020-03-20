@@ -121,6 +121,9 @@ fi
 # Chromium depot_tools
 export PATH="$PATH:$HOME/projects/depot_tools"
 
+if [ -d "$HOME/.npm-global/bin" ] ; then
+    PATH="$HOME/.npm-global/bin:$PATH"
+fi
 if [ -d "$HOME/.local/bin" ] ; then
     PATH="$HOME/.local/bin:$PATH"
 fi
