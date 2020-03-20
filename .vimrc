@@ -91,6 +91,20 @@ Plug 'cespare/vim-toml'
 Plug 'leafgarland/typescript-vim'
 Plug 'junegunn/vader.vim'
 
+let g:markdown_fenced_languages = [
+    \ 'c',
+    \ 'cpp',
+    \ 'diff',
+    \ 'python',
+    \ 'bash=sh',
+    \ 'java',
+    \ 'json',
+    \ 'shell=sh',
+    \ 'VimL=vim',
+    \ 'xml',
+    \ 'yaml',
+    \ ]
+
 " END FILETYPES }}}2
 
 " AMENITIES (projectionist, unimpaired) {{{2
