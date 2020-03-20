@@ -94,6 +94,7 @@ Plug 'junegunn/vader.vim'
 " END FILETYPES }}}2
 
 " AMENITIES (projectionist, unimpaired) {{{2
+" Plugins that broadly affect the editor environment.
 
 Plug 'ciaranm/securemodelines'
 Plug 'editorconfig/editorconfig-vim'
@@ -123,9 +124,13 @@ let g:projectionist_heuristics = {
 "Plug 'tpope/vim-sleuth'
 Plug 'tpope/vim-unimpaired'
 
+Plug 'lotabout/skim', { 'dir': '~/.skim', 'do': './install' }
+Plug 'lotabout/skim.vim'
+
 " END AMENITIES }}}2
 
 " EDITOR UTILS (abolish, bracketed-paste) {{{2
+" Plugins that add self-contained editor utilities to invoke.
 
 Plug 'tpope/vim-abolish'
 Plug 'ConradIrwin/vim-bracketed-paste'
