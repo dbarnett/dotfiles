@@ -38,11 +38,11 @@ silent !mkdir -p ~/.vim/backups
 set backupdir=~/.vim/backups
 
 if &term =~ '^screen'
-    " tmux will send xterm-style keys when its xterm-keys option is on
-    execute "set <xUp>=\e[1;*A"
-    execute "set <xDown>=\e[1;*B"
-    execute "set <xRight>=\e[1;*C"
-    execute "set <xLeft>=\e[1;*D"
+  " tmux will send xterm-style keys when its xterm-keys option is on
+  execute "set <xUp>=\e[1;*A"
+  execute "set <xDown>=\e[1;*B"
+  execute "set <xRight>=\e[1;*C"
+  execute "set <xLeft>=\e[1;*D"
 endif
 
 augroup my_settings
@@ -54,7 +54,7 @@ augroup my_settings
 augroup END
 
 if !exists('A8_EMBEDDED')
-    let g:confirm_quit = 1  " confirm quit only in a8
+  let g:confirm_quit = 1  " confirm quit only in a8
 endif
 
 " END BASIC CONFIGURATION }}}1
@@ -203,10 +203,10 @@ Plug 'prabirshrestha/asyncomplete-emoji.vim'
 
 augroup asyncomplete_setup
   au User asyncomplete_setup call asyncomplete#register_source(asyncomplete#sources#emoji#get_source_options({
-      \ 'name': 'emoji',
-      \ 'whitelist': ['*'],
-      \ 'completor': function('asyncomplete#sources#emoji#completor'),
-      \ }))
+    \ 'name': 'emoji',
+    \ 'whitelist': ['*'],
+    \ 'completor': function('asyncomplete#sources#emoji#completor'),
+    \ }))
 augroup END
 
 augroup lsp_setup
@@ -249,24 +249,24 @@ Glaive syncopate plugin[mappings]
 command -nargs=1 VC  call ExecuteVimCommandAndViewOutput(<q-args>)
 
 function ExecuteVimCommandAndViewOutput(cmd)
-    redir @v
-    silent execute a:cmd
-    redir END
-    new
-    set buftype=nofile
-    put v
+  redir @v
+  silent execute a:cmd
+  redir END
+  new
+  set buftype=nofile
+  put v
 endfunction
 
 function! ToggleFoldIndent()
-    if &foldmethod == 'indent'
-        set foldlevel=999
-        set foldmethod=manual
-    else
-        set foldmethod=indent
-        set foldminlines=5
-        set foldnestmax=3
-        set foldlevel=0
-    endif
+  if &foldmethod == 'indent'
+    set foldlevel=999
+    set foldmethod=manual
+  else
+    set foldmethod=indent
+    set foldminlines=5
+    set foldnestmax=3
+    set foldlevel=0
+  endif
 endfunction
 
 nmap <F8> :call ToggleFoldIndent()<CR>
@@ -274,4 +274,4 @@ nmap <F8> :call ToggleFoldIndent()<CR>
 
 " END CUSTOM UTILS }}}1
 
-" vim:foldmethod=marker:sw=2:sts=2:tw=100
+" vim:fdm=marker:sw=2:sts=2:ts=2:et:tw=100
