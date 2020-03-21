@@ -266,6 +266,12 @@ Glaive syncopate plugin[mappings]
 
 " CUSTOM UTILS / MAPPINGS (e.g., fold shortcuts) {{{1
 
+" Jump between windows with Ctrl-arrow
+nnoremap <C-Up> <C-W><Up>
+nnoremap <C-Left> <C-W><Left>
+nnoremap <C-Down> <C-W><Down>
+nnoremap <C-Right> <C-W><Right>
+
 " z> unfolds one level (w/ no delay) and z>> opens all folds.
 " z< does the reverse.
 function TimeoutMapping(mode, lhs, rhs) abort
