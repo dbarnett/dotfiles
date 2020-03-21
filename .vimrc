@@ -264,9 +264,7 @@ Glaive syncopate plugin[mappings]
 
 " END PLUGINS }}}1
 
-" CUSTOM UTILS / MAPPINGS (VC, ToggleFoldIndent) {{{1
-
-command -nargs=1 VC  call ExecuteVimCommandAndViewOutput(<q-args>)
+" CUSTOM UTILS / MAPPINGS (e.g., fold shortcuts) {{{1
 
 function ExecuteVimCommandAndViewOutput(cmd)
   redir @v
