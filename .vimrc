@@ -272,8 +272,16 @@ nnoremap <C-Left> <C-W><Left>
 nnoremap <C-Down> <C-W><Down>
 nnoremap <C-Right> <C-W><Right>
 
-" z> unfolds one level (w/ no delay) and z>> opens all folds.
-" z< does the reverse.
+""
+" Define a short-lived vim mapping from {lhs} to {rhs} in {mode}.
+" This is used to support an improved replacement for 'timeout' behavior where a
+" mapping should do one thing instantly but "change its mind" and do something
+" else if another key is pressed immediately.
+"
+" For example, this defines a mapping that immediately unfolds one level but
+" unfolds all levels if the ">" keypress is repeated: >
+"   nnoremap z> zr:call TimeoutMapping('nnore', '>', 'zR')<CR>
+" <
 function TimeoutMapping(mode, lhs, rhs) abort
   " Define short-lived <buffer> mapping.
   execute a:mode.'map <buffer> <nowait>' a:lhs a:rhs
@@ -284,6 +292,8 @@ function TimeoutMapping(mode, lhs, rhs) abort
   call timer_start(&timeoutlen, {tid -> execute(l:unmap_cmd)})
 endfunction
 
+" z> unfolds one level (w/ no delay) and z>> opens all folds.
+" z< does the reverse.
 nnoremap z> zr:call TimeoutMapping('nnore', '>', 'zR')<CR>
 nnoremap z< zm:call TimeoutMapping('nnore', '<', 'zM')<CR>
 
