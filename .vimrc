@@ -266,29 +266,20 @@ Glaive syncopate plugin[mappings]
 
 " CUSTOM UTILS / MAPPINGS (e.g., fold shortcuts) {{{1
 
-function ExecuteVimCommandAndViewOutput(cmd)
-  redir @v
-  silent execute a:cmd
-  redir END
-  new
-  set buftype=nofile
-  put v
+" z> unfolds one level (w/ no delay) and z>> opens all folds.
+" z< does the reverse.
+function TimeoutMapping(mode, lhs, rhs) abort
+  " Define short-lived <buffer> mapping.
+  execute a:mode.'map <buffer> <nowait>' a:lhs a:rhs
+
+  " Schedule it to be deleted after timeout.
+  let l:basemode = substitute(a:mode, '\mnore$', '', '')
+  let l:unmap_cmd = printf('silent %sunmap <buffer> %s', l:basemode, a:lhs)
+  call timer_start(&timeoutlen, {tid -> execute(l:unmap_cmd)})
 endfunction
 
-function! ToggleFoldIndent()
-  if &foldmethod == 'indent'
-    set foldlevel=999
-    set foldmethod=manual
-  else
-    set foldmethod=indent
-    set foldminlines=5
-    set foldnestmax=3
-    set foldlevel=0
-  endif
-endfunction
-
-nmap <F8> :call ToggleFoldIndent()<CR>
-"nnoremap <silent> <F8> :TlistToggle<CR>
+nnoremap z> zr:call TimeoutMapping('nnore', '>', 'zR')<CR>
+nnoremap z< zm:call TimeoutMapping('nnore', '<', 'zM')<CR>
 
 " END CUSTOM UTILS }}}1
 
