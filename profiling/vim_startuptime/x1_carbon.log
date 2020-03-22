@@ -1,0 +1,143 @@
+
+
+times in msec
+ clock   self+sourced   self:  sourced script
+ clock   elapsed:              other lines
+
+000.004  000.004: --- VIM STARTING ---
+000.113  000.109: Allocated generic buffers
+000.147  000.034: locale set
+000.158  000.011: GUI prepared
+000.165  000.007: clipboard setup
+000.170  000.005: window checked
+001.204  001.034: inits 1
+001.233  000.029: parsing arguments
+001.234  000.001: expanding arguments
+001.267  000.033: shell init
+002.470  001.203: xsmp init
+003.171  000.701: Termcap init
+003.213  000.042: inits 2
+003.372  000.159: init highlight
+004.247  000.572  000.572: sourcing /usr/share/vim/vim81/debian.vim
+004.300  000.865  000.293: sourcing $VIM/vimrc
+006.196  001.061  001.061: sourcing /usr/share/vim/vim81/syntax/syncolor.vim
+006.307  001.441  000.380: sourcing /usr/share/vim/vim81/syntax/synload.vim
+012.375  006.007  006.007: sourcing /usr/share/vim/vim81/filetype.vim
+012.420  007.764  000.316: sourcing /usr/share/vim/vim81/syntax/syntax.vim
+012.484  000.013  000.013: sourcing /usr/share/vim/vim81/filetype.vim
+012.742  000.198  000.198: sourcing /usr/share/vim/vim81/ftplugin.vim
+012.976  000.171  000.171: sourcing /usr/share/vim/vim81/indent.vim
+013.538  000.158  000.158: sourcing /usr/share/vim/vim81/syntax/syncolor.vim
+013.911  000.153  000.153: sourcing /usr/share/vim/vim81/syntax/syncolor.vim
+014.292  000.149  000.149: sourcing /usr/share/vim/vim81/syntax/syncolor.vim
+014.599  000.160  000.160: sourcing /usr/share/vim/vim81/syntax/syncolor.vim
+014.795  001.722  001.102: sourcing /usr/share/vim/vim81/colors/slate.vim
+036.295  001.727  001.727: sourcing /home/dbarnett/.vim/autoload/plug.vim
+043.175  001.554  001.554: sourcing /usr/share/vim/vim81/ftoff.vim
+044.377  000.188  000.188: sourcing /home/dbarnett/.vim/plugged/dart-vim-plugin/ftdetect/dart.vim
+046.253  000.217  000.217: sourcing /home/dbarnett/.vim/plugged/vader.vim/ftdetect/vader.vim
+062.809  000.176  000.176: sourcing /home/dbarnett/.vim/plugged/vim-ft-vroom/ftdetect/vroom.vim
+063.319  000.421  000.421: sourcing /home/dbarnett/.vim/plugged/i3-vim-syntax/ftdetect/i3.vim
+063.576  000.153  000.153: sourcing /home/dbarnett/.vim/plugged/vim-soy/ftdetect/soy.vim
+063.788  000.136  000.136: sourcing /home/dbarnett/.vim/plugged/tmux.vim/ftdetect/tmux.vim
+064.034  000.162  000.162: sourcing /home/dbarnett/.vim/plugged/vim-toml/ftdetect/toml.vim
+064.266  000.144  000.144: sourcing /home/dbarnett/.vim/plugged/typescript-vim/ftdetect/typescript.vim
+064.676  000.148  000.148: sourcing /home/dbarnett/.vim/plugged/vim-vtd/ftdetect/vtd.vim
+065.076  010.306  008.966: sourcing /usr/share/vim/vim81/filetype.vim
+065.500  000.022  000.022: sourcing /usr/share/vim/vim81/ftplugin.vim
+065.905  000.018  000.018: sourcing /usr/share/vim/vim81/indent.vim
+067.618  000.429  000.429: sourcing /home/dbarnett/.vim/plugged/vim-maktaba/autoload/maktaba/path.vim
+068.697  000.556  000.556: sourcing /home/dbarnett/.vim/plugged/vim-maktaba/autoload/maktaba/ensure.vim
+069.666  000.319  000.319: sourcing /home/dbarnett/.vim/plugged/vim-maktaba/autoload/maktaba/enum.vim
+070.268  000.474  000.474: sourcing /home/dbarnett/.vim/plugged/vim-maktaba/autoload/maktaba/value.vim
+071.021  001.900  001.107: sourcing /home/dbarnett/.vim/plugged/vim-maktaba/autoload/maktaba/log.vim
+072.051  000.550  000.550: sourcing /home/dbarnett/.vim/plugged/vim-maktaba/autoload/maktaba/json.vim
+072.366  000.223  000.223: sourcing /home/dbarnett/.vim/plugged/vim-maktaba/autoload/maktaba/string.vim
+073.351  000.342  000.342: sourcing /home/dbarnett/.vim/plugged/vim-maktaba/autoload/maktaba/rtp.vim
+076.125  000.393  000.393: sourcing /home/dbarnett/.vim/plugged/vim-maktaba/autoload/maktaba/error.vim
+076.918  000.169  000.169: sourcing /home/dbarnett/.vim/plugged/vim-maktaba/autoload/maktaba/reflist.vim
+077.034  010.110  005.548: sourcing /home/dbarnett/.vim/plugged/vim-maktaba/autoload/maktaba.vim
+077.045  010.993  000.883: sourcing /home/dbarnett/.vim/plugged/vim-maktaba/autoload/maktaba/plugin.vim
+082.503  000.504  000.504: sourcing /home/dbarnett/.vim/plugged/vim-maktaba/autoload/maktaba/setting.vim
+082.844  000.225  000.225: sourcing /home/dbarnett/.vim/plugged/vim-maktaba/autoload/maktaba/flags.vim
+093.387  001.082  001.082: sourcing /home/dbarnett/.vim/plugged/vim-syncopate/instant/flags.vim
+121.586  000.272  000.272: sourcing /home/dbarnett/.vim/plugged/vim-vtd/autoload/vtd.vim
+121.821  001.449  001.177: sourcing /home/dbarnett/.vim/plugged/vim-vtd/instant/flags.vim
+142.959  002.079  002.079: sourcing /home/dbarnett/.vim/plugged/vim-coverage/instant/flags.vim
+153.446  000.329  000.329: sourcing /home/dbarnett/.vim/plugged/vim-glaive/autoload/glaive.vim
+155.155  000.902  000.902: sourcing /home/dbarnett/.vim/plugged/vim-glaive/plugin/commands.vim
+155.911  151.567  110.104: sourcing $HOME/.vimrc
+155.916  000.112: sourcing vimrc file(s)
+156.689  000.556  000.556: sourcing /home/dbarnett/.vim/plugged/vim-glaive/plugin/commands.vim
+156.980  000.203  000.203: sourcing /home/dbarnett/.vim/plugged/vimproc.vim/plugin/vimproc.vim
+157.622  000.477  000.477: sourcing /home/dbarnett/.vim/plugged/securemodelines/plugin/securemodelines.vim
+158.466  000.748  000.748: sourcing /home/dbarnett/.vim/plugged/editorconfig-vim/plugin/editorconfig.vim
+158.928  000.361  000.361: sourcing /home/dbarnett/.vim/plugged/vim-projectionist/plugin/projectionist.vim
+171.901  012.858  012.858: sourcing /home/dbarnett/.vim/plugged/vim-unimpaired/plugin/unimpaired.vim
+172.952  000.939  000.939: sourcing /home/dbarnett/.skim/plugin/skim.vim
+174.138  001.091  001.091: sourcing /home/dbarnett/.vim/plugged/skim.vim/plugin/fzf.vim
+175.142  000.888  000.888: sourcing /home/dbarnett/.vim/plugged/vim-abolish/plugin/abolish.vim
+175.443  000.209  000.209: sourcing /home/dbarnett/.vim/plugged/vim-bracketed-paste/plugin/bracketed-paste.vim
+176.788  000.746  000.746: sourcing /home/dbarnett/.vim/plugged/vim-textobj-user/autoload/textobj/user.vim
+178.363  002.787  002.041: sourcing /home/dbarnett/.vim/plugged/vim-textobj-variable-segment/plugin/textobj/variable-segment.vim
+179.313  000.816  000.816: sourcing /home/dbarnett/.vim/plugged/vim-syncopate/plugin/commands.vim
+180.770  001.423  001.423: sourcing /home/dbarnett/.vim/plugged/vim-syncopate/plugin/mappings.vim
+182.078  001.107  001.107: sourcing /home/dbarnett/.vim/plugged/vim-vtd/plugin/commands.vim
+182.906  000.790  000.790: sourcing /home/dbarnett/.vim/plugged/vim-vtd/plugin/mappings.vim
+198.937  015.993  015.993: sourcing /home/dbarnett/.vim/plugged/vim-vtd/plugin/vtd.vim
+199.703  000.654  000.654: sourcing /home/dbarnett/.vim/plugged/vim-vinegar/plugin/vinegar.vim
+199.920  000.140  000.140: sourcing /home/dbarnett/.vim/plugged/vim-snippets/plugin/vimsnippets.vim
+200.736  000.299  000.299: sourcing /home/dbarnett/.vim/plugged/vim-test/autoload/test.vim
+201.474  001.483  001.184: sourcing /home/dbarnett/.vim/plugged/vim-test/plugin/test.vim
+202.394  000.831  000.831: sourcing /home/dbarnett/.vim/plugged/vim-scriptease/plugin/scriptease.vim
+203.311  000.790  000.790: sourcing /home/dbarnett/.vim/plugged/vim-coverage/plugin/commands.vim
+204.382  000.239  000.239: sourcing /home/dbarnett/.vim/plugged/vim-maktaba/autoload/maktaba/extension.vim
+204.913  000.363  000.363: sourcing /home/dbarnett/.vim/plugged/vim-maktaba/autoload/maktaba/function.vim
+205.486  000.184  000.184: sourcing /home/dbarnett/.vim/plugged/vim-coverage/autoload/coverage/python.vim
+206.135  000.353  000.353: sourcing /home/dbarnett/.vim/plugged/vim-coverage/autoload/coverage.vim
+206.499  000.152  000.152: sourcing /home/dbarnett/.vim/plugged/vim-coverage/autoload/coverage/vim.vim
+206.650  003.313  002.022: sourcing /home/dbarnett/.vim/plugged/vim-coverage/plugin/coverage.vim
+207.366  000.692  000.692: sourcing /home/dbarnett/.vim/plugged/vim-coverage/plugin/mappings.vim
+207.959  000.514  000.514: sourcing /home/dbarnett/.vim/plugged/vim-signify/plugin/signify.vim
+209.520  000.206  000.206: sourcing /home/dbarnett/.vim/plugged/ale/autoload/ale/events.vim
+209.758  001.726  001.520: sourcing /home/dbarnett/.vim/plugged/ale/plugin/ale.vim
+210.064  000.210  000.210: sourcing /home/dbarnett/.vim/plugged/vim-vimlint/plugin/vimlint.vim
+211.104  000.950  000.950: sourcing /home/dbarnett/.vim/plugged/vim-lsp/plugin/lsp.vim
+212.672  001.017  001.017: sourcing /home/dbarnett/.vim/plugged/vim-lsp-settings/autoload/lsp_settings.vim
+213.177  000.227  000.227: sourcing /home/dbarnett/.vim/plugged/vim-lsp-settings/autoload/lsp_settings/utils.vim
+217.636  000.169  000.169: sourcing /home/dbarnett/.vim/plugged/vim-lsp-settings/autoload/lsp_settings/profile.vim
+218.768  000.869  000.869: sourcing /home/dbarnett/.vim/plugged/vim-lsp/autoload/lsp/utils.vim
+221.617  001.667  001.667: sourcing /home/dbarnett/.vim/plugged/vim-lsp/autoload/lsp.vim
+221.704  010.488  006.539: sourcing /home/dbarnett/.vim/plugged/vim-lsp-settings/plugin/lsp_settings.vim
+222.079  000.296  000.296: sourcing /home/dbarnett/.vim/plugged/asyncomplete.vim/plugin/asyncomplete.vim
+222.494  000.341  000.341: sourcing /home/dbarnett/.vim/plugged/asyncomplete-lsp.vim/plugin/asyncomplete-lsp.vim
+223.168  000.590  000.590: sourcing /home/dbarnett/.vim/plugged/vim-vebugger/plugin/vebugger.vim
+223.699  000.222  000.222: sourcing /usr/share/vim/vim81/plugin/getscriptPlugin.vim
+224.078  000.357  000.357: sourcing /usr/share/vim/vim81/plugin/gzip.vim
+225.674  001.574  001.574: sourcing /usr/share/vim/vim81/plugin/logiPat.vim
+225.887  000.190  000.190: sourcing /usr/share/vim/vim81/plugin/manpager.vim
+226.348  000.440  000.440: sourcing /usr/share/vim/vim81/plugin/matchparen.vim
+227.215  000.842  000.842: sourcing /usr/share/vim/vim81/plugin/netrwPlugin.vim
+227.447  000.201  000.201: sourcing /usr/share/vim/vim81/plugin/rrhelper.vim
+227.658  000.183  000.183: sourcing /usr/share/vim/vim81/plugin/spellfile.vim
+228.025  000.341  000.341: sourcing /usr/share/vim/vim81/plugin/tarPlugin.vim
+228.220  000.167  000.167: sourcing /usr/share/vim/vim81/plugin/tohtml.vim
+228.476  000.229  000.229: sourcing /usr/share/vim/vim81/plugin/vimballPlugin.vim
+228.729  000.220  000.220: sourcing /usr/share/vim/vim81/plugin/zipPlugin.vim
+228.734  004.588: loading plugins
+228.804  000.070: loading packages
+228.852  000.048: loading after plugins
+228.874  000.022: inits 3
+229.526  000.652: reading viminfo
+235.828  006.302: setup clipboard
+235.851  000.023: setting raw mode
+235.852  000.001: start termcap
+235.881  000.029: clearing screen
+237.401  000.556  000.556: sourcing /home/dbarnett/.vim/plugged/ale/autoload/ale.vim
+237.521  001.084: opening buffers
+238.134  000.384  000.384: sourcing /home/dbarnett/.vim/plugged/vim-signify/autoload/sy.vim
+239.462  000.903  000.903: sourcing /home/dbarnett/.vim/plugged/asyncomplete.vim/autoload/asyncomplete.vim
+240.271  000.220  000.220: sourcing /home/dbarnett/.vim/plugged/asyncomplete.vim/autoload/asyncomplete/utils/_on_change/textchangedp.vim
+241.292  000.150  000.150: sourcing /home/dbarnett/.vim/plugged/asyncomplete-emoji.vim/autoload/asyncomplete/sources/emoji.vim
+241.386  002.208: BufEnter autocommands
+241.388  000.002: editing files in windows
