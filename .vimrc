@@ -284,7 +284,7 @@ nnoremap <C-Right> <C-W><Right>
 " <
 function TimeoutMapping(mode, lhs, rhs) abort
   " Define short-lived <buffer> mapping.
-  execute a:mode.'map <buffer> <nowait>' a:lhs a:rhs
+  execute a:mode.'map <buffer> <nowait> <silent>' a:lhs a:rhs
 
   " Schedule it to be deleted after timeout.
   let l:basemode = substitute(a:mode, '\mnore$', '', '')
@@ -294,8 +294,8 @@ endfunction
 
 " z> unfolds one level (w/ no delay) and z>> opens all folds.
 " z< does the reverse.
-nnoremap z> zr:call TimeoutMapping('nnore', '>', 'zR')<CR>
-nnoremap z< zm:call TimeoutMapping('nnore', '<', 'zM')<CR>
+nnoremap <silent> z> zr:call TimeoutMapping('nnore', '>', 'zR')<CR>
+nnoremap <silent> z< zm:call TimeoutMapping('nnore', '<', 'zM')<CR>
 
 " END CUSTOM UTILS }}}1
 
