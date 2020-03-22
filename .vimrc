@@ -73,6 +73,7 @@ call plug#begin('~/.vim/plugged')
 
 " CORE PLUGINS (maktaba, vimproc.vim) {{{2
 
+Plug 'junegunn/vim-plug'
 Plug 'google/vim-maktaba'
 Plug 'google/vim-glaive'
 Plug 'Shougo/vimproc.vim', {'do' : 'make'}
