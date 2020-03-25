@@ -30,6 +30,7 @@ highlight Search ctermbg=4
 set isfname+=@-@
 set nojoinspaces
 set spell
+set shiftwidth=2 tabstop=2 softtabstop=2 expandtab
 
 silent !mkdir -p ~/.vim/swaps
 set directory=~/.vim/swaps
