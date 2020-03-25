@@ -1,0 +1,12 @@
+{
+  "pyls": {
+    "workspace_config": {
+      "pyls": {
+        "plugins": {
+          "pycodestyle": { "enabled": false },
+          "pyflakes": { "enabled": false }
+        }
+      }
+    }
+  }
+}

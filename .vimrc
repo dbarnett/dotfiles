@@ -241,6 +241,7 @@ if isdirectory(expand('~/.log'))
 endif
 let g:lsp_diagnostics_enabled = 0
 
+" See also: config in vim-lsp-settings settings.json.
 augroup lsp_setup
   if (executable('pyls'))
     au User lsp_setup call lsp#register_server({
