@@ -234,6 +234,13 @@ augroup asyncomplete_setup
     \ }))
 augroup END
 
+if isdirectory(expand('~/.log'))
+  " Uncomment this if troubleshooting LSP.
+  "let g:lsp_log_verbose = 1
+  let g:lsp_log_file = expand('~/.log/vim-lsp.log')
+endif
+let g:lsp_diagnostics_enabled = 0
+
 augroup lsp_setup
   if (executable('pyls'))
     au User lsp_setup call lsp#register_server({
