@@ -158,7 +158,9 @@ Plug 'google/vim-syncopate'
 
 " MODES (vtd, vinegar) {{{2
 
-Plug 'chiphogg/vim-vtd'
+if !has('nvim')
+  Plug 'chiphogg/vim-vtd', { 'on': 'VtdView' }
+endif
 
 " Workaround for https://github.com/tpope/vim-vinegar/issues/63 (clobbering -).
 nnoremap - -
