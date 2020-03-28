@@ -1,10 +1,31 @@
-# How to set up a fresh (Debian-based) system to my tastes
+# How to set up a fresh system to my tastes
 
-## Basic setup
+## Basic setup (Debian-based)
+
 ```sh
-$ sudo apt-get install $(cat ubuntu_selections)
+$ sudo apt install $(<system_bootstrap/ubuntu_selections.txt)
 $ sudo pypi-install pythonpy
 ```
+
+## Basic setup (OS X)
+
+Install https://brew.sh/
+
+```sh
+$ brew install $(<system_bootstrap/brew_packages.txt)
+$ pip3 install pythonpy
+```
+
+If there are permission errors, try
+
+```sh
+chmod g+w -R /usr/local
+```
+
+and check paths and user has groups admin and staff.
+
+## More setup
+
 Git:
 ```sh
 $ git config --global user.name "My Name"

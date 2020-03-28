@@ -1,0 +1,6 @@
+git
+neovim
+python
+ranger
+rust
+vim
