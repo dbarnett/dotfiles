@@ -1,0 +1,144 @@
+
+
+times in msec
+ clock   self+sourced   self:  sourced script
+ clock   elapsed:              other lines
+
+000.026  000.026: --- VIM STARTING ---
+000.310  000.284: Allocated generic buffers
+001.473  001.163: locale set
+001.482  000.009: clipboard setup
+001.498  000.016: window checked
+002.850  001.352: inits 1
+002.878  000.028: parsing arguments
+002.881  000.003: expanding arguments
+012.037  009.156: shell init
+012.809  000.772: Termcap init
+012.841  000.032: inits 2
+013.185  000.344: init highlight
+017.187  002.199  002.199: sourcing /usr/local/share/vim/vim82/syntax/syncolor.vim
+017.566  002.797  000.598: sourcing /usr/local/share/vim/vim82/syntax/synload.vim
+035.508  017.709  017.709: sourcing /usr/local/share/vim/vim82/filetype.vim
+035.623  021.127  000.621: sourcing /usr/local/share/vim/vim82/syntax/syntax.vim
+035.871  000.038  000.038: sourcing /usr/local/share/vim/vim82/filetype.vim
+036.166  000.114  000.114: sourcing /usr/local/share/vim/vim82/ftplugin.vim
+036.440  000.093  000.093: sourcing /usr/local/share/vim/vim82/indent.vim
+037.557  000.446  000.446: sourcing /usr/local/share/vim/vim82/syntax/syncolor.vim
+038.477  000.428  000.428: sourcing /usr/local/share/vim/vim82/syntax/syncolor.vim
+039.873  000.495  000.495: sourcing /usr/local/share/vim/vim82/syntax/syncolor.vim
+040.692  000.432  000.432: sourcing /usr/local/share/vim/vim82/syntax/syncolor.vim
+041.179  004.480  002.679: sourcing /usr/local/share/vim/vim82/colors/slate.vim
+153.065  003.848  003.848: sourcing /Users/david/.vim/autoload/plug.vim
+175.962  004.626  004.626: sourcing /usr/local/share/vim/vim82/ftoff.vim
+177.459  000.088  000.088: sourcing /Users/david/.vim/plugged/dart-vim-plugin/ftdetect/dart.vim
+178.248  000.038  000.038: sourcing /Users/david/.vim/plugged/vim-ft-vroom/ftdetect/vroom.vim
+179.071  000.061  000.061: sourcing /Users/david/.vim/plugged/i3-vim-syntax/ftdetect/i3.vim
+179.822  000.034  000.034: sourcing /Users/david/.vim/plugged/vim-soy/ftdetect/soy.vim
+180.587  000.065  000.065: sourcing /Users/david/.vim/plugged/tmux.vim/ftdetect/tmux.vim
+181.473  000.098  000.098: sourcing /Users/david/.vim/plugged/vim-toml/ftdetect/toml.vim
+182.253  000.050  000.050: sourcing /Users/david/.vim/plugged/typescript-vim/ftdetect/typescript.vim
+183.185  000.061  000.061: sourcing /Users/david/.vim/plugged/vader.vim/ftdetect/vader.vim
+209.103  000.054  000.054: sourcing /Users/david/.vim/plugged/vim-vtd/ftdetect/vtd.vim
+209.660  016.875  016.821: sourcing /usr/local/share/vim/vim82/filetype.vim
+210.240  000.034  000.034: sourcing /usr/local/share/vim/vim82/ftplugin.vim
+210.771  000.029  000.029: sourcing /usr/local/share/vim/vim82/indent.vim
+211.904  000.777  000.777: sourcing /usr/local/Cellar/vim/8.2.0450/share/vim/vim82/syntax/nosyntax.vim
+214.394  000.533  000.533: sourcing /usr/local/share/vim/vim82/syntax/syncolor.vim
+215.886  000.445  000.445: sourcing /usr/local/share/vim/vim82/syntax/syncolor.vim
+217.036  000.440  000.440: sourcing /usr/local/share/vim/vim82/syntax/syncolor.vim
+217.516  004.510  003.092: sourcing /usr/local/share/vim/vim82/colors/slate.vim
+217.797  005.342  000.832: sourcing /usr/local/share/vim/vim82/syntax/synload.vim
+217.879  006.920  000.801: sourcing /usr/local/share/vim/vim82/syntax/syntax.vim
+220.654  000.623  000.623: sourcing /Users/david/.vim/plugged/vim-maktaba/autoload/maktaba/path.vim
+222.194  000.578  000.578: sourcing /Users/david/.vim/plugged/vim-maktaba/autoload/maktaba/ensure.vim
+223.753  000.335  000.335: sourcing /Users/david/.vim/plugged/vim-maktaba/autoload/maktaba/enum.vim
+224.855  000.816  000.816: sourcing /Users/david/.vim/plugged/vim-maktaba/autoload/maktaba/value.vim
+226.343  003.280  002.129: sourcing /Users/david/.vim/plugged/vim-maktaba/autoload/maktaba/log.vim
+227.789  000.753  000.753: sourcing /Users/david/.vim/plugged/vim-maktaba/autoload/maktaba/json.vim
+228.157  000.131  000.131: sourcing /Users/david/.vim/plugged/vim-maktaba/autoload/maktaba/string.vim
+229.803  000.355  000.355: sourcing /Users/david/.vim/plugged/vim-maktaba/autoload/maktaba/rtp.vim
+234.267  000.507  000.507: sourcing /Users/david/.vim/plugged/vim-maktaba/autoload/maktaba/error.vim
+235.776  000.114  000.114: sourcing /Users/david/.vim/plugged/vim-maktaba/autoload/maktaba/reflist.vim
+236.040  016.408  010.067: sourcing /Users/david/.vim/plugged/vim-maktaba/autoload/maktaba.vim
+236.072  017.928  001.520: sourcing /Users/david/.vim/plugged/vim-maktaba/autoload/maktaba/plugin.vim
+247.776  001.201  001.201: sourcing /Users/david/.vim/plugged/vim-maktaba/autoload/maktaba/setting.vim
+248.540  000.307  000.307: sourcing /Users/david/.vim/plugged/vim-maktaba/autoload/maktaba/flags.vim
+271.900  002.752  002.752: sourcing /Users/david/.vim/plugged/vim-syncopate/instant/flags.vim
+336.179  000.451  000.451: sourcing /Users/david/.vim/plugged/vim-vtd/autoload/vtd.vim
+336.817  003.109  002.658: sourcing /Users/david/.vim/plugged/vim-vtd/instant/flags.vim
+394.278  005.625  005.625: sourcing /Users/david/.vim/plugged/vim-coverage/instant/flags.vim
+410.564  000.389  000.389: sourcing /Users/david/.vim/plugged/vim-glaive/autoload/glaive.vim
+414.368  001.813  001.813: sourcing /Users/david/.vim/plugged/vim-glaive/plugin/commands.vim
+416.267  402.398  310.595: sourcing $HOME/.vimrc
+416.288  000.705: sourcing vimrc file(s)
+418.518  001.625  001.625: sourcing /Users/david/.vim/plugged/vim-glaive/plugin/commands.vim
+419.112  000.198  000.198: sourcing /Users/david/.vim/plugged/vimproc.vim/plugin/vimproc.vim
+420.090  000.646  000.646: sourcing /Users/david/.vim/plugged/securemodelines/plugin/securemodelines.vim
+422.508  002.084  002.084: sourcing /Users/david/.vim/plugged/editorconfig-vim/plugin/editorconfig.vim
+423.626  000.673  000.673: sourcing /Users/david/.vim/plugged/vim-projectionist/plugin/projectionist.vim
+460.166  036.196  036.196: sourcing /Users/david/.vim/plugged/vim-unimpaired/plugin/unimpaired.vim
+462.538  001.924  001.924: sourcing /Users/david/.skim/plugin/skim.vim
+466.163  003.232  003.232: sourcing /Users/david/.vim/plugged/skim.vim/plugin/fzf.vim
+469.020  002.120  002.120: sourcing /Users/david/.vim/plugged/vim-abolish/plugin/abolish.vim
+469.671  000.256  000.256: sourcing /Users/david/.vim/plugged/vim-bracketed-paste/plugin/bracketed-paste.vim
+471.962  001.439  001.439: sourcing /Users/david/.vim/plugged/vim-textobj-user/autoload/textobj/user.vim
+476.251  006.087  004.648: sourcing /Users/david/.vim/plugged/vim-textobj-variable-segment/plugin/textobj/variable-segment.vim
+478.475  001.777  001.777: sourcing /Users/david/.vim/plugged/vim-syncopate/plugin/commands.vim
+482.761  004.076  004.076: sourcing /Users/david/.vim/plugged/vim-syncopate/plugin/mappings.vim
+485.084  001.795  001.795: sourcing /Users/david/.vim/plugged/vim-vtd/plugin/commands.vim
+486.842  001.594  001.594: sourcing /Users/david/.vim/plugged/vim-vtd/plugin/mappings.vim
+526.069  039.068  039.068: sourcing /Users/david/.vim/plugged/vim-vtd/plugin/vtd.vim
+527.337  000.830  000.830: sourcing /Users/david/.vim/plugged/vim-vinegar/plugin/vinegar.vim
+527.806  000.096  000.096: sourcing /Users/david/.vim/plugged/vim-snippets/plugin/vimsnippets.vim
+529.268  000.410  000.410: sourcing /Users/david/.vim/plugged/vim-test/autoload/test.vim
+532.121  003.936  003.526: sourcing /Users/david/.vim/plugged/vim-test/plugin/test.vim
+534.114  001.585  001.585: sourcing /Users/david/.vim/plugged/vim-scriptease/plugin/scriptease.vim
+536.592  001.995  001.995: sourcing /Users/david/.vim/plugged/vim-coverage/plugin/commands.vim
+539.141  000.326  000.326: sourcing /Users/david/.vim/plugged/vim-maktaba/autoload/maktaba/extension.vim
+540.425  000.642  000.642: sourcing /Users/david/.vim/plugged/vim-maktaba/autoload/maktaba/function.vim
+541.575  000.154  000.154: sourcing /Users/david/.vim/plugged/vim-coverage/autoload/coverage/python.vim
+543.120  000.674  000.674: sourcing /Users/david/.vim/plugged/vim-coverage/autoload/coverage.vim
+543.770  000.074  000.074: sourcing /Users/david/.vim/plugged/vim-coverage/autoload/coverage/vim.vim
+544.248  007.475  005.605: sourcing /Users/david/.vim/plugged/vim-coverage/plugin/coverage.vim
+546.449  002.039  002.039: sourcing /Users/david/.vim/plugged/vim-coverage/plugin/mappings.vim
+549.419  002.420  002.420: sourcing /Users/david/.vim/plugged/vim-signify/plugin/signify.vim
+552.943  000.316  000.316: sourcing /Users/david/.vim/plugged/ale/autoload/ale/events.vim
+553.612  003.718  003.402: sourcing /Users/david/.vim/plugged/ale/plugin/ale.vim
+554.133  000.123  000.123: sourcing /Users/david/.vim/plugged/vim-vimlint/plugin/vimlint.vim
+556.954  002.426  002.426: sourcing /Users/david/.vim/plugged/vim-lsp/plugin/lsp.vim
+560.510  002.425  002.425: sourcing /Users/david/.vim/plugged/vim-lsp-settings/autoload/lsp_settings.vim
+561.280  000.137  000.137: sourcing /Users/david/.vim/plugged/vim-lsp-settings/autoload/lsp_settings/utils.vim
+571.634  000.218  000.218: sourcing /Users/david/.vim/plugged/vim-lsp-settings/autoload/lsp_settings/profile.vim
+573.579  001.405  001.405: sourcing /Users/david/.vim/plugged/vim-lsp/autoload/lsp/utils.vim
+576.656  019.258  015.073: sourcing /Users/david/.vim/plugged/vim-lsp-settings/plugin/lsp_settings.vim
+577.515  000.431  000.431: sourcing /Users/david/.vim/plugged/asyncomplete.vim/plugin/asyncomplete.vim
+578.323  000.427  000.427: sourcing /Users/david/.vim/plugged/asyncomplete-lsp.vim/plugin/asyncomplete-lsp.vim
+580.796  001.685  001.685: sourcing /Users/david/.vim/plugged/vim-vebugger/plugin/vebugger.vim
+582.302  000.205  000.205: sourcing /usr/local/share/vim/vim82/plugin/getscriptPlugin.vim
+583.185  000.742  000.742: sourcing /usr/local/share/vim/vim82/plugin/gzip.vim
+585.438  002.108  002.108: sourcing /usr/local/share/vim/vim82/plugin/logiPat.vim
+585.878  000.155  000.155: sourcing /usr/local/share/vim/vim82/plugin/manpager.vim
+586.732  000.711  000.711: sourcing /usr/local/share/vim/vim82/plugin/matchparen.vim
+588.790  001.899  001.899: sourcing /usr/local/share/vim/vim82/plugin/netrwPlugin.vim
+589.019  000.037  000.037: sourcing /usr/local/share/vim/vim82/plugin/rrhelper.vim
+589.262  000.085  000.085: sourcing /usr/local/share/vim/vim82/plugin/spellfile.vim
+589.928  000.510  000.510: sourcing /usr/local/share/vim/vim82/plugin/tarPlugin.vim
+590.441  000.313  000.313: sourcing /usr/local/share/vim/vim82/plugin/tohtml.vim
+591.119  000.508  000.508: sourcing /usr/local/share/vim/vim82/plugin/vimballPlugin.vim
+591.908  000.594  000.594: sourcing /usr/local/share/vim/vim82/plugin/zipPlugin.vim
+591.931  015.981: loading plugins
+592.141  000.210: loading packages
+592.233  000.092: loading after plugins
+592.257  000.024: inits 3
+592.769  000.512: reading viminfo
+592.863  000.094: setting raw mode
+592.866  000.003: start termcap
+592.905  000.039: clearing screen
+594.920  001.055  001.055: sourcing /Users/david/.vim/plugged/ale/autoload/ale.vim
+595.144  001.184: opening buffers
+596.277  000.617  000.617: sourcing /Users/david/.vim/plugged/vim-signify/autoload/sy.vim
+599.625  002.378  002.378: sourcing /Users/david/.vim/plugged/asyncomplete.vim/autoload/asyncomplete.vim
+601.141  000.503  000.503: sourcing /Users/david/.vim/plugged/asyncomplete.vim/autoload/asyncomplete/utils/_on_change/textchangedp.vim
+602.719  000.150  000.150: sourcing /Users/david/.vim/plugged/asyncomplete-emoji.vim/autoload/asyncomplete/sources/emoji.vim
+602.996  004.204: BufEnter autocommands
+603.010  000.014: editing files in windows
