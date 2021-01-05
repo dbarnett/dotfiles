@@ -28,5 +28,6 @@
         }
       }
     }
-  }
+  },
+  "eclipse-jdt-ls": { "disabled": true }
 }
