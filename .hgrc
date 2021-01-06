@@ -1,15 +1,21 @@
 [ui]
-username = David Barnett
+username = David Barnett # <email@domain>
 ignore.david = ~/.hgignore
-editor = hg-commit-editor
+interface = curses
+merge = vimdiff
+# editor = hg-commit-editor
+editor = vim
+tweakdefaults = True
 
 [pager]
 pager = LESS='FRSX' less
 
 [extensions]
+absorb =
+amend =
 bisect =
-mq =
-hgk =
-transplant =
-pager =
-color =
+evolve =
+rebase =
+shelve =
+# Provides "unamend", but overrides "uncommit" with annoying nag.
+# uncommit =

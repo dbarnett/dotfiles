@@ -1,6 +1,6 @@
 [user]
     name = David Barnett
-    email = davidbarnett2@gmail.com
+    # email =
 [core]
     autocrlf = input
     excludesfile = ~/.gitignore
@@ -11,5 +11,6 @@
     tool = meld
 [mergetool]
     keepBackup = false
+    prompt = false
 [diff]
     algorithm = patience
