@@ -7,6 +7,7 @@ set nocompatible
 set t_u7=
 
 set nomodeline
+set backspace=indent,eol,start
 set wildmode=longest,list
 set autoindent
 set scrolloff=2
@@ -139,6 +140,7 @@ let g:projectionist_heuristics = {
 
 "Plug 'tpope/vim-sleuth'
 Plug 'tpope/vim-unimpaired'
+Plug 'tpope/vim-surround'
 
 Plug 'lotabout/skim', { 'dir': '~/.skim', 'do': './install' }
 Plug 'lotabout/skim.vim'
@@ -176,6 +178,7 @@ Plug 'neomake/neomake'
 
 Plug 'google/vim-codefmt'
 Plug 'google/vim-codereview'
+Plug 'AndrewRadev/splitjoin.vim'
 Plug 'honza/vim-snippets'
 
 Plug 'janko/vim-test'
@@ -209,7 +212,8 @@ Plug 'mhinz/vim-signify'
 
 Plug 'dense-analysis/ale'
 let g:ale_linters = {
-    \ 'python': ['pyflakes']}
+     \ 'python': ['pyls'],
+     \ }
 
 Plug 'syngan/vim-vimlint'
 Plug 'ynkdir/vim-vimlparser'
@@ -227,11 +231,11 @@ Plug 'prabirshrestha/asyncomplete-lsp.vim'
 Plug 'prabirshrestha/asyncomplete-emoji.vim'
 
 augroup asyncomplete_setup
-  au User asyncomplete_setup call asyncomplete#register_source(asyncomplete#sources#emoji#get_source_options({
-    \ 'name': 'emoji',
-    \ 'whitelist': ['*'],
-    \ 'completor': function('asyncomplete#sources#emoji#completor'),
-    \ }))
+ au User asyncomplete_setup call asyncomplete#register_source(asyncomplete#sources#emoji#get_source_options({
+   \ 'name': 'emoji',
+   \ 'allowlist': ['*'],
+   \ 'completor': function('asyncomplete#sources#emoji#completor'),
+   \ }))
 augroup END
 
 if isdirectory(expand('~/.log'))
@@ -247,7 +251,7 @@ augroup lsp_setup
     au User lsp_setup call lsp#register_server({
         \ 'name': 'pyls',
         \ 'cmd': {server_info->['pyls']},
-        \ 'whitelist': ['python']
+        \ 'allowlist': ['python']
         \ })
   endif
 augroup END
