@@ -83,15 +83,15 @@ Plug 'Shougo/vimproc.vim', {'do' : 'make'}
 
 " FILETYPES {{{2
 
-Plug 'vim-scripts/syntaxconkyrc.vim', { 'for': 'conkyrc' }
-Plug 'dart-lang/dart-vim-plugin', { 'for': 'dart' }
-Plug 'google/vim-ft-vroom', { 'for': 'vroom' }
-Plug 'PotatoesMaster/i3-vim-syntax', { 'for': 'i3' }
-Plug 'duganchen/vim-soy', { 'for': 'soy' }
-Plug 'zaiste/tmux.vim', { 'for': 'tmux' }
-Plug 'cespare/vim-toml', { 'for': 'toml' }
-Plug 'leafgarland/typescript-vim', { 'for': 'typescript' }
-Plug 'junegunn/vader.vim', { 'on': 'Vader', 'for': 'vader' }
+Plug 'vim-scripts/syntaxconkyrc.vim'
+Plug 'dart-lang/dart-vim-plugin'
+Plug 'google/vim-ft-vroom'
+Plug 'PotatoesMaster/i3-vim-syntax'
+Plug 'duganchen/vim-soy'
+Plug 'zaiste/tmux.vim'
+Plug 'cespare/vim-toml'
+Plug 'leafgarland/typescript-vim'
+Plug 'junegunn/vader.vim'
 
 let g:markdown_fenced_languages = [
     \ 'c',
@@ -115,7 +115,7 @@ let g:markdown_fenced_languages = [
 Plug 'ciaranm/securemodelines'
 Plug 'editorconfig/editorconfig-vim'
 
-Plug 'sjl/gundo.vim', { 'on': ['GundoShow', 'GundoToggle'] }
+Plug 'sjl/gundo.vim'
 let g:gundo_preview_bottom = 1
 nnoremap <F5> :GundoToggle<CR>
 "Plug 'embear/vim-localvimrc'
@@ -159,7 +159,7 @@ Plug 'google/vim-syncopate'
 " MODES (vtd, vinegar) {{{2
 
 if !has('nvim')
-  Plug 'chiphogg/vim-vtd', { 'on': 'VtdView' }
+  Plug 'chiphogg/vim-vtd'
 endif
 
 " Workaround for https://github.com/tpope/vim-vinegar/issues/63 (clobbering -).
@@ -171,11 +171,11 @@ Plug 'tpope/vim-vinegar'
 " BASIC DEVTOOLS (dispatch, neomake, bazel, snippets) {{{2
 " Provide commands and simple helpers.
 
-Plug 'tpope/vim-dispatch', { 'on': ['Make', 'Dispatch', 'Start', 'Spawn'] }
-Plug 'neomake/neomake', { 'on': 'Neomake' }
+Plug 'tpope/vim-dispatch'
+Plug 'neomake/neomake'
 
-Plug 'google/vim-codefmt', { 'on': ['AutoFormatBuffer', 'FormatCode', 'FormatLines'] }
-Plug 'google/vim-codereview', { 'on': 'CodeReview' }
+Plug 'google/vim-codefmt'
+Plug 'google/vim-codereview'
 Plug 'honza/vim-snippets'
 
 Plug 'janko/vim-test'
@@ -186,19 +186,16 @@ if has('python')
   let g:UltiSnipsEditSplit = 'vertical'
 endif
 
-Plug 'http://repo.or.cz/vcscommand.git', { 'on': [
-    \ 'VCSAdd', 'VCSAnnotate', 'VCSBlame', 'VCSCommit', 'VCSDelete', 'VCSDiff',
-    \ 'VCSGotoOriginal', 'VCSLog', 'VCSRemove', 'VCSRevert', 'VCSReview',
-    \ 'VCSStatus', 'VCSUpdate', 'VCSVimDiff'] }
+Plug 'http://repo.or.cz/vcscommand.git'
 
 let g:VCSCommandSplit = 'vertical'
 let g:VCSCommandDisableMappings = 1
 
 " bazel
-Plug 'bazelbuild/vim-bazel', { 'on': 'Bazel', 'for': 'bzl' }
+Plug 'bazelbuild/vim-bazel'
 
 " HTML/XML
-Plug 'mattn/emmet-vim', { 'for': ['html', 'xml', 'xslt'], 'on': 'Emmet' }
+Plug 'mattn/emmet-vim'
 
 " vimscript
 Plug 'tpope/vim-scriptease'
