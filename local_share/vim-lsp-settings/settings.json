@@ -1,4 +1,5 @@
 {
+  "$schema": "https://mattn.github.io/vim-lsp-settings/local-schema.json",
   "json-languageserver": {
     "workspace_config": {
       "json": {
