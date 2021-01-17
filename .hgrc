@@ -2,7 +2,6 @@
 username = David Barnett # <email@domain>
 ignore.david = ~/.hgignore
 interface = curses
-merge = vimdiff
 # editor = hg-commit-editor
 editor = vim
 tweakdefaults = True
