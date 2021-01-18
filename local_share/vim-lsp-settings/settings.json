@@ -30,5 +30,6 @@
       }
     }
   },
+  "pyls-all": { "disabled": true },
   "eclipse-jdt-ls": { "disabled": true }
 }
