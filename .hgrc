@@ -14,6 +14,8 @@ absorb =
 amend =
 bisect =
 evolve =
+journal =
+purge =
 rebase =
 shelve =
 # Provides "unamend", but overrides "uncommit" with annoying nag.
