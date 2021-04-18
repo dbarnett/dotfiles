@@ -5,6 +5,8 @@
     autocrlf = input
     excludesfile = ~/.gitignore
     editor = vim
+[init]
+    defaultBranch = main
 [color]
     ui = auto
 [merge]
@@ -14,3 +16,5 @@
     prompt = false
 [diff]
     algorithm = patience
+[pull]
+    ff = only
