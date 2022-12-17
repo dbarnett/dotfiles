@@ -18,4 +18,4 @@
 [pull]
     ff = only
 [include]
-    path = .gitconfig.local
+    path = .gitconfig.d/user.conf
