@@ -1,3 +1,14 @@
 [user]
-    name = "David Barnett"
-    email = "{{ env.VCS_AUTHOR_EMAIL }}"
+name = "David Barnett"
+email = "{{ env.VCS_AUTHOR_EMAIL }}"
+
+[ui]
+editor = "nvim"
+
+[revset-aliases]
+'mine' = "author({{ env.VCS_AUTHOR_EMAIL }}) | author(dbarnett) | author(davidbarnett)"
+'user(x)' = 'author(x) | committer(x)'
+
+[alias]
+prev = ["co", "@--"]
+next = ["co", "@-+ ~ @"]
