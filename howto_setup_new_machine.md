@@ -11,6 +11,8 @@ $ $(tail -n 1 ~/.profile)
 $ yadm clone git@github.com:dbarnett/dotfiles.git
 ```
 
+Note: requires env var support in yadm 3.2.0 or later.
+
 The following instructions are mostly old manual setup instructions I need to
 update to take advantage of yadm.
 
