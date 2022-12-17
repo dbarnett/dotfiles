@@ -65,7 +65,7 @@ fi
 PS1R='$(date)'
 unset color_prompt force_color_prompt
 
-source $HOME/dotfiles/right_prompt.sh
+source $HOME/.local/bin/right_prompt.sh
 # Append print_pre_prompt to PROMPT_COMMAND, newline-separated with blank lines stripped.
 PROMPT_COMMAND="${PROMPT_COMMAND%%
 }

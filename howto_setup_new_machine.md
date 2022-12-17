@@ -1,5 +1,17 @@
 # How to set up a fresh system to my tastes
 
+This dotfiles config is applied using [yadm](https://yadm.io/).
+[Install it](https://yadm.io/docs/install) and then [activate
+it](https://yadm.io/docs/getting_started#if-you-have-an-existing-remote-repository)
+like:
+
+```sh
+$ yadm clone git@github.com:dbarnett/dotfiles.git
+```
+
+The following instructions are mostly old manual setup instructions I need to
+update to take advantage of yadm.
+
 ## Basic setup (Debian-based)
 
 ```sh
@@ -28,7 +40,6 @@ and check paths and user has groups admin and staff.
 
 Git:
 ```sh
-$ git config --global user.name "My Name"
 $ git config --global user.email myaddress@example.com
 ```
 
@@ -36,10 +47,6 @@ Also set up SSH keys for GitHub:
 https://help.github.com/articles/adding-a-new-ssh-key-to-your-github-account/
 
 ```sh
-$ git clone git@github.com:dbarnett/dotfiles.git
-$ mkdir ~/projects ~/.local/bin
-$ ln -s dotfiles/bin dotfiles/.* ~/
-$ mkdir ~/.i3 && ln -s dotfiles/i3_config ~/.i3/config
 $ (cd ~/Downloads && wget https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Black_Holes_-_Monsters_in_Space.jpg/1280px-Black_Holes_-_Monsters_in_Space.jpg)
 ```
 
@@ -58,13 +65,13 @@ Edit > Profile Preferences > Scrolling > Scrollback > 10000
 ## For i3
 Kill ugly dunst notifications:
 ```sh
-$ sudo apt-get install notify-osd
-$ sudo apt-get purge dunst
+$ sudo apt install notify-osd
+$ sudo apt purge dunst
 ```
 
 Tolerable launcher:
 ```sh
-$ sudo apt-get remove suckless-tools 
+$ sudo apt remove suckless-tools 
 $ sudo dpkg -i Downloads/rofi_0.15.11-4_amd64.deb  # if package isn't in dist
 $ sudo ln -s /usr/bin/rofi /usr/local/bin/dmenu
 ```
