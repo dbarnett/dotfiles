@@ -16,13 +16,6 @@ Note: requires env var support in yadm 3.2.0 or later.
 The following instructions are mostly old manual setup instructions I need to
 update to take advantage of yadm.
 
-## Basic setup (Debian-based)
-
-```sh
-$ sudo apt install $(<system_bootstrap/ubuntu_selections.txt)
-$ sudo pypi-install pythonpy
-```
-
 ## Basic setup (OS X)
 
 Install https://brew.sh/
@@ -42,12 +35,7 @@ and check paths and user has groups admin and staff.
 
 ## More setup
 
-Git:
-```sh
-$ git config --global user.email myaddress@example.com
-```
-
-Also set up SSH keys for GitHub:
+Set up SSH keys for GitHub:
 https://help.github.com/articles/adding-a-new-ssh-key-to-your-github-account/
 
 ```sh
