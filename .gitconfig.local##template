@@ -1,0 +1,2 @@
+[user]
+  email = {{ env.VCS_AUTHOR_EMAIL }}

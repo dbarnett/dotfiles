@@ -1,0 +1,3 @@
+[user]
+    name = "David Barnett"
+    email = "{{ env.VCS_AUTHOR_EMAIL }}"

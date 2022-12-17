@@ -1,6 +1,5 @@
 [user]
     name = David Barnett
-    # email =
 [core]
     autocrlf = input
     excludesfile = ~/.gitignore
@@ -18,3 +17,5 @@
     algorithm = patience
 [pull]
     ff = only
+[include]
+    path = .gitconfig.local

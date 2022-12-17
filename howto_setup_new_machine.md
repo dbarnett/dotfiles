@@ -6,6 +6,8 @@ it](https://yadm.io/docs/getting_started#if-you-have-an-existing-remote-reposito
 like:
 
 ```sh
+$ echo 'export VCS_AUTHOR_EMAIL=me@example.com' >> ~/.profile
+$ $(tail -n 1 ~/.profile)
 $ yadm clone git@github.com:dbarnett/dotfiles.git
 ```
 

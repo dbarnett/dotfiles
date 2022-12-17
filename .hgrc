@@ -1,5 +1,5 @@
 [ui]
-username = David Barnett # <email@domain>
+username = David Barnett
 ignore.david = ~/.hgignore
 interface = curses
 # editor = hg-commit-editor
@@ -20,3 +20,5 @@ rebase =
 shelve =
 # Provides "unamend", but overrides "uncommit" with annoying nag.
 # uncommit =
+
+%include ~/.hgrc.local
