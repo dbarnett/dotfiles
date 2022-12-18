@@ -33,7 +33,8 @@ install_essential_debs() {
     nodejs \
     npm \
     neovim \
-    vim-gtk3
+    vim-gtk3 \
+    clipit
 }
 
 install_rust() {
