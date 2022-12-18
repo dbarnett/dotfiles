@@ -34,7 +34,7 @@ install_essential_debs() {
     npm \
     neovim \
     vim-gtk3 \
-    clipit
+    diodon
 }
 
 install_rust() {
