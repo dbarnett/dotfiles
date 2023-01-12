@@ -6,3 +6,4 @@
 .lvimrc
 .a8/
 /vimspell/*.spl
+/.vscode/
