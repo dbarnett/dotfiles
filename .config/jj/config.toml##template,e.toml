@@ -1,3 +1,4 @@
+#:schema ./_schema.json
 [user]
 name = "David Barnett"
 email = "{{ env.VCS_AUTHOR_EMAIL }}"
@@ -8,7 +9,4 @@ editor = "nvim"
 [revset-aliases]
 'mine' = "author({{ env.VCS_AUTHOR_EMAIL }}) | author(dbarnett) | author(davidbarnett)"
 'user(x)' = 'author(x) | committer(x)'
-
-[alias]
-prev = ["co", "@--"]
-next = ["co", "@-+ ~ @"]
+'off(x)' = 'x.. | ((x..)- & :x)'
