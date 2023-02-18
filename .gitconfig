@@ -2,19 +2,26 @@
     name = David Barnett
 [core]
     autocrlf = input
-    excludesfile = ~/.gitignore
+    excludesFile = ~/.gitignore
     editor = vim
+    pager = delta
 [init]
     defaultBranch = main
 [color]
     ui = auto
 [merge]
     tool = meld
+    conflictStyle = diff3
 [mergetool]
     keepBackup = false
     prompt = false
 [diff]
     algorithm = patience
+    colorMoved = default
+[interactive]
+    diffFilter = delta --color-only
+[delta]
+    navigate = true
 [pull]
     ff = only
 [include]
