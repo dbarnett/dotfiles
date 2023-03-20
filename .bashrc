@@ -139,3 +139,7 @@ fi
 if [ -f "/usr/share/doc/fzf/examples/completion.bash" ] ; then
   source /usr/share/doc/fzf/examples/completion.bash
 fi
+
+if [ -f "/usr/local/share/ondir/scripts.sh" ] ; then
+  source /usr/local/share/ondir/scripts.sh
+fi
