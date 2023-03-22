@@ -26,6 +26,7 @@ install_essential_debs() {
     colormake \
     curl \
     fzf \
+    ondir \
     percol \
     python3 \
     python3-stdeb \

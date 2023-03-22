@@ -1,15 +1,4 @@
 # Config for ondir (https://github.com/alecthomas/ondir).
-#
-# Initial setup:
-#   gh repo clone alecthomas/ondir
-#   cd ondir
-#   sudo make PREFIX=/usr/local CONF=/usr/local/etc/ondirrc install
-#   sudo install scripts.* /usr/local/share/ondir/
-#   cat << EOF >> ~/.bashrc
-#   if [ -f "/usr/local/share/ondir/scripts.sh" ] ; then
-#     source /usr/local/share/ondir/scripts.sh
-#   fi
-#   EOF
 
 enter ~/projects/jj
   eval export GIT_DIR="$ONDIRWD/.jj/repo/store/git"
