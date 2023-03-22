@@ -26,6 +26,7 @@ install_essential_debs() {
     colormake \
     curl \
     fzf \
+    keychain \
     ondir \
     percol \
     python3 \

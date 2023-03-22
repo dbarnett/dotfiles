@@ -32,3 +32,5 @@ fi
 if [ -f "$HOME/.cargo/env" ] ; then
   . "$HOME/.cargo/env"
 fi
+
+eval `keychain --eval --agents ssh`
