@@ -1,3 +1,3 @@
 " Extra ftdetect rules for sh filetype
 
-autocmd BufNewFile,BufRead .ondirrc setf sh
+autocmd BufNewFile,BufRead .envrc,.envrc.*,.ondirrc setf sh

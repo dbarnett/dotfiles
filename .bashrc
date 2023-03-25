@@ -143,3 +143,6 @@ fi
 if [ -f "/usr/share/ondir/integration/bash" ] ; then
   source /usr/share/ondir/integration/bash
 fi
+
+# TODO(https://github.com/martinvonz/jj/issues/1433): Re-enable
+# eval "$(direnv hook bash)"

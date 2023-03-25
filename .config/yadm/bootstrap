@@ -25,6 +25,7 @@ install_essential_debs() {
     colordiff \
     colormake \
     curl \
+    direnv \
     fzf \
     keychain \
     ondir \
