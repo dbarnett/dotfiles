@@ -33,6 +33,6 @@ if [ -f "$HOME/.cargo/env" ] ; then
   . "$HOME/.cargo/env"
 fi
 
-eval `keychain --eval --agents ssh`
+eval `keychain --eval --agents ssh --quiet`
 
 if [ -e $HOME/.nix-profile/etc/profile.d/nix.sh ]; then . $HOME/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
