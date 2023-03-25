@@ -146,3 +146,7 @@ fi
 
 # TODO(https://github.com/martinvonz/jj/issues/1433): Re-enable
 # eval "$(direnv hook bash)"
+
+if [ -x "$(command -v starship)" ]; then
+  eval "$(starship init bash)"
+fi
