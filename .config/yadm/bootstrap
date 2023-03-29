@@ -28,7 +28,6 @@ install_essential_debs() {
     direnv \
     fzf \
     keychain \
-    ondir \
     percol \
     python3 \
     python3-stdeb \

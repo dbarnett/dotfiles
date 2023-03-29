@@ -140,12 +140,9 @@ if [ -f "/usr/share/doc/fzf/examples/completion.bash" ] ; then
   source /usr/share/doc/fzf/examples/completion.bash
 fi
 
-if [ -f "/usr/share/ondir/integration/bash" ] ; then
-  source /usr/share/ondir/integration/bash
+if [ -x "$(command -v direnv)" ]; then
+  eval "$(direnv hook bash)"
 fi
-
-# TODO(https://github.com/martinvonz/jj/issues/1433): Re-enable
-# eval "$(direnv hook bash)"
 
 if [ -x "$(command -v starship)" ]; then
   eval "$(starship init bash)"
