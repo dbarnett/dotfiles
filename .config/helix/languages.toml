@@ -1,0 +1,7 @@
+[[language]]
+name = "vim"
+scope = "source.vim"
+file-types = [".vimrc", "vim"]
+roots = ["addon-info.json"]
+comment-token = '"'
+language-server = { command = "vim-language-server", args = ["--stdio"] }
