@@ -119,17 +119,15 @@ if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
     . /etc/bash_completion
 fi
 
-# Chromium depot_tools
-export PATH="$PATH:$HOME/projects/depot_tools"
-
 if [ -d "$HOME/.npm-global/bin" ] ; then
     PATH="$HOME/.npm-global/bin:$PATH"
 fi
+if [ -f "$HOME/.cargo/env" ] ; then
+    . $HOME/.cargo/env
+fi
+
 if [ -d "$HOME/.local/bin" ] ; then
     PATH="$HOME/.local/bin:$PATH"
-fi
-if [ -d "$HOME/.cargo/bin" ] ; then
-    PATH="$HOME/.cargo/bin:$PATH"
 fi
 
 # Enable fzf reverse-i-search and fuzzy command completion.
