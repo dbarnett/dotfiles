@@ -145,3 +145,7 @@ fi
 if [ -x "$(command -v starship)" ]; then
   eval "$(starship init bash)"
 fi
+
+if [ -f ~/.config/broot/launcher/bash/br ]; then
+  . ~/.config/broot/launcher/bash/br
+fi
