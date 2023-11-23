@@ -80,6 +80,11 @@ Plug 'google/vim-maktaba'
 Plug 'google/vim-glaive'
 Plug 'Shougo/vimproc.vim', {'do' : 'make'}
 
+if has('nvim')
+  Plug 'nvim-lua/plenary.nvim'
+  Plug 'nvim-tree/nvim-web-devicons'
+endif
+
 " END CORE PLUGINS }}}2
 
 " FILETYPES {{{2
@@ -138,6 +143,10 @@ Plug 'tpope/vim-surround'
 
 Plug 'lotabout/skim', { 'dir': '~/.skim', 'do': './install' }
 Plug 'lotabout/skim.vim'
+
+if has('nvim')
+  Plug 'nvim-telescope/telescope.nvim', { 'branch': '0.1.x' }
+endif
 
 " END AMENITIES }}}2
 
