@@ -89,10 +89,15 @@ endif
 
 " FILETYPES {{{2
 
+if has('nvim-0.9.1')
+  Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+endif
+
 Plug 'vim-scripts/syntaxconkyrc.vim'
 Plug 'dart-lang/dart-vim-plugin'
 Plug 'google/vim-ft-vroom'
 Plug 'PotatoesMaster/i3-vim-syntax'
+Plug 'google/vim-jsonnet'
 Plug 'duganchen/vim-soy'
 Plug 'zaiste/tmux.vim'
 Plug 'cespare/vim-toml'
