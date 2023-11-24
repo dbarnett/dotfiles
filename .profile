@@ -37,6 +37,10 @@ if [ -d "$HOME/.npm-global/bin" ] ; then
   PATH="$HOME/.npm-global/bin:$PATH"
 fi
 
+if [ -d "$HOME/go" ] ; then
+  PATH="$HOME/go/bin:$PATH"
+fi
+
 if [ -x "$(command -v keychain)" ]; then
   eval "$(keychain --eval --agents ssh --quiet)"
 fi
