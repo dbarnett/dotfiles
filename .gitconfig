@@ -3,7 +3,6 @@
 [core]
     autocrlf = input
     excludesFile = ~/.gitignore
-    editor = vim
     pager = delta
 [init]
     defaultBranch = main
