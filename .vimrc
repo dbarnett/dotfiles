@@ -153,6 +153,8 @@ if has('nvim')
   Plug 'nvim-telescope/telescope.nvim', { 'branch': '0.1.x' }
 endif
 
+Plug 'micarmst/vim-spellsync'
+
 " END AMENITIES }}}2
 
 " EDITOR UTILS (abolish, bracketed-paste) {{{2
