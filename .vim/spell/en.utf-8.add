@@ -121,6 +121,8 @@ CallFunc
 CamelCased
 CannotEnter
 CanonicalName
+carveout
+carveouts
 cd
 cfg
 cfile
@@ -372,6 +374,7 @@ glibc
 glitching
 globbing
 gmail
+gmailctl
 godoc
 gofmt
 goimports
@@ -604,6 +607,7 @@ onactivate
 onbegin
 onblur
 onboarding
+oncall
 onclick
 onend
 onerror
