@@ -273,6 +273,22 @@ imap <C-Space> <Plug>(asyncomplete_force_refresh)
 Plug 'idanarye/vim-vebugger'
 let g:vebugger_leader='<Leader>d'
 
+" Helper for installing servers programmatically
+func LspInstallServerThenQuit(name) abort
+  let s:lsp_server_installing = a:name
+  execute 'LspInstallServer!' a:name
+  call timer_start(500, funcref('s:QuitIfLspServerInstalled'), { 'repeat': 100 })
+endfunc
+
+func s:QuitIfLspServerInstalled(...) abort
+  for l:s in lsp_settings#installed_servers()
+    if l:s.name ==# s:lsp_server_installing
+      qa
+    endif
+  endfor
+  echo 'QuitIfLspServerInstalled still waiting for: ' . s:lsp_server_installing
+endfunc
+
 " END ADVANCED DEVTOOLS }}}2
 
 call plug#end()

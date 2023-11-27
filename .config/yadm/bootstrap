@@ -55,12 +55,9 @@ configure_vim() {
     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
   vim +'PlugInstall --sync' +qa
   # Set up language servers for vim/neovim
-  # Note:
-  vim \
-    +'setf bash' +'LspInstallServer' \
-    +'setf markdown' +'LspInstallServer' \
-    +'setf yaml' +'LspInstallServer' \
-    +qa
+  vim +'set ft=sh' +'set cmdheight=9' +'call LspInstallServerThenQuit("bash-language-server")'
+  vim +'set ft=markdown' +'set cmdheight=9' +'call LspInstallServerThenQuit("marksman")'
+  vim +'set ft=yaml' +'set cmdheight=9' +'call LspInstallServerThenQuit("yaml-language-server")'
 }
 
 install_essential_pkgs
