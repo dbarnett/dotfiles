@@ -100,13 +100,15 @@ fi
 # enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
 # sources /etc/bash.bashrc).
-#if ! shopt -oq posix; then
-#  if [ -f /usr/share/bash-completion/bash_completion ]; then
-#    . /usr/share/bash-completion/bash_completion
-#  elif [ -f /etc/bash_completion ]; then
-#    . /etc/bash_completion
-#  fi
-#fi
+# Special case to manually source for vscode. For some reason it doesn't do
+# this automatically but everywhere else does.
+if [ "$TERM_PROGRAM" = "vscode" ] && ! shopt -oq posix; then
+  if [ -f /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+  elif [ -f /etc/bash_completion ]; then
+    . /etc/bash_completion
+  fi
+fi
 
 # Enable fzf reverse-i-search and fuzzy command completion.
 if [ -f "/usr/share/doc/fzf/examples/key-bindings.bash" ] ; then
