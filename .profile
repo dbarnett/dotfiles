@@ -41,6 +41,9 @@ if [ -d "$HOME/go" ] ; then
   PATH="$HOME/go/bin:$PATH"
 fi
 
+WASMTIME_HOME="$HOME/.wasmtime"
+PATH="$WASMTIME_HOME/bin:$PATH"
+
 if [ -x "$(command -v keychain)" ]; then
   eval "$(keychain --eval --agents ssh --quiet)"
 fi
