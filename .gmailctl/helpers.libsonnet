@@ -11,9 +11,6 @@
     ] + [
       { from: l }
       for l in lists
-    ] + [
-      { cc: l }
-      for l in lists
     ],
   },
 }
