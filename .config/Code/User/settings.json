@@ -6,5 +6,6 @@
             "path": "bash",
             "args": ["-l"]
         }
-    }
+    },
+    "terminal.integrated.stickyScroll.enabled": true
 }
