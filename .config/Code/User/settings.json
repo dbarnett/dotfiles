@@ -1,5 +1,6 @@
 {
     "files.defaultLanguage": "en",
+    "_comment.terminal.integrated": "Workaround to enable login shell (microsoft/vscode#7263)",
     "terminal.integrated.defaultProfile.linux": "bash",
     "terminal.integrated.profiles.linux": {
         "bash": {
@@ -7,5 +8,16 @@
             "args": ["-l"]
         }
     },
-    "terminal.integrated.stickyScroll.enabled": true
+    "terminal.integrated.stickyScroll.enabled": true,
+    "vim.handleKeys": {
+        "<C-d>": true,
+        "<C-p>": false,
+        "<C-s>": false,
+        "<C-z>": false
+    },
+    "_comment.vim.textwidth": "Hard-coded global while waiting on editorconfig/editorconfig-vscode#272",
+    "vim.textwidth": 100,
+    "editor.unicodeHighlight.allowedCharacters": {
+        "’": true
+    }
 }
