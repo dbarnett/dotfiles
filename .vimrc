@@ -149,8 +149,15 @@ Plug 'tpope/vim-surround'
 Plug 'lotabout/skim', { 'dir': '~/.skim', 'do': './install' }
 Plug 'lotabout/skim.vim'
 
-if has('nvim')
+if has('nvim-0.9')
   Plug 'nvim-telescope/telescope.nvim', { 'branch': '0.1.x' }
+
+  nnoremap <leader>ff <cmd>Telescope find_files<cr>
+  nnoremap <leader>fg <cmd>Telescope live_grep<cr>
+  nnoremap <leader>fb <cmd>Telescope buffers<cr>
+  nnoremap <leader>fh <cmd>Telescope help_tags<cr>
+
+  Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 endif
 
 Plug 'micarmst/vim-spellsync'
