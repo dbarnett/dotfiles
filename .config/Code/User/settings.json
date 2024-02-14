@@ -19,5 +19,6 @@
     "vim.textwidth": 100,
     "editor.unicodeHighlight.allowedCharacters": {
         "’": true
-    }
+    },
+    "editor.fontFamily": "'Droid Sans Mono', 'monospace', monospace, 'FiraCode Nerd Font Mono'"
 }
