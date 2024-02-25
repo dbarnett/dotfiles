@@ -102,7 +102,7 @@ fi
 # sources /etc/bash.bashrc).
 # Special case to manually source for vscode. For some reason it doesn't do
 # this automatically but everywhere else does.
-if [ "$TERM_PROGRAM" = "vscode" ] && ! shopt -oq posix; then
+if [ "$TERM_PROGRAM" = "vscode" ] || ! shopt -oq posix; then
   if [ -f /usr/share/bash-completion/bash_completion ]; then
     . /usr/share/bash-completion/bash_completion
   elif [ -f /etc/bash_completion ]; then
