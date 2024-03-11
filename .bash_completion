@@ -10,6 +10,6 @@ if [ -x "$(command -v gmailctl)" ]; then
   source <(gmailctl completion bash)
 fi
 if [ -x "$(command -v jj)" ]; then
-  source <(jj util completion)
+  source <(jj util completion bash)
 fi
 PATH="$OLDPATH"
