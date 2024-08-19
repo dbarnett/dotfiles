@@ -2,6 +2,7 @@
 .sw[a-p]
 *.pyc
 .fuse_hidden*
+/.env/
 /tags
 .lvimrc
 .a8/
