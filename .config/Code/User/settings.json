@@ -1,13 +1,5 @@
 {
     "files.defaultLanguage": "en",
-    "_comment.terminal.integrated": "Workaround to enable login shell (microsoft/vscode#7263)",
-    "terminal.integrated.defaultProfile.linux": "bash",
-    "terminal.integrated.profiles.linux": {
-        "bash": {
-            "path": "bash",
-            "args": ["-l"]
-        }
-    },
     "terminal.integrated.stickyScroll.enabled": true,
     "vim.handleKeys": {
         "<C-d>": true,
