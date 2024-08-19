@@ -20,5 +20,19 @@
     "editor.unicodeHighlight.allowedCharacters": {
         "’": true
     },
-    "editor.fontFamily": "'Droid Sans Mono', 'monospace', monospace, 'FiraCode Nerd Font Mono'"
+    "editor.fontFamily": "'Droid Sans Mono', 'monospace', monospace, 'FiraCode Nerd Font Mono'",
+    "explorer.fileNesting.patterns": {
+        "Cargo.toml": "Cargo.lock",
+        "*.sqlite": "${capture}.${extname}-*",
+        "*.db": "${capture}.${extname}-*",
+        "*.sqlite3": "${capture}.${extname}-*",
+        "*.db3": "${capture}.${extname}-*",
+        "*.sdb": "${capture}.${extname}-*",
+        "*.s3db": "${capture}.${extname}-*"
+    },
+    "[python]": {
+        "diffEditor.ignoreTrimWhitespace": false,
+        "editor.formatOnType": true,
+        "editor.wordBasedSuggestions": "off"
+    }
 }
