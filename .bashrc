@@ -68,14 +68,6 @@ fi
 PS1R='$(date)'
 unset color_prompt force_color_prompt
 
-source $HOME/.local/bin/right_prompt.sh
-# Append print_pre_prompt to PROMPT_COMMAND, newline-separated with blank lines stripped.
-PROMPT_COMMAND="${PROMPT_COMMAND%%
-}
-print_pre_prompt"
-PROMPT_COMMAND="${PROMPT_COMMAND##
-}"
-
 # If this is an xterm set the title to user@host:dir
 case "$TERM" in
 xterm*|rxvt*)
