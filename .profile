@@ -52,6 +52,9 @@ fi
 PNPM_HOME="$HOME/.local/share/pnpm"
 PATH="$PNPM_HOME:$PATH"
 
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+
 export BUN_INSTALL="$HOME/.bun"
 if [ -d "$BUN_INSTALL/bin" ] ; then
   export PATH="$BUN_INSTALL/bin:$PATH"

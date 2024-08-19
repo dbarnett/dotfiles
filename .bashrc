@@ -114,6 +114,10 @@ if [ -x "$(command -v direnv)" ]; then
   eval "$(direnv hook bash)"
 fi
 
+if [ -x "$(command -v pyenv)" ]; then
+  eval "$(pyenv init -)"
+fi
+
 if [ -x "$(command -v starship)" ]; then
   eval "$(starship init bash)"
 fi
