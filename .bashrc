@@ -117,3 +117,7 @@ fi
 if [ -x "$(command -v starship)" ]; then
   eval "$(starship init bash)"
 fi
+
+if [ -x "$(command -v keychain)" ]; then
+  eval "$(keychain --eval --agents ssh --quiet)"
+fi
