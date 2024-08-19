@@ -123,5 +123,6 @@ if [ -x "$(command -v starship)" ]; then
 fi
 
 if [ -x "$(command -v keychain)" ]; then
-  eval "$(keychain --eval --agents ssh --quiet)"
+  # Override $SHELL for fish-shell/fish-shell#4583.
+  SHELL=bash; eval "$(keychain --eval --agents ssh --quiet)"
 fi
