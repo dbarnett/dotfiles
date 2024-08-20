@@ -1,5 +1,8 @@
 {
     "files.defaultLanguage": "en",
+    "files.exclude": {
+        "**/.jj": true
+    },
     "terminal.integrated.stickyScroll.enabled": true,
     "vim.handleKeys": {
         "<C-d>": true,
