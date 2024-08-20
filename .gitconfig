@@ -17,6 +17,9 @@
 [diff]
     algorithm = patience
     colorMoved = default
+[diff "lockb"]
+    textconv = bun
+    binary = true
 [interactive]
     diffFilter = delta --color-only
 [delta]
