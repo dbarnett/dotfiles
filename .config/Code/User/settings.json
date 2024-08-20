@@ -29,5 +29,8 @@
         "diffEditor.ignoreTrimWhitespace": false,
         "editor.formatOnType": true,
         "editor.wordBasedSuggestions": "off"
-    }
+    },
+    "zig.path": "zig",
+    "zig.zls.path": "~/.config/Code/User/globalStorage/ziglang.vscode-zig/zls_install/zls",
+    "zig.initialSetupDone": true
 }
