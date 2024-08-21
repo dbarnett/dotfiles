@@ -1,3 +1,7 @@
+[[grammar]]
+name = "vim"
+source = { git = "https://github.com/tree-sitter-grammars/tree-sitter-vim", rev = "f3cd62d8bd043ef20507e84bb6b4b53731ccf3a7" }
+
 [language-server.vim-language-server]
 command = "vim-language-server"
 args = ["--stdio"]
