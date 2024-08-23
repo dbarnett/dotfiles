@@ -5,6 +5,7 @@ email = "{{ env.VCS_AUTHOR_EMAIL }}"
 
 [ui]
 editor = "nvim"
+merge-editor = "meld"
 graph.style = "curved"
 pager = "delta"
 diff.format = "git"
