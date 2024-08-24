@@ -13,3 +13,7 @@ if [ -x "$(command -v jj)" ]; then
   source <(jj util completion bash)
 fi
 PATH="$OLDPATH"
+
+# Begin added by argcomplete
+source "/usr/lib/python3/dist-packages/argcomplete/bash_completion.d/_python-argcomplete"
+# End added by argcomplete
