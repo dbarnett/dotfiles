@@ -14,6 +14,7 @@ diff.format = "git"
 'mine' = "author(\"{{ env.VCS_AUTHOR_EMAIL }}\") | author(dbarnett) | author(davidbarnett)"
 'user(x)' = 'author(x) | committer(x)'
 'off(x)' = 'x.. | ((x..)- & :x)'
+'default(n)' = '@ | ancestors(immutable_heads().., n) | trunk()'
 
 [git]
 private-commits = "description(glob:'wip:*') | description(glob:'private:*')"
