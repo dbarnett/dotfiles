@@ -17,5 +17,22 @@
   },
   "file_types": {
     "ini": [".editorconfig"]
+  },
+  "languages": {
+    "Python": {
+      "language_servers": ["pylsp"]
+    }
+  },
+  "lsp": {
+    "pylsp": {
+      "settings": {
+        "plugins": {
+          "pycodestyle": {
+            "enabled": true,
+            "ignore": ["E501"]
+          }
+        }
+      }
+    }
   }
 }
