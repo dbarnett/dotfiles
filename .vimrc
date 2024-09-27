@@ -93,6 +93,7 @@ if has('nvim-0.9.1')
   Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 endif
 
+Plug 'aliou/bats.vim'
 Plug 'vim-scripts/syntaxconkyrc.vim'
 Plug 'dart-lang/dart-vim-plugin'
 Plug 'google/vim-ft-vroom'
