@@ -20,19 +20,13 @@
   },
   "languages": {
     "Python": {
-      "language_servers": ["pylsp"]
+      "language_servers": ["pylsp"],
+      "format_on_save": "off"
     }
   },
   "lsp": {
     "pylsp": {
-      "settings": {
-        "plugins": {
-          "pycodestyle": {
-            "enabled": true,
-            "ignore": ["E501"]
-          }
-        }
-      }
+      "settings": {}
     }
   }
 }
