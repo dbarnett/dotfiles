@@ -1,11 +1,22 @@
-[[grammar]]
-name = "vim"
-source = { git = "https://github.com/tree-sitter-grammars/tree-sitter-vim", rev = "f3cd62d8bd043ef20507e84bb6b4b53731ccf3a7" }
+# Python
+[[language]]
+name = "python"
+language-servers = ["pylsp", "ruff"]
 
-[language-server.vim-language-server]
-command = "vim-language-server"
-args = ["--stdio"]
+[language-server.pylsp.config.pylsp.plugins]
+flake8 = {enabled = true, extendIgnore = ["E501"]}
+pycodestyle = {enabled = false}
+pyflakes = {enabled = false}
 
+[language-server.ruff]
+command = "ruff-lsp"
+config = { settings = { args = ["server"] } }
+
+# Rust
+[language-server.rust-analyzer.config.check]
+command = "clippy"
+
+# Vim
 [[language]]
 name = "vim"
 scope = "source.vim"
@@ -13,3 +24,11 @@ file-types = [".vimrc", "vim"]
 roots = ["addon-info.json"]
 comment-token = '"'
 language-servers = ["vim-language-server"]
+
+[[grammar]]
+name = "vim"
+source = { git = "https://github.com/tree-sitter-grammars/tree-sitter-vim", rev = "f3cd62d8bd043ef20507e84bb6b4b53731ccf3a7" }
+
+[language-server.vim-language-server]
+command = "vim-language-server"
+args = ["--stdio"]
