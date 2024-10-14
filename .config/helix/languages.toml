@@ -16,6 +16,16 @@ config = { settings = { args = ["server"] } }
 [language-server.rust-analyzer.config.check]
 command = "clippy"
 
+# TOML
+[[language]]
+name = "toml"
+formatter = { command = "taplo", args = ["fmt", "-"] }
+
+[language-server.taplo.config]
+# Workaround for nonsense of being nonfunctional outside git directories
+# (https://github.com/helix-editor/helix/issues/3897#issuecomment-2361674437)
+root_dir = [".git", "*.toml"]
+
 # Vim
 [[language]]
 name = "vim"
