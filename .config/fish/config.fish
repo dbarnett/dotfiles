@@ -2,11 +2,11 @@ if status is-interactive
   # Requires foreign-env: https://github.com/oh-my-fish/plugin-foreign-env
   # Context: https://superuser.com/questions/446925/re-use-profile-for-fish
   fenv source ~/.profile
-  # Deduplicate $PATH, re-adding each item from tail to head.
+  # Deduplicate $PATH
   set -l old_path $PATH
-  set -e PATH
-  for p in $old_path[-1..1]
-    fish_add_path --path $p
+  set -e PATH[1..]
+  for p in $old_path
+    fish_add_path --path --append $p
   end
 
   type -q direnv; and direnv hook fish | source
