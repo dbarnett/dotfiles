@@ -25,7 +25,7 @@ https://help.github.com/articles/adding-a-new-ssh-key-to-your-github-account/
 ### Fonts
 
 Some things like [Starship](https://starship.rs) need special fonts like
-[Nerd Fonts](nerdfonts.com). To install on e.g. Debian Linux, do:
+[Nerd Fonts](https://nerdfonts.com). To install on e.g. Debian Linux, do:
 
 ```sh
 $ wget https://github.com/ryanoasis/nerd-fonts/releases/latest/download/FiraCode.zip
@@ -33,6 +33,8 @@ $ mkdir -p ~/.local/share/fonts
 $ cd ~/.local/share/fonts/
 $ unzip ~/FiraCode.zip *.ttf
 ```
+
+or on Mac just install font-fira-code-nerd-font through Homebrew.
 
 Also requires some weird
 [Nerd Font Web setup](https://mshaugh.github.io/nerdfont-webfonts/) involving
