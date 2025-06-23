@@ -16,6 +16,6 @@ if status is-interactive
   if type -q keychain
     # Override $SHELL for fish-shell/fish-shell#4583.
     set -lx SHELL fish
-    eval (keychain --eval --agents ssh --quiet)
+    eval (keychain --eval id_ed25519 --quiet)
   end
 end
