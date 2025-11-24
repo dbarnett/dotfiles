@@ -2,8 +2,9 @@
 
 ## System bootstrap
 
-This dotfiles config is applied using [yadm](https://yadm.io/).
-[Install it](https://yadm.io/docs/install) and then [activate
+This dotfiles config is currently managed with [yadm](https://yadm.io/), though migration to [chezmoi](https://www.chezmoi.io/) is under consideration for better templating and cross-platform support.
+
+[Install yadm](https://yadm.io/docs/install) and then [activate
 it](https://yadm.io/docs/getting_started#if-you-have-an-existing-remote-repository)
 like:
 
@@ -16,6 +17,15 @@ $ yadm clone git@github.com:dbarnett/dotfiles.git
 Note: requires env var support in yadm 3.2.0 or later.
 
 TODO: Fix sometimes getting stuck on vim plug installs etc and needing rerun.
+
+## Desktop environment
+
+On Arch Linux, this setup includes [HyDE](https://github.com/prasanthrangan/HyDE) (Hyprland Desktop Environment) with customized configs for:
+- Hyprland compositor
+- swaync (notification daemon)
+- Various startup applications and workflows
+
+HyDE configs are located in `~/.config/hypr/` and `~/.config/hyde/`.
 
 ### More setup
 
@@ -76,7 +86,10 @@ chmod g+w -R /usr/local
 
 and check paths and user has groups admin and staff.
 
-### For i3
+### For i3 (legacy)
+
+**Note**: This section is legacy - currently using Hyprland instead of i3.
+
 Kill ugly dunst notifications:
 ```sh
 $ sudo apt install notify-osd
@@ -85,8 +98,8 @@ $ sudo apt purge dunst
 
 Tolerable launcher:
 ```sh
-$ sudo apt remove suckless-tools 
-$ sudo dpkg -i Downloads/rofi_0.15.11-4_amd64.deb  # if package isn't in dist
+$ sudo apt remove suckless-tools
+$ sudo apt install rofi
 $ sudo ln -s /usr/bin/rofi /usr/local/bin/dmenu
 ```
 
