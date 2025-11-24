@@ -1,8 +1,8 @@
-# David's home directory & dotfiles
+# 🏠 David's home directory & dotfiles
 
-## System bootstrap
+## 🚀 System bootstrap
 
-This dotfiles config is currently managed with [yadm](https://yadm.io/), though migration to [chezmoi](https://www.chezmoi.io/) is under consideration for better templating and cross-platform support.
+This dotfiles config is currently managed with [yadm](https://yadm.io/), though migration to [chezmoi](https://www.chezmoi.io/) is under consideration for better templating and cross-platform support (see [#1](https://github.com/dbarnett/dotfiles/issues/1)).
 
 [Install yadm](https://yadm.io/docs/install) and then [activate
 it](https://yadm.io/docs/getting_started#if-you-have-an-existing-remote-repository)
@@ -16,23 +16,25 @@ $ yadm clone git@github.com:dbarnett/dotfiles.git
 
 Note: requires env var support in yadm 3.2.0 or later.
 
-TODO: Fix sometimes getting stuck on vim plug installs etc and needing rerun.
+**TODO:** Fix sometimes getting stuck on vim plug installs etc and needing rerun.
 
-## Desktop environment
+## 🖥️ Desktop environment
 
 On Arch Linux, this setup includes [HyDE](https://github.com/prasanthrangan/HyDE) (Hyprland Desktop Environment) with customized configs for:
-- Hyprland compositor
-- swaync (notification daemon)
-- Various startup applications and workflows
+- 🪟 Hyprland compositor
+- 🔔 swaync (notification daemon)
+- 🚀 Various startup applications and workflows
 
 HyDE configs are located in `~/.config/hypr/` and `~/.config/hyde/`.
 
-### More setup
+See [#2](https://github.com/dbarnett/dotfiles/issues/2) for known issues and configuration details.
+
+### 🔐 SSH setup
 
 Set up SSH keys for GitHub:
 https://help.github.com/articles/adding-a-new-ssh-key-to-your-github-account/
 
-### Fonts
+### 🔤 Fonts
 
 Some things like [Starship](https://starship.rs) need special fonts like
 [Nerd Fonts](https://nerdfonts.com). To install on e.g. Debian Linux, do:
@@ -50,7 +52,7 @@ Also requires some weird
 [Nerd Font Web setup](https://mshaugh.github.io/nerdfont-webfonts/) involving
 `term_.prefs_` for things like Chrome Secure Shell extension.
 
-### Other preferences
+### ⚙️ Other preferences
 
 Set up Compose key. On Linux:
 
@@ -64,12 +66,12 @@ gtk-chtheme (Ambiance or similar)
 gnome-terminal scrolling:
 Edit > Profile Preferences > Scrolling > Scrollback > 10000
 
-## Legacy system bootstraps
+## 📜 Legacy system bootstraps
 
 The following instructions are mostly old manual setup instructions I need to
 update to take advantage of yadm.
 
-### Basic setup (OS X)
+### 🍎 Basic setup (macOS)
 
 Install https://brew.sh/
 
