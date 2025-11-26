@@ -18,6 +18,23 @@ Note: requires env var support in yadm 3.2.0 or later.
 
 **TODO:** Fix sometimes getting stuck on vim plug installs etc and needing rerun.
 
+### 🔄 Development workflow
+
+This repo uses a git worktree for safe editing:
+- **`~/`** - Live configs on `main` branch (managed by yadm)
+- **`~/.dotfiles/`** - Staging workspace on `staging` branch
+
+To make changes:
+```sh
+cd ~/.dotfiles/
+# Edit files here safely without breaking live system
+git add .
+git commit -m "Update configs"
+# Test changes, then merge to apply live:
+git checkout main
+git merge staging
+```
+
 ## 🖥️ Desktop environment
 
 On Arch Linux, this setup includes [HyDE](https://github.com/prasanthrangan/HyDE) (Hyprland Desktop Environment) with customized configs for:
