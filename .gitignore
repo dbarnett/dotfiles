@@ -7,4 +7,5 @@
 .lvimrc
 .a8/
 /vimspell/*.spl
+/.claude/settings.local.json
 /AGENTS.local.md

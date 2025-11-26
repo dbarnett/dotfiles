@@ -1,6 +1,6 @@
 # 🏠 Dotfiles Repository - Agent Instructions
 
-**Last Updated:** 2025-12-07
+**Last Updated:** 2025-12-07 (Claude Code config section added)
 **Location:** `~/.dotfiles/AGENTS.dotfiles.md`
 
 This file contains dotfiles-specific instructions for AI coding assistants working in this repository.
@@ -25,6 +25,59 @@ Because files here mirror to `$HOME/`, we handle agent instructions specially:
 **Read BOTH files:**
 1. Read `AGENTS.md` first for general conventions
 2. Read this file (`AGENTS.dotfiles.md`) for dotfiles-specific guidance
+
+### Claude Code Configuration
+
+**IMPORTANT**: Because this is a yadm-managed dotfiles repo, any `.claude/settings.json` in this directory would also become `~/.claude/settings.json` (same file). Therefore:
+
+- **Use `.claude/settings.local.json`** - Already gitignored (see `.gitignore:10`)
+- **Do NOT track `.claude/settings.json`** - Would propagate to global Claude config
+
+**Why `.gitignore` instead of `.git/info/exclude`:**
+
+Due to [jj-vcs/jj#8140](https://github.com/jj-vcs/jj/issues/8140), jj fails to respect `.git/info/exclude` in worktrees (though it works fine in regular repos). This means:
+- ❌ Can't use `.git/info/exclude` to ignore files only in this worktree
+- ✅ Must use `.gitignore` to ignore `.claude/settings.local.json` globally
+
+This is acceptable because:
+- `.claude/settings.local.json` should be gitignored in ALL repos anyway (it's machine-specific)
+- If we couldn't gitignore it globally, we'd have no workaround for this specific yadm+worktree setup
+
+**Required setup for new worktrees:**
+
+Create `.dotfiles/.claude/settings.local.json`:
+```json
+{
+  "permissions": {
+    "additionalDirectories": [
+      "~/.config"
+    ],
+    "allow": [
+      "Read(~/.config/**)",
+      "Edit(~/.config/**)",
+      "Bash(ls:~/.config/**)",
+      "Bash(grep:~/.config/**)",
+      "Bash(find:~/.config/**)"
+    ]
+  }
+}
+```
+
+This allows Claude Code to:
+- Access `~/.config` files (Hyprland, waybar, etc.)
+- Read and edit configuration files
+- Run diagnostic commands on configs
+
+NOTE: Similarly, CLAUDE.md is tracked as a symlink to AGENTS.md for now because they *STILL* haven't added support for AGENTS.md (https://github.com/anthropics/claude-code/issues/6235) and bootstrapping CC's link to that is a must.
+
+**Verify setup:**
+```shell
+# Should exist and be gitignored
+ls -la .claude/settings.local.json
+
+# Should NOT be tracked
+git status  # should not show .claude/settings.local.json
+```
 
 ---
 
@@ -220,6 +273,7 @@ yadm diff --stat
 When starting work on dotfiles:
 
 - [ ] `cd ~/.dotfiles/` (work in staging)
+- [ ] Verify `.claude/settings.local.json` exists (if using Claude Code)
 - [ ] Read both `AGENTS.md` and `AGENTS.dotfiles.md`
 - [ ] Check `AGENTS.local.md` (if exists) for recent session context
 - [ ] Check GitHub issues: `gh issue list --repo dbarnett/dotfiles`
