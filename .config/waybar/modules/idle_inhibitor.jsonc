@@ -1,0 +1,14 @@
+{
+  "idle_inhibitor": {
+    "format": "{icon}",
+    "rotate": 0,
+    "format-icons": {
+      "activated": "☕",
+      "deactivated": "💤"
+    },
+    "justify": "center",
+    "tooltip": "true",
+    "tooltip-format-activated": " Caffeine Mode Active\nPrevents system from going to sleep",
+    "tooltip-format-deactivated": " Caffeine Mode Inactive\nSystem will follow normal power settings"
+  }
+}

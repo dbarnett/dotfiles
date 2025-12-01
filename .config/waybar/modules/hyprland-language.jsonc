@@ -1,0 +1,10 @@
+{
+  "hyprland/language": {
+    "format": "{short}",
+    "format-short-en": "🇺🇸",
+    "format-short-es": "🇲🇽",
+    "rotate": 0,
+    "on-click": "hyde-shell keyboardswitch",
+    "tooltip-format": "{long}"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "custom/keyboard": {
+    "exec": "~/.local/bin/waybar-keyboard-layout",
+    "interval": 1,
+    "format": "{}",
+    "on-click": "hyde-shell keyboardswitch",
+    "tooltip": true,
+    "tooltip-format": "Click to switch keyboard layout"
+  }
+}

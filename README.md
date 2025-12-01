@@ -44,9 +44,7 @@ On Arch Linux, this setup includes [HyDE](https://github.com/prasanthrangan/HyDE
 
 HyDE configs are located in `~/.config/hypr/` and `~/.config/hyde/`.
 
-**📝 See [`.config/desktop.md`](.config/desktop.md) for detailed configuration notes, customizations, and troubleshooting.**
-
-See [#2](https://github.com/dbarnett/dotfiles/issues/2) for known issues tracking.
+See [#2](https://github.com/dbarnett/dotfiles/issues/2) for known issues and configuration details.
 
 ### 🔐 SSH setup
 
