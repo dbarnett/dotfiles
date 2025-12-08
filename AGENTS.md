@@ -3,6 +3,18 @@
 **Last Updated:** 2025-12-05
 **Location:** `~/AGENTS.md`
 
+---
+
+## ⚠️ DOTFILES REPOSITORY NOTICE
+
+**If you are working in the dotfiles repository (usually `~/.dotfiles/` or a repo associated with remote dbarnett/dotfiles), you MUST also read `AGENTS.dotfiles.md`.**
+
+That file contains dotfiles-specific instructions, current configuration status, and known issues.
+
+**If you are NOT in the dotfiles repository, ignore this notice.**
+
+---
+
 This file contains general preferences and conventions for AI coding assistants (Claude Code, Cursor, Gemini CLI, etc.) across all projects.
 
 ---
