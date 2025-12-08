@@ -418,6 +418,50 @@ fi
 
 **Note:** Claude Code internally runs Bash tool commands in bash, but generated scripts and code suggestions should still be shell-agnostic since users may run them in their preferred shell.
 
+### Error Handling in Shell Scripts
+
+**CRITICAL: NEVER use `|| true` to hide failures**
+
+❌ **WRONG - Hides failures:**
+```shell
+RESULT=$(some_command || true)
+pgrep -x dunst || true
+```
+
+✅ **CORRECT - Check exit codes explicitly:**
+```shell
+# Pattern 1: Check with if statement
+if pgrep -x dunst >/dev/null 2>&1; then
+    DUNST_RUNNING=1
+else
+    DUNST_RUNNING=0
+fi
+
+# Pattern 2: Capture output and check status separately
+CONFIG_ERRORS=$(hyprctl configerrors 2>&1)
+if [ $? -ne 0 ]; then
+    echo "ERROR: Command failed"
+    exit 1
+fi
+
+# Pattern 3: Explicit error handling
+if ! command_that_might_fail; then
+    echo "ERROR: Command failed"
+    ERRORS=$((ERRORS + 1))
+fi
+```
+
+**Why this matters:**
+- `|| true` makes every command "succeed" even when it fails
+- Failures silently propagate, making debugging impossible
+- Status codes contain important information about what went wrong
+- Proper error handling allows scripts to report actionable diagnostics
+
+**When checking if a process exists:**
+- ✅ Redirect output: `pgrep -x process >/dev/null 2>&1`
+- ✅ Check exit code: `if pgrep -x process >/dev/null 2>&1; then ...`
+- ❌ NEVER: `pgrep -x process || true`
+
 ### File Editing
 - Clean up trailing whitespace (except `.md` files)
 - Ensure newline at end of file
