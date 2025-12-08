@@ -14,13 +14,93 @@ This is a **yadm-managed dotfiles repository** with a git worktree setup:
 - **`~/`** - Live configs based on `main` branch (managed by yadm)
 - **`~/.dotfiles/`** - Staging workspace on `staging` branch (this directory)
 
-### Important: AGENTS.md Handling
+### Important: $HOME vs Worktree File Handling
 
-Because files here mirror to `$HOME/`, we handle agent instructions specially:
+Because files here mirror to `$HOME/`, all config files exist in two places:
 
-- `~/AGENTS.md` - Global user instructions (tracked in this repo, synced to home)
+- `~/path/to/file` - Live version in $HOME (on main branch via yadm)
+- `~/.dotfiles/path/to/file` - Worktree staging version (via jj in this directory)
+
+**Example with AGENTS.md:**
+- `~/AGENTS.md` - Global user instructions (live version in $HOME, on main branch)
+- `~/.dotfiles/AGENTS.md` - Worktree version (in this directory)
 - `~/.dotfiles/AGENTS.dotfiles.md` - **This file** - dotfiles-specific instructions
-- `~/.dotfiles/AGENTS.md` - Copy of global instructions (same as `~/AGENTS.md`)
+
+**How to handle updates:**
+- **Prefer editing `$HOME` versions directly** for isolated changes
+  - Avoids creating divergent versions that need merging
+  - No sync workflow needed - just commit with yadm
+- **Only edit worktree versions** when already making related changes here
+  - Keeps related changes together in one jj change
+  - **Never edit both copies in same session** - causes merge conflicts
+
+**Why prefer $HOME edits:**
+- Editing in worktree creates a fork between repo and `$HOME` versions
+- Must then merge changes, risking conflicts in critical system configs
+- Conflict markers in `.gitconfig`, `.vimrc`, shell configs → can't use tools to fix them
+- Safer to edit `$HOME` directly, then commit via yadm
+
+**Syncing worktree changes to $HOME:**
+
+After committing changes in `~/.dotfiles/` and moving them onto main branch via jj:
+
+```shell
+# 1. Check what would change (yadm HEAD auto-updates when jj moves main bookmark)
+yadm status
+yadm diff ../AGENTS.md  # (or whatever files changed)
+
+# Note: Files are tracked with ../ prefix from worktree perspective
+# "Changes not staged" means $HOME has old/different content
+
+# 2. Review diffs carefully to ensure they're expected changes
+# Make sure no $HOME-only edits were made that should be preserved
+
+# 3. If diffs look correct, restore repo versions to $HOME:
+yadm checkout -- ../AGENTS.md ../.gitignore  # etc
+
+# 4. Verify sync worked:
+yadm status  # Should show clean or only other unrelated files
+```
+
+**If $HOME has divergent edits you want to keep:**
+
+```shell
+# Option A: Commit $HOME changes via yadm first, then handle merge
+yadm add AGENTS.md
+yadm commit -m "Local $HOME edits to AGENTS.md"
+# Now manually reconcile the two versions
+
+# Option B: Manually inspect and merge
+# View both versions, copy desired parts, then checkout repo version
+cat ~/AGENTS.md  # Current $HOME version
+jj show main:AGENTS.md  # Repo version
+# Manually edit ~/AGENTS.md to combine, then commit via yadm
+```
+
+**Recovery if merge conflicts break configs:**
+
+If you get conflict markers in critical files (`.gitconfig`, `.vimrc`, etc.):
+
+```shell
+# Emergency: Use basic tools that don't depend on broken configs
+cat ~/.vimrc | grep -v "<<<<<<\|>>>>>>\|======" > ~/.vimrc.cleaned
+mv ~/.vimrc.cleaned ~/.vimrc
+
+# Or restore last working version
+yadm checkout HEAD~1 -- .vimrc
+
+# Or use worktree version
+cp ~/.dotfiles/.vimrc ~/.vimrc
+
+# Fix conflicts, then commit
+yadm add .vimrc
+yadm commit -m "Resolve merge conflict"
+```
+
+**For AI assistants:**
+- When making changes here, walk user through sync process afterward
+- Explain merge risks before committing changes that diverge from `$HOME`
+- Provide recovery commands if conflicts occur
 
 **Read BOTH files:**
 1. Read `AGENTS.md` first for general conventions
