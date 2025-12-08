@@ -1,6 +1,6 @@
 # AGENTS.md - General Directives for AI Coding Assistants
 
-**Last Updated:** 2025-12-05
+**Last Updated:** 2025-12-07
 **Location:** `~/AGENTS.md`
 
 ---
@@ -59,6 +59,28 @@ Since many AI tools only read files within the project workspace, you have three
 - Tool-specific rules (e.g., `.cursor/rules/` for Cursor IDE)
 - Project architecture patterns and anti-patterns
 - Known issues and workarounds specific to this project
+
+### Tool & MCP Server Documentation
+
+**For tool/MCP configuration details:**
+- Create `~/AGENTS.TOOLS.local.md` for global tool usage notes and MCP server specifics
+- Reference it from project `AGENTS.local.md` files where relevant
+- Keep `AGENTS.TOOLS.local.md` untracked and private
+- In public/shared AGENTS.md files, only mention which tools/MCPs you use, not how
+
+**Why keep details in local files instead of AGENTS.md:**
+- **Platform-dependent:** Different machines may have different agents/MCPs installed
+- **Version resilience:** Agents update their config formats; local files don't need repo syncing
+- **Privacy:** Avoid committing API patterns, authentication details, access specifics
+- **Machine-specific:** Each system can document its actual configuration state
+
+**What to document in AGENTS.TOOLS.local.md:**
+- Where MCP servers are configured (file paths, JSON keys)
+- How to check for newly installed but undocumented servers
+- MCP server usage patterns and caveats
+- Tool-specific quirks and best practices
+- Known issues and workarounds
+- Authentication/access patterns
 
 ---
 

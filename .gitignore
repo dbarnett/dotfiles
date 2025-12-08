@@ -2,10 +2,11 @@
 .sw[a-p]
 *.pyc
 .fuse_hidden*
-/.env/
+/.env
 /tags
 .lvimrc
 .a8/
 /vimspell/*.spl
 /.claude/settings.local.json
 /AGENTS.local.md
+/AGENTS.TOOLS.local.md
