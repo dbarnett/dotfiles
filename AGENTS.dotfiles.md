@@ -7,38 +7,74 @@ This file contains dotfiles-specific instructions for AI coding assistants worki
 
 ---
 
-## 📋 Repository Context
+## 📋 Repository Context & File Structure
 
 This is a **yadm-managed dotfiles repository** with a git worktree setup:
 
-- **`~/`** - Live configs based on `main` branch (managed by yadm)
-- **`~/.dotfiles/`** - Staging workspace on `staging` branch (this directory)
+- **`~/`** - Live configs (main branch via yadm, may have uncommitted changes)
+- **`~/.dotfiles/`** - Staging workspace (this directory, via jj)
 
-### Important: $HOME vs Worktree File Handling
+### Understanding the Three-Way Mirror
 
-Because files here mirror to `$HOME/`, all config files exist in two places:
+Because this repo mirrors `$HOME/`, each config file actually has **three versions to consider:**
 
-- `~/path/to/file` - Live version in $HOME (on main branch via yadm)
-- `~/.dotfiles/path/to/file` - Worktree staging version (via jj in this directory)
+**Example: `README.md`**
+1. **`~/README.md`** - The literal current file in $HOME (may have local edits)
+2. **`main:/README.md`** - The version committed on main branch (intended for $HOME)
+3. **`~/.dotfiles/README.md`** - Working copy being staged (may have uncommitted edits)
 
-**Example with AGENTS.md:**
-- `~/AGENTS.md` - Global user instructions (live version in $HOME, on main branch)
-- `~/.dotfiles/AGENTS.md` - Worktree version (in this directory)
-- `~/.dotfiles/AGENTS.dotfiles.md` - **This file** - dotfiles-specific instructions
+**Example workflow scenarios:**
 
-**How to handle updates:**
-- **Prefer editing `$HOME` versions directly** for isolated changes
-  - Avoids creating divergent versions that need merging
-  - No sync workflow needed - just commit with yadm
-- **Only edit worktree versions** when already making related changes here
-  - Keeps related changes together in one jj change
-  - **Never edit both copies in same session** - causes merge conflicts
+**Scenario A: Simple isolated change to one file**
+```shell
+# Want to add an alias to .bashrc
+vim ~/.bashrc           # Edit in $HOME directly
+source ~/.bashrc        # Test it
+yadm add .bashrc
+yadm commit -m "Add new alias"
+# Done! No worktree involvement, no syncing needed
+```
 
-**Why prefer $HOME edits:**
-- Editing in worktree creates a fork between repo and `$HOME` versions
-- Must then merge changes, risking conflicts in critical system configs
-- Conflict markers in `.gitconfig`, `.vimrc`, shell configs → can't use tools to fix them
-- Safer to edit `$HOME` directly, then commit via yadm
+**Scenario B: Multi-file change already in progress**
+```shell
+# Already working in ~/.dotfiles/ on related changes
+cd ~/.dotfiles/
+vim .bashrc .profile .gitconfig  # Edit multiple files together
+jj describe -m "Configure new tool"
+# Test changes, then move to main
+jj bookmark set main
+# Now sync to $HOME:
+yadm status                      # See what's different
+yadm checkout -- ../.bashrc ../.profile ../.gitconfig
+```
+
+**Scenario C: Accidentally edited both places (avoid this!)**
+```shell
+cd ~/.dotfiles/
+vim AGENTS.md  # Edit version in worktree
+vim ~/AGENTS.md  # Edit live version
+
+# Oops: edited ~/AGENTS.md AND ~/.dotfiles/AGENTS.md differently
+# Now have conflicting versions, must manually reconcile
+# This is why we pick ONE place to work at a time
+```
+
+**General principle:** Work in `$HOME` for simple isolated changes. Work in `~/.dotfiles/` when you're already staging multi-file changes together.
+
+### Documentation Files in This Repo
+
+- **`README.md`** - User-facing documentation (setup, config architecture, cross-platform support)
+- **`AGENTS.dotfiles.md`** - **This file** - AI agent workflow for working in this yadm repo
+- **`AGENTS.md`** - Copy of global `~/AGENTS.md` (general AI agent conventions across all projects)
+- **`AGENTS.local.md`** - Gitignored session notes (current state, TODOs, decisions)
+
+**Decision framework: Where should I edit?**
+
+Ask: "Am I already working on multi-file changes in `~/.dotfiles/`?"
+- **YES** → Continue editing in `~/.dotfiles/`, keep changes together
+- **NO** → Edit in `$HOME` directly, commit with yadm (simpler)
+
+**Critical rule:** Never edit both `~/file` and `~/.dotfiles/file` in the same session. Pick one or the other to avoid manual merge conflicts.
 
 **Syncing worktree changes to $HOME:**
 
@@ -66,6 +102,7 @@ yadm status  # Should show clean or only other unrelated files
 
 ```shell
 # Option A: Commit $HOME changes via yadm first, then handle merge
+# TODO: Commands to switch branches first here?
 yadm add AGENTS.md
 yadm commit -m "Local $HOME edits to AGENTS.md"
 # Now manually reconcile the two versions
