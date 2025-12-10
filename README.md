@@ -72,10 +72,59 @@ fi
 ```
 
 **What goes where:**
-- ✅ **Base (git):** Portable tool setup (Homebrew, Cargo, Starship, direnv, pyenv), general aliases, OS detection
-- ⚠️ **Local (gitignored):** Work-specific tools (SDKMAN, company SDKs, VPN configs), hardcoded machine paths, API keys, work-specific aliases/functions
+- ✅ **Base (git):** Portable tool setup (Homebrew, Cargo, Starship, direnv), general aliases, OS detection
+- ⚠️ **Local (gitignored):** Work-specific tools (pyenv, nvm, SDKMAN, company SDKs), VPN configs, hardcoded machine paths, API keys, work-specific aliases/functions
 
 **Testing separation:** To verify base configs work independently, temporarily rename `.local` files and start a fresh shell. Core functionality should work without errors.
+
+### Version Manager Isolation (pyenv, nvm, sdkman)
+
+**Context:** Version managers like pyenv/nvm/sdkman are typically installed by work setup scripts and create complexity:
+- Shell-specific implementations (nvm vs fish-nvm are separate tools)
+- Path conflicts between personal npm setup and work nvm
+- Duplicate installations when fish-nvm and standard nvm don't share directories
+
+**Strategy:** Keep version managers ONLY in `.local` configs on work machines.
+
+**Setup in `.profile.local` (work machine):**
+```shell
+# Version managers need PATH setup before shell-specific init
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+
+export NVM_DIR="$HOME/.nvm"
+# Note: nvm.sh sourcing happens in .bashrc.local
+
+export SDKMAN_DIR="$HOME/.sdkman"
+[[ -s "$SDKMAN_DIR/bin/sdkman-init.sh" ]] && source "$SDKMAN_DIR/bin/sdkman-init.sh"
+```
+
+**Bash init in `.bashrc.local` (work machine):**
+```shell
+# Conditional init - only runs if tools are installed
+if [ -x "$(command -v pyenv)" ]; then
+  eval "$(pyenv init -)"
+fi
+
+# Load standard nvm if using it (conflicts with fish-nvm)
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+```
+
+**Fish init in `.config/fish/config.local.fish` (work machine):**
+```fish
+# Version manager initialization
+type -q pyenv; and pyenv init - | source
+
+# fish-nvm configuration - point to standard nvm directory to avoid duplicates
+set -gx nvm_data "$NVM_DIR/versions/node"
+```
+
+**nvm vs fish-nvm conflict resolution:**
+- Standard nvm is bash-specific (shell functions)
+- fish-nvm is separate implementation for fish
+- Both can install node to different directories → duplicates
+- Solution: Configure `nvm_data` to point to standard nvm's directory
+- Or: Choose one implementation (fish-nvm only, skip loading nvm.sh in bash)
 
 ### Config variants: Linux vs macOS
 
