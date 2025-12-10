@@ -86,9 +86,154 @@ if [ "$OS" = "Linux" ]; then
     fi
 
 elif [ "$OS" = "Darwin" ]; then
-    printf "%bℹ️  No diagnostics implemented for macOS yet%b\n" "${BLUE}" "${NC}"
+    ERRORS=0
+    WARNINGS=0
+
+    # Check shell environment setup
+    printf "%b🐚 Fish Shell Check (CRITICAL - your default shell)%b\n" "${BLUE}" "${NC}"
+    printf "%s\n" "--------------------------------"
+
+    # Essential paths that should be in PATH
+    REQUIRED_PATHS="/opt/homebrew/bin /usr/local/bin /usr/bin"
+    
+    # Minimal PATH needed to find shell executables (but NOT inherited into the shell's config)
+    # This simulates what macOS login provides before shell config runs
+    MINIMAL_PATH="/usr/bin:/bin:/usr/sbin:/sbin"
+    
+    # Test fish shell in COMPLETELY ISOLATED environment (no inherited env vars)
+    # This simulates what Cursor embedded terminals see - a fresh shell session
+    printf "%bTesting fish (isolated - simulates Cursor terminals)...%b\n" "${BLUE}" "${NC}"
+    FISH_PATH=$(env -i HOME="$HOME" USER="$USER" PATH="$MINIMAL_PATH" /opt/homebrew/bin/fish -i -c 'echo $PATH' 2>/dev/null)
+    FISH_EXIT=$?
+    
+    if [ $FISH_EXIT -ne 0 ]; then
+        printf "%b❌ ERROR: fish shell failed to start in clean environment%b\n" "${RED}" "${NC}"
+        printf "   %bThis means Cursor terminals will also fail!%b\n" "${YELLOW}" "${NC}"
+        ERRORS=$((ERRORS + 1))
+    else
+        MISSING_PATHS=""
+        for required_path in $REQUIRED_PATHS; do
+            if ! echo "$FISH_PATH" | tr ' ' '\n' | grep -q "^${required_path}$"; then
+                MISSING_PATHS="$MISSING_PATHS $required_path"
+            fi
+        done
+        
+        if [ -n "$MISSING_PATHS" ]; then
+            printf "%b❌ CRITICAL ERROR: fish shell missing essential paths:%b\n" "${RED}" "${NC}"
+            printf "   Missing:%b\n" "$MISSING_PATHS"
+            printf "   %b⚠️  This breaks Cursor embedded terminals and other tools!%b\n" "${YELLOW}" "${NC}"
+            printf "   %bCheck ~/.config/fish/config.fish%b\n" "${YELLOW}" "${NC}"
+            printf "   %bEnsure: type -q /opt/homebrew/bin/brew; and /opt/homebrew/bin/brew shellenv | source%b\n" "${YELLOW}" "${NC}"
+            printf "   %b        is UNCOMMENTED and runs for interactive shells%b\n" "${YELLOW}" "${NC}"
+            ERRORS=$((ERRORS + 1))
+        else
+            printf "%b✅ OK: fish has all essential paths%b\n" "${GREEN}" "${NC}"
+        fi
+    fi
+
+    # Test essential tool availability in fish (isolated)
+    printf "%bTesting essential tools in fish (isolated)...%b\n" "${BLUE}" "${NC}"
+    ESSENTIAL_TOOLS="brew git node"
+    MISSING_TOOLS=""
+    
+    for tool in $ESSENTIAL_TOOLS; do
+        if ! env -i HOME="$HOME" USER="$USER" PATH="$MINIMAL_PATH" /opt/homebrew/bin/fish -i -c "type -q $tool" 2>/dev/null; then
+            MISSING_TOOLS="$MISSING_TOOLS $tool"
+        fi
+    done
+    
+    if [ -n "$MISSING_TOOLS" ]; then
+        printf "%b⚠️  WARNING: Some tools not accessible in fish:%b\n" "${YELLOW}" "${NC}"
+        printf "   Missing:%b\n" "$MISSING_TOOLS"
+        WARNINGS=$((WARNINGS + 1))
+    else
+        printf "%b✅ OK: All essential tools accessible%b\n" "${GREEN}" "${NC}"
+    fi
+
     printf "\n"
-    exit 0
+    
+    # Bash check is informational only (not critical since fish is the default)
+    printf "%b🐚 Bash Shell Check (informational)%b\n" "${BLUE}" "${NC}"
+    printf "%s\n" "--------------------------------"
+    printf "%bTesting bash (isolated)...%b\n" "${BLUE}" "${NC}"
+    BASH_PATH=$(env -i HOME="$HOME" USER="$USER" PATH="$MINIMAL_PATH" /bin/bash -i -c 'echo $PATH' 2>/dev/null)
+    BASH_EXIT=$?
+    
+    if [ $BASH_EXIT -ne 0 ]; then
+        printf "%b⚠️  WARNING: bash shell failed to start%b\n" "${YELLOW}" "${NC}"
+        WARNINGS=$((WARNINGS + 1))
+    else
+        MISSING_PATHS=""
+        for required_path in $REQUIRED_PATHS; do
+            if ! echo "$BASH_PATH" | tr ':' '\n' | grep -q "^${required_path}$"; then
+                MISSING_PATHS="$MISSING_PATHS $required_path"
+            fi
+        done
+        
+        if [ -n "$MISSING_PATHS" ]; then
+            printf "%b⚠️  WARNING: bash shell missing paths:%b\n" "${YELLOW}" "${NC}"
+            printf "   Missing:%b (check ~/.bashrc and ~/.profile)\n" "$MISSING_PATHS"
+            WARNINGS=$((WARNINGS + 1))
+        else
+            printf "%b✅ OK: bash has all essential paths%b\n" "${GREEN}" "${NC}"
+        fi
+    fi
+
+    printf "\n"
+
+    # Check direnv functionality
+    printf "%b🔧 Direnv Health Check%b\n" "${BLUE}" "${NC}"
+    printf "%s\n" "--------------------------------"
+    
+    if command -v direnv >/dev/null 2>&1; then
+        # Check direnv version
+        DIRENV_VERSION=$(direnv version 2>&1)
+        printf "%bDirectenv version: %s%b\n" "${BLUE}" "$DIRENV_VERSION" "${NC}"
+        
+        # Create a test .envrc in a temp directory
+        TEST_DIR=$(mktemp -d)
+        cat > "$TEST_DIR/.envrc" << 'EOF'
+export TEST_VAR="test_value"
+EOF
+        
+        # Test direnv allow and load
+        cd "$TEST_DIR" || exit 1
+        if timeout 3 direnv allow >/dev/null 2>&1; then
+            printf "%b✅ OK: direnv allow works (no hang)%b\n" "${GREEN}" "${NC}"
+            
+            # Test if it loads
+            if timeout 3 bash -c 'eval "$(direnv export bash 2>/dev/null)" && [ "$TEST_VAR" = "test_value" ]' 2>/dev/null; then
+                printf "%b✅ OK: direnv load works%b\n" "${GREEN}" "${NC}"
+            else
+                printf "%b⚠️  WARNING: direnv allow works but load might have issues%b\n" "${YELLOW}" "${NC}"
+                WARNINGS=$((WARNINGS + 1))
+            fi
+        else
+            printf "%b❌ ERROR: direnv allow hangs or times out%b\n" "${RED}" "${NC}"
+            printf "   %bThis indicates a bash/direnv configuration issue%b\n" "${YELLOW}" "${NC}"
+            ERRORS=$((ERRORS + 1))
+        fi
+        
+        # Cleanup
+        cd - >/dev/null || exit 1
+        rm -rf "$TEST_DIR"
+    else
+        printf "%b⚠️  WARNING: direnv not installed%b\n" "${YELLOW}" "${NC}"
+        WARNINGS=$((WARNINGS + 1))
+    fi
+
+    printf "\n"
+
+    if [ "$ERRORS" -gt 0 ]; then
+        printf "%b❌ %d error(s) and %d warning(s) found%b\n" "${RED}" "$ERRORS" "$WARNINGS" "${NC}"
+        exit 1
+    elif [ "$WARNINGS" -gt 0 ]; then
+        printf "%b⚠️  %d warning(s) found (no critical errors)%b\n" "${YELLOW}" "$WARNINGS" "${NC}"
+        exit 0
+    else
+        printf "%b✨ All checks passed!%b\n" "${GREEN}" "${NC}"
+        exit 0
+    fi
 
 else
     printf "%b⚠️  Unknown OS: %s%b\n" "${YELLOW}" "$OS" "${NC}"
