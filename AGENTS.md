@@ -17,6 +17,19 @@ That file contains dotfiles-specific instructions, current configuration status,
 
 This file contains general preferences and conventions for AI coding assistants (Claude Code, Cursor, Gemini CLI, etc.) across all projects.
 
+## 📑 Quick Navigation
+
+**Essential sections to read:**
+- **📋 How to Use This File** - Setting up project-level AGENTS.md files
+- **🐚 Version Control: Jujutsu (jj)** - VCS commands and workflows
+- **📁 Branch Metadata** - THIS_BRANCH.md and check_this_branch.sh usage
+- **🎯 General Coding Preferences** - Shell scripts, error handling, testing
+
+**See also:**
+- `~/AGENTS.TOOLS.local.md` - Tool/MCP server configurations (if exists)
+- Project `.cursor/rules/` - IDE-specific coding rules
+- Project `AGENTS.local.md` - Machine-specific overrides
+
 ---
 
 ## 📋 How to Use This File
@@ -378,6 +391,108 @@ What explicitly will NOT be done here?
    - When a check stabilizes → migrate to permanent test/script
    - Simplify check_this_branch.sh as checks move out
    - Goal: End with trivial script, not masterpiece to delete
+
+**BEST PRACTICES FOR OUTPUT:**
+
+These patterns make check_this_branch.sh more useful for both humans and AI assistants:
+
+1. **Always show current change metadata at the start**
+   - Display current + parent change IDs, descriptions, empty status
+   - Show position relative to main (e.g., "main+3")
+   - Include bookmark/branch name if set
+   - **Why:** Helps AI detect when user switched changes between interactions
+   - **Why:** Provides immediate context about what's being checked
+
+```shell
+# Extract jj metadata
+echo "=== Branch Checks for <Project> ==="
+echo ""
+echo "Current: $CURRENT_CHANGE_ID (empty): Fix typo in docs"
+echo "Parent:  $PARENT_CHANGE_ID: Implement feature X"
+echo "Branch:  feature-x"
+echo "Ahead:   main+3"
+echo ""
+```
+
+2. **Display timing information at the end**
+   - Use millisecond precision for performance awareness
+   - Helps identify slow checks that need optimization
+   - **Why:** Self-contained performance context AI can notice and act on
+   - **Why:** User feedback loop for keeping checks fast
+
+```shell
+# Start timing
+START_TIME=$(python3 -c 'import time; print(int(time.time() * 1000))')
+
+# ... run checks ...
+
+# End timing
+END_TIME=$(python3 -c 'import time; print(int(time.time() * 1000))')
+ELAPSED_MS=$((END_TIME - START_TIME))
+printf "Checks finished after %d.%03d seconds\n" $((ELAPSED_MS / 1000)) $((ELAPSED_MS % 1000))
+```
+
+3. **Consolidate related checks to reduce noise**
+   - Group formatting checks (whitespace, tabs, line endings)
+   - Combine similar validations (multiple linters for same files)
+   - Show single ✅/❌ for grouped checks when all pass/fail
+   - Show details only when needed
+
+```shell
+# ❌ NOISY - separate output for each
+echo "🔍 Checking trailing whitespace..."
+echo "✅ No trailing whitespace"
+echo "🔍 Checking tabs..."
+echo "✅ No tabs"
+
+# ✅ QUIET - consolidated
+echo "🔍 Checking formatting (whitespace, tabs)..."
+echo "✅ No formatting issues"
+```
+
+4. **Include actionable context in output**
+   - Explain what checks mean: "(informational only)", "(blocking)"
+   - Provide interpretation guidance: "(warnings above are known issue, can be ignored)"
+   - Note future improvements: "(will have automated tests when extracted to library)"
+   - Give remediation hints: "Fix FIXME comments or convert to TODO"
+
+```shell
+echo "📋 TODO comments in branch files (informational only)..."
+echo "📝 Testing notes:"
+echo "   • phrTables.js: Validated via runSmokeTests() after manual push"
+echo "   • Future library extractions will have automated tests here"
+```
+
+5. **Use clear visual hierarchy**
+   - Use emoji/symbols consistently: 🔍 (running), ✅ (pass), ❌ (fail), ⚠️ (warning)
+   - Section headers with ===
+   - Indent supporting details
+   - Separate sections with blank lines
+
+6. **Handle missing tools gracefully**
+   - Check if tool exists before running: `command -v tool >/dev/null 2>&1`
+   - Explain when skipping: "(markdownlint not installed, skipping)"
+   - Don't fail on optional checks
+
+7. **Provide clear exit context**
+   - Summarize results before exit
+   - Remind about publication blockers
+   - Give specific commands to run next
+   - Use appropriate exit codes (0 = success, 1 = error)
+
+```shell
+echo "=== Summary ==="
+echo "✅ All checks passed"
+echo ""
+echo "Checks finished after 5.234 seconds"
+echo ""
+echo "⚠️  REMINDER: This branch is NOT READY FOR PR until:"
+echo "   - THIS_BRANCH.md is removed"
+echo "   - check_this_branch.sh is removed"
+echo ""
+echo "   Use: rm THIS_BRANCH.md check_this_branch.sh"
+echo "   Then: jj squash (to squash deletion into parent changes)"
+```
 
 **Initial Template:**
 ```bash
@@ -745,6 +860,107 @@ fi
 - ✅ Redirect output: `pgrep -x process >/dev/null 2>&1`
 - ✅ Check exit code: `if pgrep -x process >/dev/null 2>&1; then ...`
 - ❌ NEVER: `pgrep -x process || true`
+
+**CRITICAL: Check actual exit codes and stderr, don't assume failure reasons**
+
+❌ **WRONG - Assumes any failure means specific thing:**
+```shell
+# Assumes any exit code means "not found"
+if ! some_command; then
+    echo "Command not found"
+fi
+
+# Assumes any failure means file doesn't exist
+result=$(cat file.txt 2>&1) || echo "File doesn't exist"
+```
+
+✅ **CORRECT - Check exit codes and stderr explicitly:**
+```shell
+# Check exit code explicitly
+if ! output=$(some_command 2>&1); then
+    exit_code=$?
+    if [ $exit_code -eq 127 ]; then
+        echo "ERROR: Command not found"
+    elif [ $exit_code -eq 1 ]; then
+        echo "ERROR: Command failed: $output"
+    else
+        echo "ERROR: Command failed with exit code $exit_code"
+    fi
+fi
+
+# Check stderr for specific error messages
+if ! result=$(cat file.txt 2>&1); then
+    if echo "$result" | grep -q "No such file"; then
+        echo "File doesn't exist"
+    elif echo "$result" | grep -q "Permission denied"; then
+        echo "Permission denied"
+    else
+        echo "Failed to read file: $result"
+    fi
+fi
+```
+
+**Why this matters:**
+- Exit codes carry specific meaning (127=not found, 1=general error, 2=misuse, etc.)
+- stderr contains diagnostic information about what actually went wrong
+- Assuming failure reasons leads to misleading error messages
+- Proper diagnostics make debugging possible
+
+### Output Formatting in Shell Scripts
+
+**CRITICAL: Avoid "log-log-log" patterns for multiline output**
+
+❌ **WRONG - Breaks vertical alignment:**
+```shell
+echo "=== Summary ==="
+echo "  Status:    ✅ Passed"
+echo "  Files:     42"
+echo "  Time:      1.234s"
+
+# Especially bad when variables have different widths:
+for file in $FILES; do
+    echo "Processing: $file"  # Breaks alignment in logs
+    echo "  Status:   $status"
+    echo "  Size:     $size"
+done
+```
+
+✅ **CORRECT - Use single output for block-formatted content:**
+```shell
+# Pattern 1: printf with format string
+printf "=== Summary ===
+  Status:    ✅ Passed
+  Files:     %d
+  Time:      %.3fs
+" "$file_count" "$elapsed"
+
+# Pattern 2: Heredoc or here-string (POSIX sh)
+cat <<EOF
+=== Summary ===
+  Status:    ✅ Passed
+  Files:     $file_count
+  Time:      ${elapsed}s
+EOF
+
+# Pattern 3: Build string then output once
+output="=== Summary ===
+  Status:    ✅ Passed
+  Files:     $file_count
+  Time:      ${elapsed}s"
+echo "$output"
+```
+
+**Why this matters:**
+- Multiple echo calls break vertical alignment when buffered or redirected
+- Log viewers may interleave output from parallel processes between echo calls
+- Block-formatted output (tables, aligned columns) must stay together
+- Single output statement ensures atomic write to stdout/logs
+
+**When multiline output is acceptable:**
+- ✅ Separate logical sections: different echo for different sections
+- ✅ Progressive status updates: "Processing file 1... done", "Processing file 2... done"
+- ✅ Streaming output where each line is independent
+- ❌ NEVER: Block-formatted tables or aligned columns with multiple echo calls
 
 ### File Editing
 - Clean up trailing whitespace (except `.md` files)
