@@ -78,51 +78,48 @@ Ask: "Am I already working on multi-file changes in `~/.dotfiles/`?"
 
 **Syncing worktree changes to $HOME:**
 
-After committing changes in `~/.dotfiles/` and moving them onto main branch via jj:
+TODO: This section needs investigation and proper documentation.
+
+**Current understanding (incomplete/possibly wrong):**
+
+After committing changes in `~/.dotfiles/` and moving them onto main branch via jj, yadm HEAD auto-updates. You'll see:
+- Files **staged** = old version from before history rewrite
+- Files **unstaged** = your intentional $HOME edits OR stale content
 
 ```shell
-# 1. Check status (yadm HEAD auto-updates when jj moves main bookmark)
-yadm status
-
-# You'll see files in one of two states:
-# - "Changes to be committed" (staged) = old version from before history rewrite
-# - "Changes not staged" (unstaged) = your intentional $HOME edits OR stale content
-```
-
-**Common case: History was rewritten (rebase, squash, etc.)**
-
-The staged/unstaged distinction tells you what to do:
-- **Staged files** = old stale versions → update to HEAD
-- **Unstaged files** = check diff to determine if intentional or stale
-
-```shell
-# Fix staged files (stale from before rewrite):
+# Basic approach (works when no $HOME edits to preserve):
 yadm restore --staged --worktree ../README.md
-# This unstages AND updates to HEAD in one command
+# This unstages AND updates to HEAD
 
-# For unstaged files, check the diff:
-yadm diff ../AGENTS.md
-
-# If changes are intentional (your edits), keep them:
-yadm add ../AGENTS.md
-
-# If changes are stale (remove old content), discard them:
-yadm restore ../AGENTS.md
-
-# Verify:
-yadm status  # Should show clean or only intentional staged changes
+# But PROBLEM: What if you WANT to merge $HOME edits with base updates?
+# Current approach would OVERWRITE $HOME edits - wrong!
 ```
 
-**Simple case: No history rewrite, just normal sync**
+**UNRESOLVED: Proper merge workflow**
 
+Scenario:
+- $HOME has old base + local edits
+- HEAD has new base (from worktree)
+- Want: new base + local edits (merged)
+
+The staged/unstaged distinction is meaningful and should NOT be reset away.
+Need proper 3-way merge that:
+1. Applies updates from (old base → new base)
+2. Preserves local $HOME-specific edits
+3. Handles conflicts with markers if edits overlap
+
+**TODO: Investigate proper git commands for this scenario**
+- Maybe: git merge-file with explicit base/theirs/ours?
+- Maybe: commit $HOME state first, then merge/rebase?
+- Maybe: use git rerere or similar?
+- Need to understand git index/staging semantics better
+
+**Current workaround:** Manually restore files you know have no local edits:
 ```shell
-# If no $HOME edits were made, just update everything:
-yadm checkout -- ../AGENTS.md ../.gitignore  # etc
-# Or: yadm reset --hard HEAD
-
-# Verify:
-yadm status  # Should be clean
+yadm restore --staged --worktree ../file  # Only if no $HOME edits!
 ```
+
+For files with both base updates AND $HOME edits: no documented solution yet.
 
 **If $HOME has divergent edits you want to keep:**
 
