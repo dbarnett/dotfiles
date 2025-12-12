@@ -986,6 +986,64 @@ echo "$output"
     grep -n "TODO" "$file" | grep -v "TODO.*out-of-scope-pattern"
     ```
 
+### Logging Patterns
+
+**AVOID consecutive Logger.log calls ("log-log-log" antipattern):**
+
+❌ **WRONG - Multiple calls break vertical alignment:**
+```javascript
+Logger.log('⚠️  WARNING: Something is wrong');
+Logger.log('   Expected: This should happen');
+Logger.log('   Suggestion: Do this instead');
+```
+
+✅ **CORRECT - Single multi-line call:**
+```javascript
+Logger.log('⚠️  WARNING: Something is wrong\n' +
+           '   Expected: This should happen\n' +
+           '   Suggestion: Do this instead');
+```
+
+❌ **WRONG - Ugly block text output in shell:**
+```shell
+echo "Doing something"
+echo ""
+echo "Details:"
+echo "  - Item 1"
+echo "  - Item 2"
+```
+
+✅ **CORRECT - Output one message as one message:**
+```shell
+echo "Doing something
+
+Details:
+  - Item 1
+  - Item 2"
+```
+
+**Newline usage:**
+- Use `\n` only to separate lines WITHIN a message
+- Don't add leading or trailing `\n` unless you specifically want a blank line after the message
+- `Logger.log('Line 1\nLine 2')` outputs two lines + automatic newline at end
+- `Logger.log('Message\n\n')` outputs message + blank line (double newline)
+
+**Why this matters:**
+- Multiple Logger.log calls may interleave with other logs in concurrent execution
+- Single call ensures message stays together as atomic block
+- Consistent newline handling prevents unexpected blank lines
+
+❌ **WRONG - Weird leading/trailing newlines:**
+```javascript
+Logger.log('\n=== Doing thing ===');
+Logger.log('Finished\n');
+```
+✅ **CORRECT - Output without leading/trailing newlines:**
+```javascript
+Logger.log('=== Doing thing ===');
+Logger.log('Finished');
+```
+
 ### Documentation
 - When code changes, update related docs immediately
 - Add "Last Updated" timestamps to docs
