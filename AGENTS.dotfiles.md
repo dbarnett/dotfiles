@@ -81,21 +81,47 @@ Ask: "Am I already working on multi-file changes in `~/.dotfiles/`?"
 After committing changes in `~/.dotfiles/` and moving them onto main branch via jj:
 
 ```shell
-# 1. Check what would change (yadm HEAD auto-updates when jj moves main bookmark)
+# 1. Check status (yadm HEAD auto-updates when jj moves main bookmark)
 yadm status
-yadm diff ../AGENTS.md  # (or whatever files changed)
 
-# Note: Files are tracked with ../ prefix from worktree perspective
-# "Changes not staged" means $HOME has old/different content
+# You'll see files in one of two states:
+# - "Changes to be committed" (staged) = old version from before history rewrite
+# - "Changes not staged" (unstaged) = your intentional $HOME edits OR stale content
+```
 
-# 2. Review diffs carefully to ensure they're expected changes
-# Make sure no $HOME-only edits were made that should be preserved
+**Common case: History was rewritten (rebase, squash, etc.)**
 
-# 3. If diffs look correct, restore repo versions to $HOME:
+The staged/unstaged distinction tells you what to do:
+- **Staged files** = old stale versions → update to HEAD
+- **Unstaged files** = check diff to determine if intentional or stale
+
+```shell
+# Fix staged files (stale from before rewrite):
+yadm restore --staged --worktree ../README.md
+# This unstages AND updates to HEAD in one command
+
+# For unstaged files, check the diff:
+yadm diff ../AGENTS.md
+
+# If changes are intentional (your edits), keep them:
+yadm add ../AGENTS.md
+
+# If changes are stale (remove old content), discard them:
+yadm restore ../AGENTS.md
+
+# Verify:
+yadm status  # Should show clean or only intentional staged changes
+```
+
+**Simple case: No history rewrite, just normal sync**
+
+```shell
+# If no $HOME edits were made, just update everything:
 yadm checkout -- ../AGENTS.md ../.gitignore  # etc
+# Or: yadm reset --hard HEAD
 
-# 4. Verify sync worked:
-yadm status  # Should show clean or only other unrelated files
+# Verify:
+yadm status  # Should be clean
 ```
 
 **If $HOME has divergent edits you want to keep:**
