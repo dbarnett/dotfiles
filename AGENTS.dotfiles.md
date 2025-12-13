@@ -1,6 +1,6 @@
 # 🏠 Dotfiles Repository - Agent Instructions
 
-**Last Updated:** 2025-12-13 (Added git-howto.md, _worktree bookmark workflow)
+**Last Updated:** 2025-12-13 (Simplified quick start, merge-by-SHA workflow)
 **Location:** `~/.dotfiles/AGENTS.dotfiles.md`
 
 This file contains dotfiles-specific instructions for AI coding assistants working in this repository.
@@ -14,52 +14,35 @@ This is a **yadm-managed dotfiles repository** with a git worktree setup:
 - **`~/`** - Live configs (main branch via yadm, may have uncommitted changes)
 - **`~/.dotfiles/`** - Staging workspace (this directory, via jj)
 
-### Understanding the Three-Way Mirror
+### Quick Start: The Two Workflows
 
-Because this repo mirrors `$HOME/`, each config file actually has **three versions to consider:**
-
-**Example: `README.md`**
-1. **`~/README.md`** - The literal current file in $HOME (may have local edits)
-2. **`main:/README.md`** - The version committed on main branch (intended for $HOME)
-3. **`~/.dotfiles/README.md`** - Working copy being staged (may have uncommitted edits)
-
-**Example workflow scenarios:**
-
-**Scenario A: Simple isolated change to one file**
+**Option 1: Edit directly in $HOME (simple)**
 ```shell
-# Want to add an alias to .bashrc
-vim ~/.bashrc           # Edit in $HOME directly
+vim ~/.bashrc           # Edit file
 source ~/.bashrc        # Test it
 yadm add .bashrc
 yadm commit -m "Add new alias"
-# Done! No worktree involvement, no syncing needed
+yadm push
+# Done!
 ```
 
-**Scenario B: Multi-file change already in progress**
+**Option 2: Edit in worktree, merge by SHA (for multi-file changes)**
 ```shell
-# Already working in ~/.dotfiles/ on related changes
 cd ~/.dotfiles/
-vim .bashrc .profile .gitconfig  # Edit multiple files together
+vim .bashrc .profile .gitconfig  # Edit multiple files
 jj describe -m "Configure new tool"
-# Test changes, then move to main
-jj bookmark set main
-# Now sync to $HOME:
-yadm status                      # See what's different
-yadm checkout -- ../.bashrc ../.profile ../.gitconfig
+jj new  # Start new empty change
+
+# Merge to $HOME by SHA
+WORKTREE_SHA=$(jj log -r @- -T commit_id --no-graph)
+yadm merge $WORKTREE_SHA --ff-only
+yadm push
+# Done!
 ```
 
-**Scenario C: Accidentally edited both places (avoid this!)**
-```shell
-cd ~/.dotfiles/
-vim AGENTS.md  # Edit version in worktree
-vim ~/AGENTS.md  # Edit live version
-
-# Oops: edited ~/AGENTS.md AND ~/.dotfiles/AGENTS.md differently
-# Now have conflicting versions, must manually reconcile
-# This is why we pick ONE place to work at a time
-```
-
-**General principle:** Work in `$HOME` for simple isolated changes. Work in `~/.dotfiles/` when you're already staging multi-file changes together.
+**Critical rules:**
+- Never edit both `~/file` and `~/.dotfiles/file` in the same session
+- Never use `jj bookmark set main` in the worktree
 
 ### Documentation Files in This Repo
 
