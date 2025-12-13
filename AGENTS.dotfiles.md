@@ -1,6 +1,6 @@
 # 🏠 Dotfiles Repository - Agent Instructions
 
-**Last Updated:** 2025-12-07 (Claude Code config section added)
+**Last Updated:** 2025-12-13 (Added git-howto.md, _worktree bookmark workflow)
 **Location:** `~/.dotfiles/AGENTS.dotfiles.md`
 
 This file contains dotfiles-specific instructions for AI coding assistants working in this repository.
@@ -70,74 +70,45 @@ vim ~/AGENTS.md  # Edit live version
 
 **Decision framework: Where should I edit?**
 
-Ask: "Am I already working on multi-file changes in `~/.dotfiles/`?"
-- **YES** → Continue editing in `~/.dotfiles/`, keep changes together
-- **NO** → Edit in `$HOME` directly, commit with yadm (simpler)
+**Guidelines for AI agents:**
+
+**For quick single-file changes:**
+- Edit in `$HOME` and commit with yadm directly
+- Simpler, fewer steps, no merge needed
+
+**For multi-file or complex changes (recommended):**
+- Edit in `~/.dotfiles/` and merge by SHA when done
+- Easier to review all related changes together in jj
+- Can use jj's history tools (jj log, jj show, jj diff)
+- Clean separation between work-in-progress and live configs
+
+**The merge-by-SHA workflow is now simple enough that worktree editing is preferred for most changes.**
 
 **Critical rule:** Never edit both `~/file` and `~/.dotfiles/file` in the same session. Pick one or the other to avoid manual merge conflicts.
 
 **Syncing worktree changes to $HOME:**
 
-After committing changes in `~/.dotfiles/` and moving them onto main branch via jj:
+See `.agents/git-howto.md` for complete workflow documentation.
+
+**TL;DR: Merge by SHA (no bookmarks needed)**
 
 ```shell
-# 1. Check what would change (yadm HEAD auto-updates when jj moves main bookmark)
+# 1. In worktree: commit your changes
+cd ~/.dotfiles/
+jj describe -m "🔧 Your changes"
+
+# 2. Get the commit SHA
+WORKTREE_SHA=$(jj log -r @ -T commit_id --no-graph)
+
+# 3. From $HOME: merge via yadm
+yadm merge $WORKTREE_SHA --ff-only
+
+# 4. Verify and push
 yadm status
-yadm diff ../AGENTS.md  # (or whatever files changed)
-
-# Note: Files are tracked with ../ prefix from worktree perspective
-# "Changes not staged" means $HOME has old/different content
-
-# 2. Review diffs carefully to ensure they're expected changes
-# Make sure no $HOME-only edits were made that should be preserved
-
-# 3. If diffs look correct, restore repo versions to $HOME:
-yadm checkout -- ../AGENTS.md ../.gitignore  # etc
-
-# 4. Verify sync worked:
-yadm status  # Should show clean or only other unrelated files
+yadm push
 ```
 
-**If $HOME has divergent edits you want to keep:**
-
-```shell
-# Option A: Commit $HOME changes via yadm first, then handle merge
-# TODO: Commands to switch branches first here?
-yadm add AGENTS.md
-yadm commit -m "Local $HOME edits to AGENTS.md"
-# Now manually reconcile the two versions
-
-# Option B: Manually inspect and merge
-# View both versions, copy desired parts, then checkout repo version
-cat ~/AGENTS.md  # Current $HOME version
-jj show main:AGENTS.md  # Repo version
-# Manually edit ~/AGENTS.md to combine, then commit via yadm
-```
-
-**Recovery if merge conflicts break configs:**
-
-If you get conflict markers in critical files (`.gitconfig`, `.vimrc`, etc.):
-
-```shell
-# Emergency: Use basic tools that don't depend on broken configs
-cat ~/.vimrc | grep -v "<<<<<<\|>>>>>>\|======" > ~/.vimrc.cleaned
-mv ~/.vimrc.cleaned ~/.vimrc
-
-# Or restore last working version
-yadm checkout HEAD~1 -- .vimrc
-
-# Or use worktree version
-cp ~/.dotfiles/.vimrc ~/.vimrc
-
-# Fix conflicts, then commit
-yadm add .vimrc
-yadm commit -m "Resolve merge conflict"
-```
-
-**For AI assistants:**
-- When making changes here, walk user through sync process afterward
-- Explain merge risks before committing changes that diverge from `$HOME`
-- Provide recovery commands if conflicts occur
+**NEVER use `jj bookmark set main` in the worktree** - this moves main out from under yadm and creates a confusing state. Always merge by SHA instead.
 
 **Read BOTH files:**
 1. Read `AGENTS.md` first for general conventions
