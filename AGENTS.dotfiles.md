@@ -1,123 +1,201 @@
-# 🏠 Dotfiles Repository - Agent Instructions
+# Dotfiles Repository - AI Agent Instructions
 
-**Last Updated:** 2025-12-13 (Simplified quick start, merge-by-SHA workflow)
-**Location:** `~/.dotfiles/AGENTS.dotfiles.md`
+**Location:** This file is repo-specific (not deployed to `~/`)
+**Last Updated:** 2025-12-14
 
-This file contains dotfiles-specific instructions for AI coding assistants working in this repository.
+For global AI agent conventions across all projects, see `~/AGENTS.md` (deployed from `literal_AGENTS.md` in this repo).
 
 ---
 
-## 📋 Repository Context & File Structure
+## ⚠️ IMPORTANT: Read This First
 
-This is a **yadm-managed dotfiles repository** with a git worktree setup:
+**You are in the dotfiles repository.** This repo uses **chezmoi** to manage dotfiles.
 
-- **`~/`** - Live configs (main branch via yadm, may have uncommitted changes)
-- **`~/.dotfiles/`** - Staging workspace (this directory, via jj)
+**Required reading:**
+1. **This file** - Repository structure and chezmoi workflow
+2. **`~/AGENTS.md`** - Global agent conventions (jj workflow, shell preferences, etc.)
+3. **`.agents/howto-chezmoi.md`** - Detailed chezmoi patterns and gotchas
+4. **`THIS_BRANCH.md`** - Current branch status and TODOs (if exists)
 
-### Quick Start: The Two Workflows
+---
 
-**Option 1: Edit directly in $HOME (simple)**
+## 📁 Repository Overview
+
+This is a chezmoi-managed dotfiles repository containing shell configs, editor settings, and tool configurations for Linux/macOS systems.
+
+**Structure:**
+- **Source:** `~/.dotfiles/` (this directory - staging workspace during migration)
+- **Future source:** `~/.local/share/chezmoi/` (will be main chezmoi source after migration)
+- **Destination:** `~/` (where files are deployed)
+- **Remote:** `git@github.com:dbarnett/dotfiles.git`
+
+**Files in this repo that DON'T deploy to home:**
+- `AGENTS.md` (this file - repo-specific instructions)
+- `THIS_BRANCH.md` (branch metadata)
+- `check_this_branch.sh` (branch validation script)
+
+**Files that DO deploy to home:**
+- `literal_AGENTS.md` → `~/AGENTS.md` (global agent guidelines)
+- `dot_agents/*` → `~/.agents/*` (specialized guides)
+- All other tracked dotfiles
+
+---
+
+## 🔧 Quick Chezmoi Reference
+
+See `.agents/howto-chezmoi.md` for detailed patterns and gotchas.
+
+**Common operations:**
 ```shell
-vim ~/.bashrc           # Edit file
-source ~/.bashrc        # Test it
-yadm add .bashrc
-yadm commit -m "Add new alias"
-yadm push
-# Done!
+chezmoi add ~/.bashrc       # Track a new file
+chezmoi edit ~/.bashrc      # Edit in source, auto-apply
+chezmoi diff                # Preview what would change
+chezmoi apply               # Deploy changes to home
+chezmoi cd                  # Jump to source directory
 ```
 
-**Option 2: Edit in worktree, merge by SHA (for multi-file changes)**
+**With encryption:**
 ```shell
-cd ~/.dotfiles/
-vim .bashrc .profile .gitconfig  # Edit multiple files
-jj describe -m "Configure new tool"
-jj new  # Start new empty change
-
-# Merge to $HOME by SHA
-WORKTREE_SHA=$(jj log -r @- -T commit_id --no-graph)
-yadm merge $WORKTREE_SHA --ff-only
-yadm push
-# Done!
+chezmoi add --encrypt ~/.gmailctl/config.personal.jsonnet
 ```
 
-**Critical rules:**
-- Never edit both `~/file` and `~/.dotfiles/file` in the same session
-- Never use `jj bookmark set main` in the worktree
-
-### Documentation Files in This Repo
-
-- **`README.md`** - User-facing documentation (setup, config architecture, cross-platform support)
-- **`AGENTS.dotfiles.md`** - **This file** - AI agent workflow for working in this yadm repo
-- **`AGENTS.md`** - Copy of global `~/AGENTS.md` (general AI agent conventions across all projects)
-- **`AGENTS.local.md`** - Gitignored session notes (current state, TODOs, decisions)
-
-**Decision framework: Where should I edit?**
-
-**Guidelines for AI agents:**
-
-**For quick single-file changes:**
-- Edit in `$HOME` and commit with yadm directly
-- Simpler, fewer steps, no merge needed
-
-**For multi-file or complex changes (recommended):**
-- Edit in `~/.dotfiles/` and merge by SHA when done
-- Easier to review all related changes together in jj
-- Can use jj's history tools (jj log, jj show, jj diff)
-- Clean separation between work-in-progress and live configs
-
-**The merge-by-SHA workflow is now simple enough that worktree editing is preferred for most changes.**
-
-**Critical rule:** Never edit both `~/file` and `~/.dotfiles/file` in the same session. Pick one or the other to avoid manual merge conflicts.
-
-**Syncing worktree changes to $HOME:**
-
-See `.agents/git-howto.md` for complete workflow documentation.
-
-**TL;DR: Merge by SHA (no bookmarks needed)**
-
-```shell
-# 1. In worktree: commit your changes
-cd ~/.dotfiles/
-jj describe -m "🔧 Your changes"
-jj new  # Start new empty change on top
-
-# 2. Get the parent commit SHA (@- is the commit we just described)
-WORKTREE_SHA=$(jj log -r @- -T commit_id --no-graph)
-
-# 3. From $HOME: merge via yadm
-yadm merge $WORKTREE_SHA --ff-only
-
-# 4. Verify and push
-yadm status
-yadm push
+**Template syntax:**
+```
+{{ if eq .machine_type "work" }}
+work-specific content
+{{ end }}
 ```
 
-**NEVER use `jj bookmark set main` in the worktree** - this moves main out from under yadm and creates a confusing state. Always merge by SHA instead.
+---
 
-**Read BOTH files:**
-1. Read `AGENTS.md` first for general conventions
-2. Read this file (`AGENTS.dotfiles.md`) for dotfiles-specific guidance
+## ⚙️ Machine Configuration
 
-### Claude Code Configuration
+Configure machine-specific settings in `~/.config/chezmoi/chezmoi.toml`:
 
-**IMPORTANT**: Because this is a yadm-managed dotfiles repo, any `.claude/settings.json` in this directory would also become `~/.claude/settings.json` (same file). Therefore:
+```toml
+[data]
+    machine_type = "work"  # or "personal"
+    vcs_author_email = "work@example.com"  # Optional override
 
-- **Use `.claude/settings.local.json`** - Already gitignored (see `.gitignore:10`)
+[encryption]
+    type = "age"
+    [encryption.age]
+        identity = "~/.config/chezmoi/key.txt"
+        recipient = "age1rfypa36vaxk04x7rr6capfayu0575t3jplwrdy22m8yn7h0gpe5q6sauay"
+```
+
+**Age encryption:**
+- Private key: `~/.config/chezmoi/key.txt` (NEVER commit, copy securely to new machines)
+- Public key: In `chezmoi.toml` above (safe to commit)
+- Encrypted files stored as `encrypted_*.age` in source
+
+---
+
+## 📋 Current State (Migration Complete)
+
+**All 92 yadm-tracked files have been migrated to chezmoi.**
+
+Chezmoi now manages all dotfiles that yadm previously tracked, including:
+- Shell configs (`.bashrc`, `.bash_aliases`, `.profile`, etc.)
+- Git configs (`.gitconfig`, `.gitignore`, `.gitconfig.d/*`)
+- Editors (`.vimrc`, `.vim/`, `.config/helix/`, `.config/fish/`, `.config/nvim`)
+- Tools (`.npmrc`, `.config/gh/`, `.config/hypr/`, etc.)
+- Encrypted files (gmailctl configs via age encryption)
+
+**Excluded from tracking (`.chezmoiignore`):**
+- Caches: `.cache/`, `.cargo/`, `.rustup/`, `.npm/`, etc.
+- App data: `.local/share/` (except specific files), `.mozilla/`, `.steam/`
+- IDEs: `.config/JetBrains/`, `.config/Code - OSS/`
+- History files: `.bash_history`, `.viminfo`, etc.
+
+---
+
+## 🔍 Common Tasks
+
+### Adding a New Dotfile
+
+```shell
+chezmoi add ~/.config/newapp/config.yaml
+```
+
+### Editing an Existing File
+
+```shell
+# Option 1: Edit in source with auto-apply
+chezmoi edit ~/.bashrc
+
+# Option 2: Edit in home, then add changes
+vim ~/.bashrc
+chezmoi add ~/.bashrc
+```
+
+### Templating for Different Machines
+
+**In source:** `dot_bashrc.tmpl`
+```shell
+{{ if eq .machine_type "work" }}
+export WORK_SPECIFIC=value
+{{ else }}
+export PERSONAL_SPECIFIC=value
+{{ end }}
+```
+
+### Adding Encrypted Files
+
+```shell
+chezmoi add --encrypt ~/.gmailctl/config.personal.jsonnet
+```
+
+**Important:** Encrypted files are stored as `encrypted_*` in source and auto-decrypted on `chezmoi apply`.
+
+---
+
+## 🐚 Version Control Workflow
+
+This repo uses **Jujutsu (jj)** for version control. See `~/AGENTS.md` for jj workflow details.
+
+**Quick reference:**
+```shell
+jj status              # Check current change
+jj show --stat         # See what changed
+jj new -m "Description" # Start new change
+jj describe            # Update change description
+jj git push            # Push bookmark to GitHub
+```
+
+---
+
+## 🔒 Security Notes
+
+**Public repository:** This is a PUBLIC repository on GitHub.
+
+**Safe to commit:**
+- Encrypted files (`encrypted_*.age`)
+- Public configuration
+- Template files
+- Age public key
+
+**NEVER commit:**
+- Age private key (`~/.config/chezmoi/key.txt`)
+- Unencrypted secrets
+- Machine-specific passwords
+- API keys or tokens
+- Personal email addresses or private info
+
+**Use `.chezmoiignore`** to exclude sensitive files from tracking.
+
+---
+
+## 🛠️ Claude Code Configuration
+
+**IMPORTANT**: Any `.claude/settings.json` in this repo becomes `~/.claude/settings.json` when deployed.
+
+- **Use `.claude/settings.local.json`** - Already gitignored (machine-specific)
 - **Do NOT track `.claude/settings.json`** - Would propagate to global Claude config
 
-**Why `.gitignore` instead of `.git/info/exclude`:**
+**Required setup for working in this repo:**
 
-Due to [jj-vcs/jj#8140](https://github.com/jj-vcs/jj/issues/8140), jj fails to respect `.git/info/exclude` in worktrees (though it works fine in regular repos). This means:
-- ❌ Can't use `.git/info/exclude` to ignore files only in this worktree
-- ✅ Must use `.gitignore` to ignore `.claude/settings.local.json` globally
-
-This is acceptable because:
-- `.claude/settings.local.json` should be gitignored in ALL repos anyway (it's machine-specific)
-- If we couldn't gitignore it globally, we'd have no workaround for this specific yadm+worktree setup
-
-**Required setup for new worktrees:**
-
-Create `.dotfiles/.claude/settings.local.json`:
+Create `.dotfiles/.claude/settings.local.json` (or in chezmoi source):
 ```json
 {
   "permissions": {
@@ -140,16 +218,7 @@ This allows Claude Code to:
 - Read and edit configuration files
 - Run diagnostic commands on configs
 
-NOTE: Similarly, CLAUDE.md is tracked as a symlink to AGENTS.md for now because they *STILL* haven't added support for AGENTS.md (https://github.com/anthropics/claude-code/issues/6235) and bootstrapping CC's link to that is a must.
-
-**Verify setup:**
-```shell
-# Should exist and be gitignored
-ls -la .claude/settings.local.json
-
-# Should NOT be tracked
-git status  # should not show .claude/settings.local.json
-```
+**Note:** `CLAUDE.md` is a symlink to `AGENTS.md` until Claude Code officially supports `AGENTS.md` ([#6235](https://github.com/anthropics/claude-code/issues/6235)).
 
 ---
 
@@ -166,7 +235,6 @@ git status  # should not show .claude/settings.local.json
 **Issue label conventions:**
 - `ai-agent` - Issues intended for AI coding assistants to read and act on
 - `enhancement` - Feature requests and improvements
-- Other labels as needed for organization
 
 **Checking issues:**
 ```shell
@@ -197,173 +265,50 @@ That file contains:
 - Wallbash color system
 - Complete command reference
 
-### Current Setup
+**Current Setup:**
 - **Compositor:** Hyprland 0.52.1
 - **Desktop Environment:** HyDE (Hyprland Desktop Environment)
 - **Plugin Manager:** hyprpm
 - **Active Plugins:** hy3 (i3-like tiling)
 
-### Configuration Locations
-
-**Main Hyprland configs** (edit in `~/.config/hypr/`):
-- `hyprland.conf` - Main config, sources other files
-- `userprefs.conf` - User-specific settings (layout, general options)
-- `keybindings.conf` - All keybindings
-- `windowrules.conf` - Window rules
-- `monitors.conf` - Monitor configuration
-- `workflows.conf` - Workflow-specific settings
-- `animations.conf` - Animation settings
-- `shaders.conf` - Shader effects
-
-**HyDE system configs** (usually don't edit directly):
-- `~/.local/share/hyde/hyprland.conf` - HyDE fallback config
-
-### hy3 Plugin Configuration
-
-**Installation:**
+**Quick diagnostic commands:**
 ```shell
-hyprpm add https://github.com/outfoxxed/hy3
-hyprpm enable hy3
-hyprctl reload
-```
-
-**Current keybindings** (in `~/.config/hypr/keybindings.conf:78-82`):
-- `Super+D` - Create tab group
-- `Super+Alt+D` - Toggle group tab/split mode
-- `Super+Alt+R` - Toggle group horizontal/vertical
-
-**Dispatchers replaced with hy3 versions:**
-- `movefocus` → `hy3:movefocus` (lines 46-49)
-- `movewindow` → `hy3:movewindow` (lines 62-65)
-
-**Reference:**
-- [hy3 GitHub](https://github.com/outfoxxed/hy3)
-- [Author's config](https://git.outfoxxed.me/outfoxxed/nixnew/src/branch/master/modules/hyprland/hyprland.conf)
-
-### 🔔 Notification Center
-
-**Target setup**: swaync v0.12.3
-- Config: `~/.config/swaync/`
-- Startup: `exec-once = swaync` in `hyprland.conf`
-- Test: `notify-send "Test" "Message"`
-- Toggle: `swaync-client -t -sw`
-
-**Waybar:**
-- Config: `~/.config/waybar/`
-- Reload: `killall waybar && waybar &`
-- Debug: `waybar -l debug`
-
----
-
-## 🔍 Diagnostic Commands
-
-### Check Hyprland Status
-```shell
-# Plugin status
-hyprctl plugin list
-hyprpm list
-
-# Current config errors
-journalctl --user -u hyprland -n 50 | grep -i error
-
-# Reload config
-hyprctl reload
-
-# Get version info
-hyprctl version
-```
-
-### Check Workspace & Window Layout
-```shell
-# List windows on workspace 3
-hyprctl clients -j | jq '.[] | select(.workspace.id == 3) | {class, title, size, at}'
-
-# Current workspace info
-hyprctl activeworkspace -j
-```
-
-### Check yadm Status
-```shell
-# Working in ~/.dotfiles/
-cd ~/.dotfiles/
-git status
-git diff --stat
-
-# See what's staged for home directory
-yadm status
-yadm diff --stat
+hyprctl plugin list    # Check plugin status
+hyprpm list            # List available plugins
+journalctl --user -u hyprland -n 50 | grep -i error  # Check for errors
 ```
 
 ---
 
-## 📝 Workflow: Making Config Changes
+## 📚 References
 
-### Safe Editing Process
-
-1. **Work in staging workspace:**
-   ```shell
-   cd ~/.dotfiles/
-   # Make changes to config files
-   ```
-
-2. **Test changes:**
-   - For Hyprland: `hyprctl reload`
-   - For waybar: `killall waybar && waybar &`
-   - For system-wide: May need to re-login
-
-3. **Commit to staging branch:**
-   ```shell
-   git add .config/hypr/userprefs.conf .config/hypr/keybindings.conf
-   git commit -m "🔧 Configure hy3 plugin with minimal keybindings"
-   ```
-
-4. **Merge to main when ready:**
-   ```shell
-   git checkout main
-   git merge staging
-   ```
-
-### Common Gotchas
-
-- ❌ Don't edit files in `~/` directly - changes won't be in version control
-- ❌ Don't commit `AGENTS.dotfiles.md` changes without updating timestamp
-- ✅ Edit in `~/.dotfiles/`, test in `~/`, commit from `~/.dotfiles/`
-
----
-
-## 📚 Resources
-
-- [yadm documentation](https://yadm.io/)
-- [Hyprland wiki](https://wiki.hyprland.org/)
-- [HyDE project](https://github.com/prasanthrangan/HyDE)
-- [hy3 plugin](https://github.com/outfoxxed/hy3)
+- **Chezmoi docs:** https://www.chezmoi.io/
+- **Chezmoi patterns:** `.agents/howto-chezmoi.md`
+- **Global conventions:** `~/AGENTS.md`
+- **Branch workflow:** `~/.agents/rules/branch-metadata.md`
+- **Shell script guidelines:** `~/.agents/rules/shell-scripts.md`
+- **Testing guidelines:** `~/.agents/rules/testing.md`
 
 ---
 
 ## ✅ Session Checklist
 
-When starting work on dotfiles:
-
-- [ ] `cd ~/.dotfiles/` (work in staging)
-- [ ] Verify `.claude/settings.local.json` exists (if using Claude Code)
-- [ ] Read both `AGENTS.md` and `AGENTS.dotfiles.md`
-- [ ] Check `AGENTS.local.md` (if exists) for recent session context
+**When starting work:**
+- [ ] Read this file (AGENTS.md)
+- [ ] Read `~/AGENTS.md` for global conventions
+- [ ] Read `.agents/howto-chezmoi.md` for chezmoi details
+- [ ] Check `THIS_BRANCH.md` if working on a branch
 - [ ] Check GitHub issues: `gh issue list --repo dbarnett/dotfiles`
-- [ ] Check `git status` to see current changes
-- [ ] Review `THIS_GIT_BRANCH.md` (if working on a branch)
-- [ ] Run diagnostic commands to understand current state
+- [ ] Run `jj status` to see current state
+- [ ] Review `chezmoi diff` before applying changes
 
-When ending a session:
-
-- [ ] Update `AGENTS.local.md` with:
-  - Session date and what was worked on
-  - Relevant GitHub issues (last fetched date)
-  - Any TODOs or temporary notes for next session
-- [ ] Update `AGENTS.dotfiles.md` ONLY if configuration structure changed
-- [ ] Update timestamp in this file if modified
-- [ ] Commit meaningful changes to staging branch
-- [ ] Consider filing GitHub issues for any recurring problems
+**When ending session:**
+- [ ] Run `./check_this_branch.sh` if it exists
+- [ ] Commit changes with descriptive message
+- [ ] Update `THIS_BRANCH.md` if working on a branch
+- [ ] Update `AGENTS.local.md` with session notes
+- [ ] Consider if changes need testing on other machines
 
 ---
 
-**End of AGENTS.dotfiles.md**
+**End of AGENTS.md** - See `~/AGENTS.md` for global conventions

@@ -1,0 +1,66 @@
+#!/bin/sh
+
+system_type=$(uname -s)
+
+install_essential_pkgs() {
+  echo "Installing essential system packages..." 1>&2
+
+  if [ "$system_type" != "Linux" ]; then
+    # TODO: Handle other platforms.
+    echo "Failed: system type $system_type not supported" 1>&2
+    return
+  fi
+
+  if grep -qe 'ID\(_LIKE\)\?=debian' /etc/os-release; then
+    install_essential_debs
+  else
+    echo "Failed: only Debian-like distros supported" 1>&2
+  fi
+}
+
+install_essential_debs() {
+  sudo apt install \
+    build-essential \
+    cmake \
+    colordiff \
+    colormake \
+    curl \
+    direnv \
+    fzf \
+    keychain \
+    percol \
+    python3 \
+    python3-stdeb \
+    pythonpy \
+    nodejs \
+    npm \
+    neovim \
+    vim-gtk3 \
+    diodon
+}
+
+install_rust() {
+  echo "Installing Rust..." 1>&2
+  rustc_path=$(which rustc)
+  if [ -x "$rustc_path" ]; then
+    echo "Already installed." 1>&2
+  else
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+  fi
+}
+
+configure_vim() {
+  # Install vim-plug for Vim
+  curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
+    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  vim +'PlugInstall --sync' +qa
+  # Set up language servers for vim/neovim
+  vim +'set ft=sh' +'set cmdheight=9' +'call LspInstallServerThenQuit("bash-language-server")'
+  vim +'set ft=markdown' +'set cmdheight=9' +'call LspInstallServerThenQuit("marksman")'
+  vim +'set ft=yaml' +'set cmdheight=9' +'call LspInstallServerThenQuit("yaml-language-server")'
+}
+
+install_essential_pkgs
+install_rust
+
+configure_vim

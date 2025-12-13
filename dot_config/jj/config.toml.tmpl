@@ -1,7 +1,7 @@
 #:schema ./_schema.json
 [user]
 name = "David Barnett"
-email = "{{ env.VCS_AUTHOR_EMAIL }}"
+email = "{{ if hasKey . "vcs_author_email" }}{{ .vcs_author_email }}{{ else }}{{ output "git" "config" "user.email" | trim }}{{ end }}"
 
 [ui]
 editor = "nvim"
@@ -11,7 +11,7 @@ pager = "delta"
 diff-formatter = ":git"
 
 [revset-aliases]
-'mine' = "author(\"{{ env.VCS_AUTHOR_EMAIL }}\") | author(dbarnett) | author(regex:\"david\\\\.?(erich|barnett).*\")"
+'mine' = "author(\"{{ if hasKey . "vcs_author_email" }}{{ .vcs_author_email }}{{ else }}{{ output "git" "config" "user.email" | trim }}{{ end }}\") | author(dbarnett) | author(regex:\"david\\\\.?(erich|barnett).*\")"
 'user(x)' = 'author(x) | committer(x)'
 'off(x)' = 'x.. | ((x..)- & :x)'
 'default(n)' = '@ | ancestors(immutable_heads().., n) | trunk()'

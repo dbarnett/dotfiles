@@ -1,0 +1,10 @@
+# Ignore yadm-specific files
+.config/yadm/
+
+# Ignore local/session files
+AGENTS.local.md
+README.MIGRATE_FROM_YADM.md
+
+# Ignore branch metadata files
+THIS_BRANCH.md
+check_this_branch.sh

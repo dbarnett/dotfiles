@@ -2,37 +2,103 @@
 
 ## 🚀 System bootstrap
 
-This dotfiles config is currently managed with [yadm](https://yadm.io/), though migration to [chezmoi](https://www.chezmoi.io/) is under consideration for better templating and cross-platform support (see [#1](https://github.com/dbarnett/dotfiles/issues/1)).
+This dotfiles config uses [chezmoi](https://www.chezmoi.io/) for templating and cross-platform support.
 
-[Install yadm](https://yadm.io/docs/install) and then [activate
-it](https://yadm.io/docs/getting_started#if-you-have-an-existing-remote-repository)
-like:
+**Note:** The `yadm-legacy` bookmark maintains the last yadm-based version if rollback is needed.
 
+### First-time setup on a new machine
+
+**Prerequisites:** If you have another dotfiles manager (yadm, stow, etc.) active, back up and remove/disable it first to avoid conflicts.
+
+After setup, clean up leftover files from previous dotfiles managers:
 ```sh
-$ echo 'export VCS_AUTHOR_EMAIL=me@example.com' >> ~/.profile.local
-$ . ~/.profile.local
-$ yadm clone git@github.com:dbarnett/dotfiles.git
+# Find leftover yadm template files
+chezmoi unmanaged | grep '##'
+# Review and remove manually as needed
 ```
 
-Note: requires env var support in yadm 3.2.0 or later.
+1. **Install chezmoi and age:**
+   ```sh
+   # Arch Linux
+   sudo pacman -S chezmoi age
 
-**TODO:** Fix sometimes getting stuck on vim plug installs etc and needing rerun.
+   # macOS
+   brew install chezmoi age
+   ```
+
+2. **Set up age encryption key:**
+
+   **First machine (generate new key):**
+   ```sh
+   mkdir -p ~/.config/chezmoi
+   age-keygen -o ~/.config/chezmoi/key.txt
+   # Save the public key shown - you'll need it in step 3
+   ```
+
+   **Additional machines (use existing key):**
+   ```sh
+   mkdir -p ~/.config/chezmoi
+   # Securely copy key.txt from first machine to ~/.config/chezmoi/key.txt
+   # (via ssh, password manager, encrypted USB, etc.)
+   ```
+
+   **⚠️ Security:** The `key.txt` file is your private key. Protect it like a password.
+
+3. **Configure chezmoi:**
+   Create `~/.config/chezmoi/chezmoi.toml`:
+   ```toml
+   encryption = "age"
+   [age]
+       identity = "~/.config/chezmoi/key.txt"
+       recipient = "age1..."  # Your public key from step 2
+   ```
+
+4. **Initialize:**
+   ```sh
+   chezmoi init git@github.com:dbarnett/dotfiles.git
+   ```
+
+   **⚠️ Caution:** Don't use `chezmoi init --apply` - it can [silently overwrite existing files](https://github.com/twpayne/chezmoi/issues/1551).
+
+5. **Decrypt encrypted files:**
+   The encrypted files (`.gmailctl/config.personal.jsonnet`) will need to be manually decrypted on the first machine, then chezmoi will sync them encrypted to new machines.
+
+6. **Review and apply dotfiles:**
+   ```sh
+   # Preview what will change
+   chezmoi diff
+
+   # Apply if everything looks good
+   chezmoi apply
+
+   # Source the new profile
+   . ~/.profile.local
+   ```
+
+   The bootstrap script (`run_once_bootstrap.sh`) will run automatically on first apply.
+
+   **Templates use your git config email by default.** To override (e.g., work email on work machine), edit `~/.config/chezmoi/chezmoi.toml` and add:
+   ```toml
+   [data]
+       vcs_author_email = "work@example.com"
+   ```
+   Then re-apply: `chezmoi apply`
 
 ### 🔄 Development workflow
 
-This repo uses a git worktree for safe editing:
-- **`~/`** - Live configs on `main` branch (managed by yadm)
-- **`~/.dotfiles/`** - Staging workspace on `staging` branch
+Edit files directly in the chezmoi source directory and apply:
 
-To make changes:
 ```sh
-cd ~/.dotfiles/
-# Edit files here safely without breaking live system
-git add .
-git commit -m "Update configs"
-# Test changes, then merge to apply live:
-git checkout main
-git merge staging
+cd ~/.local/share/chezmoi
+# Edit files
+chezmoi diff  # Preview changes
+chezmoi apply  # Apply to $HOME
+```
+
+Or use chezmoi commands from anywhere:
+```sh
+chezmoi edit ~/.bashrc  # Opens in editor, auto-applies on save
+chezmoi add ~/.new_config  # Track new file
 ```
 
 ## 🖥️ Desktop environment
@@ -76,6 +142,20 @@ fi
 - ⚠️ **Local (gitignored):** Work-specific tools (pyenv, nvm, SDKMAN, company SDKs), VPN configs, hardcoded machine paths, API keys, work-specific aliases/functions
 
 **Testing separation:** To verify base configs work independently, temporarily rename `.local` files and start a fresh shell. Core functionality should work without errors.
+
+**Chezmoi machine type configuration:**
+
+For work machines, set your machine type in `~/.config/chezmoi/chezmoi.toml`:
+```toml
+[data]
+    machine_type = "work"
+```
+
+This controls various work-specific behaviors:
+- **gmailctl:** Changes symlink from `config.personal.jsonnet` → `config.work.jsonnet`
+  - Create `~/.gmailctl/config.work.jsonnet` with work-specific Gmail filters
+  - OAuth credentials (`credentials.json`, `token.json`) are NOT synced - regenerate per-machine with `gmailctl init`
+- **Future use cases:** Can template other configs based on work vs personal machine
 
 ### Version Manager Isolation (pyenv, nvm, sdkman)
 

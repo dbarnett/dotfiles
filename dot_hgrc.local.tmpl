@@ -1,0 +1,2 @@
+[ui]
+username = David Barnett <{{ if hasKey . "vcs_author_email" }}{{ .vcs_author_email }}{{ else }}{{ output "git" "config" "user.email" | trim }}{{ end }}>
