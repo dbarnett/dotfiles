@@ -82,18 +82,23 @@ yadm push
 cd ~/.dotfiles/
 vim .profile .bashrc .gitconfig
 
-# 2. Commit changes
+# 2. Commit the working copy changes
 jj describe -m "🔧 Configure shell and editor preferences"
+# This commits the current working copy (@)
 
-# 3. Get the commit SHA
-WORKTREE_SHA=$(jj log -r @ -T commit_id --no-graph)
+# 3. Start a new empty change on top (optional but recommended)
+jj new
+# Now @ is empty, @- is the commit we want to merge
 
-# 4. Let yadm merge the changes by SHA
+# 4. Get the commit SHA
+WORKTREE_SHA=$(jj log -r @- -T commit_id --no-graph)
+
+# 5. Let yadm merge the changes by SHA
 cd ~  # or anywhere outside ~/.dotfiles/
 yadm status  # Should show clean
 yadm merge $WORKTREE_SHA --ff-only
 
-# 5. Verify and push
+# 6. Verify and push
 yadm status  # Should show "ahead of origin" but clean working directory
 yadm push
 ```

@@ -96,9 +96,10 @@ See `.agents/git-howto.md` for complete workflow documentation.
 # 1. In worktree: commit your changes
 cd ~/.dotfiles/
 jj describe -m "🔧 Your changes"
+jj new  # Start new empty change on top
 
-# 2. Get the commit SHA
-WORKTREE_SHA=$(jj log -r @ -T commit_id --no-graph)
+# 2. Get the parent commit SHA (@- is the commit we just described)
+WORKTREE_SHA=$(jj log -r @- -T commit_id --no-graph)
 
 # 3. From $HOME: merge via yadm
 yadm merge $WORKTREE_SHA --ff-only
