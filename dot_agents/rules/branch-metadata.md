@@ -166,15 +166,52 @@ These patterns make check_this_branch.sh more useful for both humans and AI assi
    - **Why:** Provides immediate context about what's being checked
 
 ```shell
-# Extract jj metadata
+# Extract jj metadata - CORRECT patterns with proper error handling
 echo "=== Branch Checks for <Project> ==="
 echo ""
-echo "Current: $CURRENT_CHANGE_ID (empty): Fix typo in docs"
-echo "Parent:  $PARENT_CHANGE_ID: Implement feature X"
-echo "Branch:  feature-x"
-echo "Ahead:   main+3"
+
+# Get current change info
+CURRENT_ID=$(jj log -r @ --no-graph -T 'change_id.short(7)' 2>&1)
+CURRENT_EXIT=$?
+if [ $CURRENT_EXIT -ne 0 ]; then
+    echo "Current: ERROR - $CURRENT_ID" >&2
+else
+    CURRENT_DESC=$(jj log -r @ --no-graph -T 'description.first_line()' 2>&1)
+    CURRENT_EMPTY=$(jj log -r @ --no-graph -T 'if(empty, " (empty)", "")' 2>&1)
+    echo "Current: $CURRENT_ID$CURRENT_EMPTY - $CURRENT_DESC"
+fi
+
+# Get parent change info
+PARENT_ID=$(jj log -r @- --no-graph -T 'change_id.short(7)' 2>&1)
+PARENT_EXIT=$?
+if [ $PARENT_EXIT -ne 0 ]; then
+    echo "Parent:  ERROR - $PARENT_ID" >&2
+else
+    PARENT_DESC=$(jj log -r @- --no-graph -T 'description.first_line()' 2>&1)
+    echo "Parent:  $PARENT_ID - $PARENT_DESC"
+fi
+
+# Show distance from main (how many commits ahead)
+DISTANCE=$(jj log -r '::@ ~ ::main' --no-graph -T '' | wc -l 2>&1)
+if [ "$DISTANCE" -gt 0 ] 2>/dev/null; then
+    echo "Ahead:   main+$DISTANCE"
+fi
+
+# Show bookmark/branch name if set
+BOOKMARK=$(jj log -r @ --no-graph -T 'bookmarks' 2>&1)
+if [ -n "$BOOKMARK" ] && [ "$BOOKMARK" != "(no bookmarks)" ]; then
+    echo "Branch:  $BOOKMARK"
+fi
 echo ""
 ```
+
+**Common jj template mistakes to avoid:**
+- ❌ `short_change_id` - keyword doesn't exist
+- ✅ `change_id.short(7)` - correct method call syntax
+- ❌ `$(jj ... 2>/dev/null || echo "unknown")` - silently hides real errors
+- ✅ `$(jj ... 2>&1)` then check `$?` and surface errors to stderr
+- ❌ `description` alone - returns full multi-line description
+- ✅ `description.first_line()` - just the summary line
 
 2. **Display timing information at the end**
    - Use millisecond precision for performance awareness
@@ -326,7 +363,7 @@ if [ $METADATA_IN_CHANGE -eq 1 ]; then
     echo "   - THIS_BRANCH.md is removed/excluded"
     echo "   - check_this_branch.sh is removed/excluded"
     echo ""
-    echo "   Use: jj restore THIS_BRANCH.md check_this_branch.sh"
+    echo "   Use: rm THIS_BRANCH.md check_this_branch.sh"
     echo "   Or create these files in a separate change that won't be published"
     echo ""
     ERRORS=$((ERRORS + 1))
