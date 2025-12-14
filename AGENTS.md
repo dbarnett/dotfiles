@@ -1,9 +1,9 @@
 # Dotfiles Repository - AI Agent Instructions
 
 **Location:** This file is repo-specific (not deployed to `~/`)
-**Last Updated:** 2025-12-14
+**Last Updated:** 2025-12-15
 
-For global AI agent conventions across all projects, see `~/AGENTS.md` (deployed from `literal_AGENTS.md` in this repo).
+For global AI agent conventions across all projects, see `~/AGENTS.global.md` (deployed from `AGENTS.global.md` in this repo).
 
 ---
 
@@ -13,7 +13,7 @@ For global AI agent conventions across all projects, see `~/AGENTS.md` (deployed
 
 **Required reading:**
 1. **This file** - Repository structure and chezmoi workflow
-2. **`~/AGENTS.md`** - Global agent conventions (jj workflow, shell preferences, etc.)
+2. **`~/AGENTS.global.md`** - Global agent conventions (jj workflow, shell preferences, etc.)
 3. **`.agents/howto-chezmoi.md`** - Detailed chezmoi patterns and gotchas
 4. **`THIS_BRANCH.md`** - Current branch status and TODOs (if exists)
 
@@ -35,7 +35,7 @@ This is a chezmoi-managed dotfiles repository containing shell configs, editor s
 - `check_this_branch.sh` (branch validation script)
 
 **Files that DO deploy to home:**
-- `literal_AGENTS.md` → `~/AGENTS.md` (global agent guidelines)
+- `AGENTS.global.md` → `~/AGENTS.global.md` (global agent guidelines)
 - `dot_agents/*` → `~/.agents/*` (specialized guides)
 - All other tracked dotfiles
 
@@ -152,7 +152,7 @@ chezmoi add --encrypt ~/.gmailctl/config.personal.jsonnet
 
 ## 🐚 Version Control Workflow
 
-This repo uses **Jujutsu (jj)** for version control. See `~/AGENTS.md` for jj workflow details.
+This repo uses **Jujutsu (jj)** for version control. See `~/AGENTS.global.md` for jj workflow details.
 
 **Quick reference:**
 ```shell
@@ -218,7 +218,7 @@ This allows Claude Code to:
 - Read and edit configuration files
 - Run diagnostic commands on configs
 
-**Note:** `CLAUDE.md` is a symlink to `AGENTS.md` until Claude Code officially supports `AGENTS.md` ([#6235](https://github.com/anthropics/claude-code/issues/6235)).
+**Note:** `CLAUDE.md` in the home directory is a symlink to `AGENTS.global.md` until Claude Code officially supports `AGENTS.md` ([#6235](https://github.com/anthropics/claude-code/issues/6235)).
 
 ---
 
@@ -284,7 +284,7 @@ journalctl --user -u hyprland -n 50 | grep -i error  # Check for errors
 
 - **Chezmoi docs:** https://www.chezmoi.io/
 - **Chezmoi patterns:** `.agents/howto-chezmoi.md`
-- **Global conventions:** `~/AGENTS.md`
+- **Global conventions:** `~/AGENTS.global.md`
 - **Branch workflow:** `~/.agents/rules/branch-metadata.md`
 - **Shell script guidelines:** `~/.agents/rules/shell-scripts.md`
 - **Testing guidelines:** `~/.agents/rules/testing.md`
@@ -295,7 +295,7 @@ journalctl --user -u hyprland -n 50 | grep -i error  # Check for errors
 
 **When starting work:**
 - [ ] Read this file (AGENTS.md)
-- [ ] Read `~/AGENTS.md` for global conventions
+- [ ] Read `~/AGENTS.global.md` for global conventions
 - [ ] Read `.agents/howto-chezmoi.md` for chezmoi details
 - [ ] Check `THIS_BRANCH.md` if working on a branch
 - [ ] Check GitHub issues: `gh issue list --repo dbarnett/dotfiles`
@@ -311,4 +311,4 @@ journalctl --user -u hyprland -n 50 | grep -i error  # Check for errors
 
 ---
 
-**End of AGENTS.md** - See `~/AGENTS.md` for global conventions
+**End of AGENTS.md** - See `~/AGENTS.global.md` for global conventions

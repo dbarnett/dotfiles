@@ -8,6 +8,9 @@ README.MIGRATE_FROM_YADM.md
 .claude/
 .env
 
+# Ignore repo-specific AGENTS.md (but deploy AGENTS.global.md → ~/AGENTS.global.md)
+AGENTS.md
+
 # Ignore user-managed symlinks
 CLAUDE.md
 
