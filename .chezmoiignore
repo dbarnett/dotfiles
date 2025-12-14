@@ -8,6 +8,9 @@ README.MIGRATE_FROM_YADM.md
 .claude/
 .env
 
+# Ignore user-managed symlinks
+CLAUDE.md
+
 # Ignore branch metadata files
 THIS_BRANCH.md
 check_this_branch.sh

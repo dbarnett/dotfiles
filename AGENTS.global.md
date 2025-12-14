@@ -1,17 +1,9 @@
-# AGENTS.md - General Directives for AI Coding Assistants
+# AGENTS.global.md - General Directives for AI Coding Assistants
 
-**Last Updated:** 2025-12-10
-**Location:** `~/AGENTS.md`
+**Last Updated:** 2025-12-15
+**Location:** `~/AGENTS.global.md`
 
----
-
-## ⚠️ DOTFILES REPOSITORY NOTICE
-
-**If you are working in the dotfiles repository (usually `~/.dotfiles/` or a repo associated with remote dbarnett/dotfiles), you MUST also read `AGENTS.dotfiles.md`.**
-
-That file contains dotfiles-specific instructions, current configuration status, and known issues.
-
-**If you are NOT in the dotfiles repository, ignore this notice.**
+**Note:** If you have an old `~/AGENTS.md` file from a previous version of this dotfiles setup, you should delete it. This file (`~/AGENTS.global.md`) has replaced it.
 
 ---
 
@@ -71,7 +63,7 @@ AGENTS.local.md
 
 Create a **public `AGENTS.md`** with portable conventions for all contributors.
 
-**IMPORTANT:** Design this from scratch - do NOT copy from `~/AGENTS.md` which contains personal preferences. `~/AGENTS.md` will generally be referenced indirectly via `AGENTS.local.md` in this case.
+**IMPORTANT:** Design this from scratch - do NOT copy from `~/AGENTS.global.md` which contains personal preferences. `~/AGENTS.global.md` will generally be referenced indirectly via `AGENTS.local.md` in this case.
 
 **Public AGENTS.md should include:**
 - Project-specific coding conventions
@@ -467,4 +459,4 @@ Fixes: #issue-number (if applicable)
 
 ---
 
-**End of AGENTS.md** - See project-specific `AGENTS.local.md` for overrides and `~/.agents/rules/` for specialized guidelines
+**End of AGENTS.global.md** - See project-specific `AGENTS.local.md` for overrides and `~/.agents/rules/` for specialized guidelines
