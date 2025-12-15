@@ -1,6 +1,6 @@
 # Chezmoi Usage Patterns & Gotchas
 
-**Last Updated:** 2025-12-14
+**Last Updated:** 2025-12-15
 
 This document contains non-obvious usage patterns and common pitfalls discovered while using chezmoi for dotfiles management.
 
@@ -236,8 +236,47 @@ chezmoi add ~/.bashrc          # Update source with local changes
 chezmoi re-add                 # Re-add all managed files
 
 # Or edit through chezmoi:
-chezmoi edit ~/.bashrc         # Edit source, auto-applies on save
+chezmoi edit ~/.bashrc         # Edit source file
+chezmoi edit --apply ~/.bashrc # Edit source and apply on exit
+chezmoi edit --watch ~/.bashrc # Edit source and auto-apply on save
 ```
+
+**Note:** `chezmoi add` is recursive by default for directories. Use `--recursive=false` to add only the directory itself.
+
+### Syncing Permissions from Destination to Source
+
+When you have permission diffs and want chezmoi to adopt your local permissions:
+
+**For files:**
+
+```shell
+chezmoi add --force ~/.some-file
+# Reads current permissions and updates source entry (executable_, private_, readonly_ attributes)
+```
+
+**For directories or when you only want to fix permissions (not content):**
+
+Use `chattr` with the appropriate attribute flags. Common permission diff patterns:
+
+```shell
+# Directory permission examples:
+chezmoi chattr -- -p ~/.ssh                    # 40700 -> 40755: Directory went from private to public
+chezmoi chattr +p ~/.ssh                       # 40755 -> 40700: Directory went from public to private
+
+# File permission examples:
+chezmoi chattr +x ~/.local/bin/script.sh      # 0644 -> 0755: File gained execute bit
+chezmoi chattr -- -x ~/.local/bin/script.sh    # 0755 -> 0644: File lost execute bit
+chezmoi chattr +p ~/.config/some-secret        # 0644 -> 0600: File became private
+chezmoi chattr -- -p ~/.config/some-file       # 0600 -> 0644: File became public
+chezmoi chattr +r ~/.config/read-only.conf     # 0644 -> 0444: File became readonly
+chezmoi chattr -- -r ~/.config/now-writable.conf # 0444 -> 0644: File became writable
+```
+
+**Permission attribute quick reference:**
+
+- `+x` / `-x` = executable bit (0755/0700 vs 0644/0600)
+- `+p` / `-p` = private (0700/0600 vs 0755/0644)
+- `+r` / `-r` = readonly (0444/0400 vs 0644/0600)
 
 ### Common Operations
 
@@ -342,7 +381,18 @@ chezmoi add ~/.config/some-link  # Now detected as symlink
 
 ## 📚 References
 
+### Official Documentation
+
 - [Official chezmoi documentation](https://www.chezmoi.io/)
 - [Target types reference](https://www.chezmoi.io/reference/target-types/)
 - [Template reference](https://www.chezmoi.io/user-guide/templating/)
 - [Manage different file types](https://www.chezmoi.io/user-guide/manage-different-types-of-file/)
+
+### Upstream Docs on GitHub
+
+For detailed command reference and workflows, see the upstream docs:
+
+- [User guide](https://github.com/twpayne/chezmoi/tree/master/assets/chezmoi.io/docs/user-guide)
+- [Daily operations](https://github.com/twpayne/chezmoi/tree/master/assets/chezmoi.io/docs/user-guide/daily-operations.md)
+- [Command overview](https://github.com/twpayne/chezmoi/tree/master/assets/chezmoi.io/docs/user-guide/command-overview.md)
+- [Manage different types of file](https://github.com/twpayne/chezmoi/tree/master/assets/chezmoi.io/docs/user-guide/manage-different-types-of-file.md)

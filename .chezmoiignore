@@ -4,6 +4,7 @@
 # Ignore local/session files
 AGENTS.local.md
 README.MIGRATE_FROM_YADM.md
+/*.code-workspace
 .claude/
 .env
 

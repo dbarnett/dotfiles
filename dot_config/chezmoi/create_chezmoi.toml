@@ -1,0 +1,23 @@
+# chezmoi configuration
+# This file is created once by chezmoi and not updated afterward.
+# Customize locally as needed. Use `chezmoi merge` to incorporate upstream changes.
+
+encryption = "age"
+[age]
+identity = "~/.config/chezmoi/key.txt"
+recipient = ""  # Add actual public key like "age1..." here
+
+[data]
+# Uncomment to override VCS author email (defaults to git config user.email if not set)
+# vcs_author_email = "your.email@example.com"
+
+[diff]
+# Uncomment to use delta for diff output (requires delta to be installed)
+# pager = "delta"
+
+[merge]
+# Uncomment to use meld for merge (requires meld to be installed)
+# Two-way merge: source file from repo (left) vs current local file (right, editable)
+# Edit the right pane to incorporate changes from the left.
+# command = "meld"
+# args = ["{{ .Source }}", "{{ .Destination }}"]
