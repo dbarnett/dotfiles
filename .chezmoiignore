@@ -4,6 +4,8 @@
 # Ignore local/session files
 AGENTS.local.md
 README.MIGRATE_FROM_YADM.md
+.claude/
+.env
 
 # Ignore branch metadata files
 THIS_BRANCH.md
