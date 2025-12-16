@@ -34,64 +34,71 @@ This file contains general preferences and conventions for AI coding assistants 
 
 ## 📋 How to Use This File
 
-### In Project-Specific Contexts
+### 🔄 Session Startup: Project AGENTS File Workflow
 
-You MUST ensure each project/repo includes some self-contained reference to the guidelines mentioned here.
-Since many AI tools only read files within the project workspace, you have two main approaches:
+**CRITICAL: Every project must have `AGENTS.local.md`. Follow this workflow at the start of every session:**
 
-#### Option A: Private AGENTS.md (Personal Projects)
-
-Use a **private symlink or hard link** for personal/private repositories:
-
-```shell
-# Symlink (recommended)
-ln -s ~/AGENTS.md .
-
-# Hard link (if symlinks aren't supported)
-ln ~/AGENTS.md .
+```
+START SESSION
+     ↓
+Does AGENTS.local.md exist?
+     │
+     ├─YES──→ Check refresh needed:
+     │          • Past "Refresh By" date?
+     │          • Seed template updated after this file?
+     │            │
+     │            ├─YES──→ Update from seed template
+     │            │            ↓
+     │            NO           │
+     │            ↓            │
+     NO                        │
+     ↓                         │
+Create from seed template      │
+     ↓←────────────────────────┘
+Ensure AGENTS.md references it:
+  • Private repo: AGENTS.md → ~/AGENTS.global.md symlink
+  • Public repo: AGENTS.md includes "MUST read AGENTS.local.md"
+     ↓
+Proceed with work
 ```
 
-**Then add to `.git/info/exclude`** (NOT `.gitignore`) to keep it private:
-```
-AGENTS.md
-AGENTS.local.md
-```
+**Refresh metadata requirements:**
 
-**Why `.git/info/exclude`:**
-- Keeps exclusions local to your repository copy
-- Avoids cluttering public `.gitignore` with personal config
-- Other contributors won't see your personal AGENTS files
-
-#### Option B: Public AGENTS.md (Shared/Open-Source Projects)
-
-Create a **public `AGENTS.md`** with portable conventions for all contributors.
-
-**IMPORTANT:** Design this from scratch - do NOT copy from `~/AGENTS.global.md` which contains personal preferences. `~/AGENTS.global.md` will generally be referenced indirectly via `AGENTS.local.md` in this case.
-
-**Public AGENTS.md should include:**
-- Project-specific coding conventions
-- Testing patterns with examples from the codebase
-- Architecture guidelines
-- Contribution workflow
-- Language-specific preferences relevant to this project
-
-**Required directive at the top:**
+Every `AGENTS.local.md` must include:
 ```markdown
-# Project AGENTS.md
-
-**IMPORTANT:** If `AGENTS.local.md` exists in this repository, you MUST read it
-and treat its contents as an extension of this file. The local file may contain
-machine-specific or contributor-specific preferences.
+**Last Updated:** YYYY-MM-DD
+**Refresh By:** YYYY-MM-DD  (max 10 days from Last Updated)
+**Seed Version:** YYYY-MM-DD  (from AGENTS.global.md Last Updated)
 ```
 
-**For your personal project-specific overrides:**
+**Quick check at session start:**
+```shell
+# Check if AGENTS.local.md exists
+test -f AGENTS.local.md && echo "EXISTS - check dates" || echo "MISSING - create from seed"
 
-Create `AGENTS.local.md` and add to `.gitignore`:
-```
-AGENTS.local.md
+# View timestamps for comparison
+head -n 10 AGENTS.local.md 2>/dev/null  # Project file dates
+head -n 5 ~/AGENTS.global.md  # Seed template version (check Last Updated)
 ```
 
-This is where YOU can put personal preferences specific to this project that shouldn't be shared with other contributors.
+**Where to find seed template:** Read `~/.agents/agents-files-howto.md` section "Project-Specific AGENTS Files" for the template and detailed setup instructions.
+
+**Note:** For Claude Code compatibility, create `CLAUDE.md` as a symlink to `AGENTS.md` (gitignore both in private repos).
+
+---
+
+### Implementation Quick Reference
+
+**When creating or setting up AGENTS files, you MUST read `~/.agents/agents-files-howto.md` for:**
+- Seed template for AGENTS.local.md
+- Symlink setup and gitignore rules
+- GitHub issue tracking patterns
+- File tracking invariants
+
+**Public AGENTS.md must include at top:**
+```markdown
+**CRITICAL: You MUST read AGENTS.local.md if it exists in this repository.**
+```
 
 ### Project-Specific Overrides
 
