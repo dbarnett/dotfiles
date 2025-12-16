@@ -10,12 +10,7 @@ This dotfiles config uses [chezmoi](https://www.chezmoi.io/) for templating and 
 
 **Prerequisites:** If you have another dotfiles manager (yadm, stow, etc.) active, back up and remove/disable it first to avoid conflicts.
 
-After setup, clean up leftover files from previous dotfiles managers:
-```sh
-# Find leftover yadm template files
-chezmoi unmanaged | grep '##'
-# Review and remove manually as needed
-```
+**Note:** Chezmoi automatically removes leftover yadm template files (`##template`, `##template,e.*`) on apply.
 
 1. **Install chezmoi and age:**
    ```sh

@@ -1,3 +1,12 @@
 AGENTS.md
 AGENTS.dotfiles.md
 CLAUDE.md
+
+# Old yadm template files
+.config/jj/config.toml##template
+.config/jj/config.toml##template,e.toml
+.gitconfig.d/user.conf##template
+.gitconfig.local##template
+.hgrc.local##template
+.hgrc.local##template,e.cfg
+
