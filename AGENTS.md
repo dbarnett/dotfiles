@@ -1,7 +1,7 @@
 # Dotfiles Repository - AI Agent Instructions
 
 **Location:** This file is repo-specific (not deployed to `~/`)
-**Last Updated:** 2025-12-15
+**Last Updated:** 2025-12-16
 
 For global AI agent conventions across all projects, see `~/AGENTS.global.md` (deployed from `AGENTS.global.md` in this repo).
 
@@ -11,11 +11,12 @@ For global AI agent conventions across all projects, see `~/AGENTS.global.md` (d
 
 **You are in the dotfiles repository.** This repo uses **chezmoi** to manage dotfiles.
 
-**Required reading:**
+**CRITICAL: You MUST read `~/AGENTS.global.md` before proceeding.** It contains essential global conventions including jj workflow, shell script preferences, file editing rules, and general coding patterns that apply to ALL work in this repository.
+
+**Additional required reading:**
 1. **This file** - Repository structure and chezmoi workflow
-2. **`~/AGENTS.global.md`** - Global agent conventions (jj workflow, shell preferences, etc.)
-3. **`.agents/howto-chezmoi.md`** - Detailed chezmoi patterns and gotchas
-4. **`THIS_BRANCH.md`** - Current branch status and TODOs (if exists)
+2. **`.agents/howto-chezmoi.md`** - Detailed chezmoi patterns and gotchas (read when working with chezmoi)
+3. **`THIS_BRANCH.md`** - Current branch status and TODOs (read if exists)
 
 ---
 
@@ -24,15 +25,21 @@ For global AI agent conventions across all projects, see `~/AGENTS.global.md` (d
 This is a chezmoi-managed dotfiles repository containing shell configs, editor settings, and tool configurations for Linux/macOS systems.
 
 **Structure:**
-- **Source:** `~/.dotfiles/` (this directory - staging workspace during migration)
-- **Future source:** `~/.local/share/chezmoi/` (will be main chezmoi source after migration)
+- **Source:** `~/.dotfiles/` → symlinked to `~/.local/share/chezmoi/` (treat as identical)
 - **Destination:** `~/` (where files are deployed)
 - **Remote:** `git@github.com:dbarnett/dotfiles.git`
 
+**Path Resolution Note:**
+When this file references dotfile paths (`.agents/`, `.config/`, `.bashrc`, etc.), they resolve to:
+- **In repo:** `./dot_*` prefix (e.g., `.agents/` → `./dot_agents/`, `.bashrc` → `./dot_bashrc`)
+- **Deployed:** `~/.*` (after chezmoi apply, e.g., `~/.agents/`, `~/.bashrc`)
+- **Best practice:** Check `./dot_*` child paths first (fresher content), fall back to `~/*` (deployed) if needed
+
 **Files in this repo that DON'T deploy to home:**
-- `AGENTS.md` (this file - repo-specific instructions)
-- `THIS_BRANCH.md` (branch metadata)
-- `check_this_branch.sh` (branch validation script)
+- `CLAUDE.md` (this file - repo-specific instructions)
+- `AGENTS.local.md` (session notes and local context)
+- `THIS_BRANCH.md` (branch metadata, if exists)
+- `check_this_branch.sh` (branch validation script, if exists)
 
 **Files that DO deploy to home:**
 - `AGENTS.global.md` → `~/AGENTS.global.md` (global agent guidelines)
@@ -294,9 +301,9 @@ journalctl --user -u hyprland -n 50 | grep -i error  # Check for errors
 ## ✅ Session Checklist
 
 **When starting work:**
+- [ ] **MUST read `~/AGENTS.global.md`** - Essential global conventions (jj, shell, coding patterns)
 - [ ] Read this file (AGENTS.md)
-- [ ] Read `~/AGENTS.global.md` for global conventions
-- [ ] Read `.agents/howto-chezmoi.md` for chezmoi details
+- [ ] Read `.agents/howto-chezmoi.md` when working with chezmoi
 - [ ] Check `THIS_BRANCH.md` if working on a branch
 - [ ] Check GitHub issues: `gh issue list --repo dbarnett/dotfiles`
 - [ ] Run `jj status` to see current state
