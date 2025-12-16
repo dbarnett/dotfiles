@@ -1,6 +1,6 @@
 # AGENTS.global.md - General Directives for AI Coding Assistants
 
-**Last Updated:** 2025-12-15 (jj-howto refactoring)
+**Last Updated:** 2025-12-16 (GitHub issue tracking guidance)
 **Location:** `~/AGENTS.global.md`
 
 **Note:** If you have an old `~/AGENTS.md` file from a previous version of this dotfiles setup, you should delete it. This file (`~/AGENTS.global.md`) has replaced it.
@@ -17,7 +17,9 @@ This file contains general preferences and conventions for AI coding assistants 
 - **🎯 General Coding Preferences** - Core principles
 
 **Specialized guides (you MUST read when relevant):**
+- **`~/.agents/agents-files-howto.md`** - READ when creating/modifying ~/.agents files OR when setting up project-specific AGENTS.local.md (includes GitHub issue tracking)
 - **`~/.agents/jj-howto.md`** - READ when working with version control in repos with `.jj/`
+- **`~/.agents/configuring-mcp-tools.md`** - READ when MCP context usage is high or when configuring MCP servers
 - **`~/.agents/rules/shell-scripts.md`** - READ when writing/debugging shell scripts
 - **`~/.agents/rules/testing.md`** - READ when writing/reviewing tests
 - **`~/.agents/rules/branch-metadata.md`** - READ when starting branch work or using THIS_BRANCH.md/check_this_branch.sh
@@ -104,6 +106,7 @@ This is where YOU can put personal preferences specific to this project that sho
 - Tool-specific rules (e.g., `.cursor/rules/` for Cursor IDE)
 - Project architecture patterns and anti-patterns
 - Known issues and workarounds specific to this project
+- **GitHub issue tracking** (for repos you own/maintain - see below)
 
 ### Tool & MCP Server Documentation
 
@@ -126,6 +129,31 @@ This is where YOU can put personal preferences specific to this project that sho
 - Tool-specific quirks and best practices
 - Known issues and workarounds
 - Authentication/access patterns
+
+### Setting Up Project-Specific AGENTS Files
+
+**➡️ For detailed guidance on setting up AGENTS.local.md (including GitHub issue tracking), read `~/.agents/agents-files-howto.md` section "Project-Specific AGENTS Files".**
+
+**Quick tips:**
+- Use `AGENTS.local.md` (gitignored) for personal project notes
+- For repos you own/maintain: Track GitHub issues with timestamped cache
+- **Symlink tip:** In Claude Code contexts, also create `CLAUDE.md` → `AGENTS.md` symlink for compatibility
+
+```shell
+# Example: Set up AGENTS.local.md with CLAUDE.md symlink
+ln -s ~/AGENTS.global.md AGENTS.md
+ln -s AGENTS.md CLAUDE.md
+# Add to .git/info/exclude:
+echo "AGENTS.md" >> .git/info/exclude
+echo "AGENTS.local.md" >> .git/info/exclude
+echo "CLAUDE.md" >> .git/info/exclude
+```
+
+### Maintaining .agents Files
+
+**➡️ When creating, modifying, or organizing AGENTS.md or ~/.agents/ files, you MUST read `~/.agents/agents-files-howto.md` for guidelines and patterns.**
+
+**Key principle:** Keep this file scannable by extracting detailed content to separate howto/rule files.
 
 ---
 
