@@ -1,6 +1,6 @@
 # Maintaining AGENTS Documentation Files
 
-**Last Updated:** 2025-12-16
+**Last Updated:** 2025-12-16 (updated cache locations and emphasized GitHub tracking as REQUIRED)
 
 ---
 
@@ -200,9 +200,15 @@ While `~/.agents/` files provide global guidance, individual projects need proje
 
 ### Tracking GitHub Issues
 
-**CRITICAL:** Always use `gh issue list` CLI commands for issue tracking, NOT GitHub MCP tools. The CLI output format is designed to be cached and compared for change detection. The specific JSON query format shown below produces consistent, diff-friendly output that can be stashed in files.
+**CRITICAL:** This is REQUIRED (not optional) for repositories you own or maintain.
 
-**Purpose:** Keep agents aware of open issues, new comments, and priorities without constantly querying GitHub API.
+**Why REQUIRED:**
+- Agents need awareness of open issues before starting work
+- Prevents working on already-reported bugs without context
+- Helps prioritize tasks based on existing issues
+- Cache format enables change detection without API spam
+
+**Always use `gh issue list` CLI commands for issue tracking, NOT GitHub MCP tools.** The CLI output format is designed to be cached and compared for change detection. The specific JSON query format shown below produces consistent, diff-friendly output that can be stashed in files.
 
 **When to use:**
 - Repositories under your direct ownership (dbarnett/*)
@@ -212,6 +218,7 @@ While `~/.agents/` files provide global guidance, individual projects need proje
 **Where to document:**
 - Private projects: In `AGENTS.local.md` or private `AGENTS.md`
 - Public projects: In `AGENTS.local.md` (gitignored), NOT public AGENTS.md
+- Cache location: `.agents/ISSUE_CACHE.md` (excluded via `.git/info/exclude` pattern `/.agents/`)
 
 #### Pattern 1: Inline Issue Tracking
 
@@ -262,14 +269,17 @@ Best for projects with >10 open issues. Keeps AGENTS.local.md clean.
 ```markdown
 ## GitHub Issues
 
-**➡️ Check `.git/info/ISSUE_CACHE.md` for current open issues**
+**➡️ READ [.agents/ISSUE_CACHE.md](.agents/ISSUE_CACHE.md) to see all open issues categorized by label**
 
-Last updated: 2025-12-15
-Directive: Compare cached issues with `gh issue list` before starting work.
-If changes detected or cache is >7 days old, regenerate cache.
+**Directive to agents:**
+1. **At session start:** Read the full ISSUE_CACHE.md file to see current state
+2. **Detect changes:** Compare issue numbers in cache vs live `gh issue list` output
+3. **Identify new issues:** Look for issue numbers in live output not in cache (those are NEW)
+4. **Check staleness:** If cache "Regenerate on or after" date has passed, regenerate
+5. **Regenerate:** Use the commands in AGENTS.local.md and update `.agents/ISSUE_CACHE.md`
 ```
 
-**Create `.git/info/ISSUE_CACHE.md`:**
+**Create `.agents/ISSUE_CACHE.md`:**
 ```markdown
 # GitHub Issue Cache for <repo-name>
 
@@ -296,44 +306,28 @@ If changes detected or cache is >7 days old, regenerate cache.
 
 **Add to `.git/info/exclude`:**
 ```
-ISSUE_CACHE.md
+/.agents/
 ```
 
-**Regeneration script:**
+This excludes the entire `.agents/` directory, keeping all cached data and working notes private.
+
+**Regeneration (use simple one-liners in AGENTS.local.md):**
+
+Instead of scripts, use simple `gh` commands that can be copy-pasted. Document them in the project's AGENTS.local.md file for easy regeneration:
+
 ```shell
-#!/usr/bin/env sh
-# Regenerate issue cache in .git/info/ISSUE_CACHE.md
+# Bugs only
+echo "## Bugs (needs attention)"
+gh issue list --state open --label bug --json number,title,labels,updatedAt \
+  --jq 'sort_by(.number) | .[] | "#\(.number) | \(.title) | labels: \(.labels | map(.name) | join(",")) | updated: \(.updatedAt | split("T")[0])"'
 
-CACHE_FILE=".git/info/ISSUE_CACHE.md"
-REPO_NAME=$(basename "$PWD")
-
-cat > "$CACHE_FILE" << EOF
-# GitHub Issue Cache for $REPO_NAME
-
-**Generated:** $(date -u +"%Y-%m-%d %H:%M UTC")
-**Regenerate on or after:** $(date -u -d '+7 days' +"%Y-%m-%d")
-
-## All Open Issues
-
-EOF
-
-gh issue list --state open --json number,title,labels,updatedAt --limit 100 \
-  --jq 'sort_by(.number) | .[] | "#\(.number) | \(.title) | labels: \(.labels | map(.name) | join(",")) | updated: \(.updatedAt | split("T")[0])"' \
-  >> "$CACHE_FILE"
-
-cat >> "$CACHE_FILE" << 'EOF'
-
-## Recently Closed (last 30 days)
-
-EOF
-
-gh issue list --state closed --search "closed:>$(date -u -d '30 days ago' +%Y-%m-%d)" \
-  --json number,title,closedAt --limit 20 \
-  --jq 'sort_by(.number) | reverse | .[] | "#\(.number) | \(.title) | closed: \(.closedAt | split("T")[0])"' \
-  >> "$CACHE_FILE"
-
-echo "✅ Issue cache regenerated: $CACHE_FILE"
+# Non-bugs (enhancements, questions, etc.)
+echo "## Non-Bug Issues"
+gh issue list --state open --label bug --json number,title,labels,updatedAt \
+  --jq 'sort_by(.number) | .[] | "#\(.number) | \(.title) | labels: \(.labels | map(.name) | join(",")) | updated: \(.updatedAt | split("T")[0])"'
 ```
+
+Agents can run these commands and copy output to `.agents/ISSUE_CACHE.md`.
 
 #### Which Pattern to Use?
 
@@ -371,7 +365,7 @@ fi
 
 #### Agent Directive
 
-When agents encounter issue cache in AGENTS.local.md or .git/info/ISSUE_CACHE.md:
+When agents encounter issue cache in AGENTS.local.md or .agents/ISSUE_CACHE.md:
 1. Check if "recheck" date has passed
 2. If yes, or if making changes to the project, fetch current issues
 3. Compare with cached listing (use issue numbers as fingerprint)

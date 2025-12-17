@@ -102,18 +102,13 @@ head -n 5 ~/AGENTS.global.md  # Seed template version (check Last Updated)
 
 ### Project-Specific Overrides
 
+**➡️ When setting up project AGENTS files, you MUST read `~/.agents/agents-files-howto.md` section "Project-Specific AGENTS Files" for detailed instructions.**
+
+**Quick reference:**
 - **`AGENTS.local.md`** - Machine-specific or personal preferences (always gitignored)
 - **`AGENTS.md`** (public version) - Portable conventions for all contributors
 - **Agents MUST read `AGENTS.local.md` if it exists** - treat as extension of AGENTS.md
-- When creating public AGENTS.md, include directive to read AGENTS.local.md if present
-
-**What to include in project-specific docs:**
-- Concrete examples of good/bad patterns from your actual codebase
-- Language-specific testing conventions with real test examples
-- Tool-specific rules (e.g., `.cursor/rules/` for Cursor IDE)
-- Project architecture patterns and anti-patterns
-- Known issues and workarounds specific to this project
-- **GitHub issue tracking** (for repos you own/maintain - see below)
+- **GitHub issue tracking is REQUIRED** for repos you own/maintain (see agents-files-howto.md)
 
 ### Tool & MCP Server Documentation
 
