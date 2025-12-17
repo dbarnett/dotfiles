@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# agents_task_init.sh - Initialize THIS_BRANCH.md and check_this_branch.sh for task/change work
+# Status: NOT YET IMPLEMENTED
+
+set -e
+
+# Colors
+if [ -t 1 ]; then
+    BOLD='\033[1m'
+    YELLOW='\033[0;33m'
+    BLUE='\033[0;34m'
+    RESET='\033[0m'
+else
+    BOLD='' YELLOW='' BLUE='' RESET=''
+fi
+
+printf "${YELLOW}⚠️  agents_task_init.sh is not yet implemented${RESET}\n\n"
+
+printf "${BOLD}This script will create:${RESET}\n"
+printf "  - THIS_BRANCH.md (track scope, decisions, TODOs for this work)\n"
+printf "  - check_this_branch.sh (validation script to run before committing)\n\n"
+
+printf "${BOLD}For now, set these up manually:${RESET}\n"
+printf "  See ${BLUE}~/.agents/rules/branch-metadata.md${RESET} for:\n"
+printf "  - THIS_BRANCH.md template and conventions\n"
+printf "  - check_this_branch.sh patterns\n"
+printf "  - When to use vs skip branch metadata files\n\n"
+
+printf "${BOLD}Quick manual setup:${RESET}\n"
+printf "  1. Read ~/.agents/rules/branch-metadata.md\n"
+printf "  2. Create THIS_BRANCH.md with task scope and TODOs\n"
+printf "  3. Create check_this_branch.sh to validate before committing\n"
+printf "  4. Update AGENTS.local.md 'Current Task Context' section\n\n"
+
+exit 1

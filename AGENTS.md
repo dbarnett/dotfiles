@@ -1,17 +1,28 @@
 # Dotfiles Repository - AI Agent Instructions
 
+**Filename:** `AGENTS.md` (you may access this via `CLAUDE.md` symlink)
 **Location:** This file is repo-specific (not deployed to `~/`)
 **Last Updated:** 2025-12-16
 
-For global AI agent conventions across all projects, see `~/AGENTS.global.md` (deployed from `AGENTS.global.md` in this repo).
+**Note:** The `CLAUDE.md` → `AGENTS.md` symlink exists for Claude Code compatibility until Claude Code officially supports `AGENTS.md` ([#6235](https://github.com/anthropics/claude-code/issues/6235)). This is a **local symlink within the repo**, not in `~/`.
 
 ---
 
-## ⚠️ IMPORTANT: Read This First
+## ⚠️ CRITICAL - READ FIRST
 
 **You are in the dotfiles repository.** This repo uses **chezmoi** to manage dotfiles.
 
-**CRITICAL: You MUST read `~/AGENTS.global.md` before proceeding.** It contains essential global conventions including jj workflow, shell script preferences, file editing rules, and general coding patterns that apply to ALL work in this repository.
+### 🚨 MANDATORY PREREQUISITE
+
+**YOU MUST READ `~/AGENTS.global.md` BEFORE PROCEEDING WITH ANY WORK.**
+
+That file contains essential global conventions including:
+- jj (Jujutsu) version control workflow
+- Shell script preferences (avoid bashisms, fish shell compatibility)
+- File editing rules (indentation, whitespace, sed prohibition)
+- General coding patterns that apply to ALL work in this repository
+
+**If you skip reading `~/AGENTS.global.md`, you WILL make mistakes.**
 
 **Additional required reading:**
 1. **This file** - Repository structure and chezmoi workflow
@@ -36,8 +47,9 @@ When this file references dotfile paths (`.agents/`, `.config/`, `.bashrc`, etc.
 - **Best practice:** Check `./dot_*` child paths first (fresher content), fall back to `~/*` (deployed) if needed
 
 **Files in this repo that DON'T deploy to home:**
-- `CLAUDE.md` (this file - repo-specific instructions)
-- `AGENTS.local.md` (session notes and local context)
+- `AGENTS.md` (this file - repo-specific instructions)
+- `CLAUDE.md` (symlink to AGENTS.md for Claude Code compatibility)
+- `AGENTS.local.md` (session notes and local context, gitignored)
 - `THIS_BRANCH.md` (branch metadata, if exists)
 - `check_this_branch.sh` (branch validation script, if exists)
 
@@ -224,8 +236,6 @@ This allows Claude Code to:
 - Access `~/.config` files (Hyprland, waybar, etc.)
 - Read and edit configuration files
 - Run diagnostic commands on configs
-
-**Note:** `CLAUDE.md` in the home directory is a symlink to `AGENTS.global.md` until Claude Code officially supports `AGENTS.md` ([#6235](https://github.com/anthropics/claude-code/issues/6235)).
 
 ---
 

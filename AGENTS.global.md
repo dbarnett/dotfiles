@@ -1,9 +1,11 @@
 # AGENTS.global.md - General Directives for AI Coding Assistants
 
-**Last Updated:** 2025-12-16 (GitHub issue tracking guidance)
+**Last Updated:** 2025-12-17
 **Location:** `~/AGENTS.global.md`
 
-**Note:** If you have an old `~/AGENTS.md` file from a previous version of this dotfiles setup, you should delete it. This file (`~/AGENTS.global.md`) has replaced it.
+**Note:** If you find an old `~/AGENTS.md` file that's plausibly from a previous version of this dotfiles setup, you MUST delete it. This file (`~/AGENTS.global.md`) has replaced it.
+
+**IMPORTANT: Run `agents_project_init.sh`** in new/unfamiliar projects to set up standard instructions
 
 ---
 
@@ -32,84 +34,6 @@ This file contains general preferences and conventions for AI coding assistants 
 
 ---
 
-## 📋 How to Use This File
-
-### 🔄 Session Startup: Project AGENTS File Workflow
-
-**CRITICAL: Every project must have `AGENTS.local.md`. Follow this workflow at the start of every session:**
-
-```
-START SESSION
-     ↓
-Does AGENTS.local.md exist?
-     │
-     ├─YES──→ Check refresh needed:
-     │          • Past "Refresh By" date?
-     │          • Seed template updated after this file?
-     │            │
-     │            ├─YES──→ Update from seed template
-     │            │            ↓
-     │            NO           │
-     │            ↓            │
-     NO                        │
-     ↓                         │
-Create from seed template      │
-     ↓←────────────────────────┘
-Ensure AGENTS.md references it:
-  • Private repo: AGENTS.md → ~/AGENTS.global.md symlink
-  • Public repo: AGENTS.md includes "MUST read AGENTS.local.md"
-     ↓
-Proceed with work
-```
-
-**Refresh metadata requirements:**
-
-Every `AGENTS.local.md` must include:
-```markdown
-**Last Updated:** YYYY-MM-DD
-**Refresh By:** YYYY-MM-DD  (max 10 days from Last Updated)
-**Seed Version:** YYYY-MM-DD  (from AGENTS.global.md Last Updated)
-```
-
-**Quick check at session start:**
-```shell
-# Check if AGENTS.local.md exists
-test -f AGENTS.local.md && echo "EXISTS - check dates" || echo "MISSING - create from seed"
-
-# View timestamps for comparison
-head -n 10 AGENTS.local.md 2>/dev/null  # Project file dates
-head -n 5 ~/AGENTS.global.md  # Seed template version (check Last Updated)
-```
-
-**Where to find seed template:** Read `~/.agents/agents-files-howto.md` section "Project-Specific AGENTS Files" for the template and detailed setup instructions.
-
-**Note:** For Claude Code compatibility, create `CLAUDE.md` as a symlink to `AGENTS.md` (gitignore both in private repos).
-
----
-
-### Implementation Quick Reference
-
-**When creating or setting up AGENTS files, you MUST read `~/.agents/agents-files-howto.md` for:**
-- Seed template for AGENTS.local.md
-- Symlink setup and gitignore rules
-- GitHub issue tracking patterns
-- File tracking invariants
-
-**Public AGENTS.md must include at top:**
-```markdown
-**CRITICAL: You MUST read AGENTS.local.md if it exists in this repository.**
-```
-
-### Project-Specific Overrides
-
-**➡️ When setting up project AGENTS files, you MUST read `~/.agents/agents-files-howto.md` section "Project-Specific AGENTS Files" for detailed instructions.**
-
-**Quick reference:**
-- **`AGENTS.local.md`** - Machine-specific or personal preferences (always gitignored)
-- **`AGENTS.md`** (public version) - Portable conventions for all contributors
-- **Agents MUST read `AGENTS.local.md` if it exists** - treat as extension of AGENTS.md
-- **GitHub issue tracking is REQUIRED** for repos you own/maintain (see agents-files-howto.md)
-
 ### Tool & MCP Server Documentation
 
 **For tool/MCP configuration details:**
@@ -131,25 +55,6 @@ head -n 5 ~/AGENTS.global.md  # Seed template version (check Last Updated)
 - Tool-specific quirks and best practices
 - Known issues and workarounds
 - Authentication/access patterns
-
-### Setting Up Project-Specific AGENTS Files
-
-**➡️ For detailed guidance on setting up AGENTS.local.md (including GitHub issue tracking), read `~/.agents/agents-files-howto.md` section "Project-Specific AGENTS Files".**
-
-**Quick tips:**
-- Use `AGENTS.local.md` (gitignored) for personal project notes
-- For repos you own/maintain: Track GitHub issues with timestamped cache
-- **Symlink tip:** In Claude Code contexts, also create `CLAUDE.md` → `AGENTS.md` symlink for compatibility
-
-```shell
-# Example: Set up AGENTS.local.md with CLAUDE.md symlink
-ln -s ~/AGENTS.global.md AGENTS.md
-ln -s AGENTS.md CLAUDE.md
-# Add to .git/info/exclude:
-echo "AGENTS.md" >> .git/info/exclude
-echo "AGENTS.local.md" >> .git/info/exclude
-echo "CLAUDE.md" >> .git/info/exclude
-```
 
 ### Maintaining .agents Files
 
@@ -379,16 +284,17 @@ Fixes: #issue-number (if applicable)
 
 ## ⚠️ Important Reminders
 
-1. **When working with version control in repos with `.jj/`, read `~/.agents/jj-howto.md`** for commands and workflows
-2. **Always use `jj` commands**, not `git` directly (except `jj git push/fetch`)
-3. **Use ````shell` not ````bash`** in markdown unless bash-specific features required
-4. **Avoid bashisms** (heredocs, process substitution, etc.) - user runs fish shell
-5. **When starting branch work, read `~/.agents/rules/branch-metadata.md`** for THIS_BRANCH.md guidance
-6. **FIXME = blocking, TODO = deferrable** - check_this_branch.sh enforces this
-7. **When writing tests, read `~/.agents/rules/testing.md`** for detailed guidelines
-8. **When writing shell scripts, read `~/.agents/rules/shell-scripts.md`** for detailed guidelines
-9. **Update this file's timestamp** when making changes
-10. **Verify project `AGENTS.md` is current** if manually copied (not symlinked)
+1. **Run `agents_project_init.sh`** in new/unfamiliar projects to set up standard instructions
+2. **When starting branch work, run `agents_task_init.sh`** for THIS_BRANCH.md guidance
+3. **When working with version control in repos with `.jj/`, read `~/.agents/jj-howto.md`** for commands and workflows
+4. **Always use `jj` commands**, not `git` directly (except `jj git push/fetch`)
+5. **Use ````shell` not ````bash`** in markdown unless bash-specific features required
+6. **Avoid bashisms** (heredocs, process substitution, etc.) - user runs fish shell
+7. **FIXME = blocking, TODO = deferrable** - check_this_branch.sh enforces this
+8. **When writing tests, read `~/.agents/rules/testing.md`** for detailed guidelines
+9. **When writing shell scripts, read `~/.agents/rules/shell-scripts.md`** for detailed guidelines
+10. **Update this file's timestamp** when making changes
+11. **Verify project `AGENTS.md` is current** if manually copied (not symlinked)
 
 ---
 
