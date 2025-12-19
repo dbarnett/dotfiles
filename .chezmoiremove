@@ -3,6 +3,8 @@ AGENTS.dotfiles.md
 CLAUDE.md
 dotfiles_profiling/
 dotfiles_profiling/**
+.local/bin/agents_project_init.sh
+.local/bin/agents_task_init.sh
 
 # Old yadm template files
 .config/jj/config.toml##template

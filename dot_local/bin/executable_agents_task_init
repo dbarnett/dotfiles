@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# agents_task_init.sh - Initialize THIS_BRANCH.md and check_this_branch.sh for task/change work
+# agents_task_init - Initialize THIS_BRANCH.md and check_this_branch.sh for task/change work
 # Status: NOT YET IMPLEMENTED
 
 set -e
@@ -14,7 +14,7 @@ else
     BOLD='' YELLOW='' BLUE='' RESET=''
 fi
 
-printf "${YELLOW}⚠️  agents_task_init.sh is not yet implemented${RESET}\n\n"
+printf "${YELLOW}⚠️  agents_task_init is not yet implemented${RESET}\n\n"
 
 printf "${BOLD}This script will create:${RESET}\n"
 printf "  - THIS_BRANCH.md (track scope, decisions, TODOs for this work)\n"

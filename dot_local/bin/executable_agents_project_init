@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# agents_project_init.sh - Initialize AGENTS files for a project
+# agents_project_init - Initialize AGENTS files for a project
 # Usage: Run from project root. Safe to run multiple times (idempotent).
 #
 # Note: Helper functions (break_refresh_mode, verbose, warn) available for
@@ -115,7 +115,7 @@ else
 # Project-Specific Agent Instructions (Local)
 
 **Last Updated:** $TODAY
-**Refresh By:** $REFRESH_BY  (run agents_project_init.sh daily, update this date when refreshing)
+**Refresh By:** $REFRESH_BY  (run agents_project_init daily, update this date when refreshing)
 **Seed Version:** $SEED_VERSION  (template version from ~/AGENTS.global.md "Last Updated")
 
 **Note:** See bottom of file for usage guidelines (what belongs here, file length conventions)
@@ -259,7 +259,7 @@ if [ -n "$EXCLUDE_FILE" ]; then
     if ! grep -q '^# AGENTS files' "$EXCLUDE_FILE" 2>/dev/null; then
         cat >> "$EXCLUDE_FILE" <<'EOF'
 
-# AGENTS files (added by agents_project_init.sh)
+# AGENTS files (added by agents_project_init)
 # To convert to shared pattern: remove AGENTS.md and optionally CLAUDE.md from this list
 AGENTS.local.md
 EOF
@@ -306,7 +306,7 @@ if [ "$IS_REFRESH" = true ]; then
         printf "${BOLD}🤖 AGENTS: Check if you should create THIS_BRANCH.md for current work${RESET}\n"
         printf "   If working on a task/change (not just exploring):\n"
         printf "   ${BLUE}Ask user:${RESET} \"Should we create THIS_BRANCH.md to track this work?\"\n"
-        printf "   ${BLUE}If yes:${RESET} Run agents_task_init.sh to bootstrap it\n\n"
+        printf "   ${BLUE}If yes:${RESET} Run agents_task_init to bootstrap it\n\n"
     fi
 
     printf "${GREEN}Done!${RESET} ${BLUE}(Script is idempotent - run as frequently as needed)${RESET}\n"
