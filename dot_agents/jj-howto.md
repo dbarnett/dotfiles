@@ -84,6 +84,11 @@ jj undo
 
 # Restore files from a change
 jj restore --from <change-id>
+
+# Read files from a specific change (without checking it out)
+jj file show -r <change-id> <path>       # show file contents from change
+jj file show -r _grafana_scripts README.md  # example: read README from another change
+jj file list -r <change-id>              # list all files in change
 ```
 
 ---
