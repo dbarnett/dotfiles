@@ -14,6 +14,7 @@ This file contains general preferences and conventions for AI coding assistants 
 ## 📑 Quick Navigation
 
 **Essential sections to read:**
+
 - **📋 How to Use This File** - Setting up project-level AGENTS.md files
 - **🐚 Version Control: Jujutsu (jj)** - Introduction (detailed howto in separate file)
 - **🎯 General Coding Preferences** - Core principles
@@ -28,6 +29,7 @@ This file contains general preferences and conventions for AI coding assistants 
 - **`~/.agents/rules/obsidian.md`** - **MUST read when working with Obsidian vault** (`~/.myvault`)
 
 **See also:**
+
 - `~/AGENTS.TOOLS.local.md` - Tool/MCP server configurations (if exists)
 - Project `.cursor/rules/` - IDE-specific coding rules
 - Project `AGENTS.local.md` - Machine-specific overrides
@@ -37,18 +39,21 @@ This file contains general preferences and conventions for AI coding assistants 
 ### Tool & MCP Server Documentation
 
 **For tool/MCP configuration details:**
+
 - Create `~/AGENTS.TOOLS.local.md` for global tool usage notes and MCP server specifics
 - Reference it from project `AGENTS.local.md` files where relevant
 - Keep `AGENTS.TOOLS.local.md` untracked and private
 - In public/shared AGENTS.md files, only mention which tools/MCPs you use, not how
 
 **Why keep details in local files instead of AGENTS.md:**
+
 - **Platform-dependent:** Different machines may have different agents/MCPs installed
 - **Version resilience:** Agents update their config formats; local files don't need repo syncing
 - **Privacy:** Avoid committing API patterns, authentication details, access specifics
 - **Machine-specific:** Each system can document its actual configuration state
 
 **What to document in AGENTS.TOOLS.local.md:**
+
 - Where MCP servers are configured (file paths, JSON keys)
 - How to check for newly installed but undocumented servers
 - MCP server usage patterns and caveats
@@ -75,6 +80,7 @@ All my projects use **Jujutsu** ([jj-vcs.dev](https://jj-vcs.dev/)) instead of d
 **If you try to use git commands directly or don't understand jj concepts, you WILL make mistakes that are hard to recover from.**
 
 **Quick overview (NOT a substitute for reading the howto):**
+
 - Jujutsu provides a friendlier interface to Git with automatic snapshotting
 - Changes are tracked continuously without explicit staging
 - You work with "changes" (stable IDs) rather than commits
@@ -97,6 +103,7 @@ All my projects use **Jujutsu** ([jj-vcs.dev](https://jj-vcs.dev/)) instead of d
 - Start scripts with `#!/usr/bin/env sh` for portability
 
 **Quick reference - MUST avoid these bashisms:**
+
 - ❌ Heredocs (`cat <<EOF`) - Will fail on fish shell
 - ❌ Process substitution (`<(command)`) - Not portable
 - ❌ Bash arrays - Not POSIX
@@ -107,6 +114,7 @@ All my projects use **Jujutsu** ([jj-vcs.dev](https://jj-vcs.dev/)) instead of d
 **CRITICAL: Avoid "log-log-log" patterns for multiline output**
 
 ❌ **WRONG - Breaks vertical alignment:**
+
 ```shell
 echo "=== Summary ==="
 echo "  Status:    ✅ Passed"
@@ -115,6 +123,7 @@ echo "  Time:      1.234s"
 ```
 
 ✅ **CORRECT - Use single output for block-formatted content:**
+
 ```shell
 # Pattern 1: printf with format string
 printf "=== Summary ===
@@ -132,12 +141,14 @@ echo "$output"
 ```
 
 **Why this matters:**
+
 - Multiple echo calls break vertical alignment when buffered or redirected
 - Log viewers may interleave output from parallel processes between echo calls
 - Block-formatted output (tables, aligned columns) must stay together
 - Single output statement ensures atomic write to stdout/logs
 
 ### File Editing
+
 - Clean up trailing whitespace (except `.md` files)
 - Ensure newline at end of file
 - Preserve existing indentation style (tabs vs spaces)
@@ -164,6 +175,7 @@ echo "$output"
 **AVOID consecutive Logger.log calls ("log-log-log" antipattern):**
 
 ❌ **WRONG - Multiple calls break vertical alignment:**
+
 ```javascript
 Logger.log('⚠️  WARNING: Something is wrong');
 Logger.log('   Expected: This should happen');
@@ -171,6 +183,7 @@ Logger.log('   Suggestion: Do this instead');
 ```
 
 ✅ **CORRECT - Single multi-line call:**
+
 ```javascript
 Logger.log('⚠️  WARNING: Something is wrong\n' +
            '   Expected: This should happen\n' +
@@ -178,6 +191,7 @@ Logger.log('⚠️  WARNING: Something is wrong\n' +
 ```
 
 ❌ **WRONG - Ugly block text output in shell:**
+
 ```shell
 echo "Doing something"
 echo ""
@@ -187,6 +201,7 @@ echo "  - Item 2"
 ```
 
 ✅ **CORRECT - Output one message as one message:**
+
 ```shell
 echo "Doing something
 
@@ -196,27 +211,34 @@ Details:
 ```
 
 **Newline usage:**
+
 - Use `\n` only to separate lines WITHIN a message
 - Don't add leading or trailing `\n` unless you specifically want a blank line after the message
 - `Logger.log('Line 1\nLine 2')` outputs two lines + automatic newline at end
 - `Logger.log('Message\n\n')` outputs message + blank line (double newline)
 
 **Why this matters:**
+
 - Multiple Logger.log calls may interleave with other logs in concurrent execution
 - Single call ensures message stays together as atomic block
 - Consistent newline handling prevents unexpected blank lines
 
 ❌ **WRONG - Weird leading/trailing newlines:**
+
 ```javascript
 Logger.log('\n=== Doing thing ===');
 Logger.log('Finished\n');
 ```
+
 ✅ **CORRECT - Output without leading/trailing newlines:**
+
 ```javascript
 Logger.log('=== Doing thing ===');
 Logger.log('Finished');
 ```
+
 ### Documentation
+
 - When code changes, update related docs immediately
 - Add "Last Updated" timestamps to docs
 - Keep docs concise and scannable
@@ -227,12 +249,14 @@ Logger.log('Finished');
 **IMPORTANT: When writing/reviewing tests, you MUST read `~/.agents/rules/testing.md` for detailed guidelines.**
 
 **Core Principles (NOT a substitute for reading the full guide):**
+
 - **One test = one thing** - Each test should verify a single behavior
 - **Use parameterized tests** for variations of the same test logic
 - **Test real behavior, not mocks** - Only mock external dependencies (APIs, databases, file systems, time)
 - **Functional tests spanning multiple components** → separate test file/directory
 
 ### Error Handling
+
 - Don't guess error causes from message text
 - Only state what's explicitly known from error metadata
 
@@ -249,16 +273,19 @@ Logger.log('Finished');
 - **Don't overthink cross-tool setup** - it's fine to help other agents work on the same code, but don't spend energy creating elaborate rules you won't actively use yourself
 
 ### Claude Code
+
 - Use symbolic code navigation tools when available
 - Check memories at session start for codebase context
 - Memories store codebase architecture, patterns, and known issues
 
 ### Cursor
+
 - Cursor has its own user memory mechanism - rely on that
 - Use `.cursor/rules/` for Cursor-specific code generation preferences
 - This file should set up reasonable context for Cursor without duplicating its memory
 
 ### Gemini CLI
+
 - (Add Gemini-specific preferences as you discover them)
 
 ---
@@ -266,7 +293,9 @@ Logger.log('Finished');
 ## 📝 Conventions Reference
 
 ### Emoji Tags for Grepping
+
 Use in notes and commit messages:
+
 - 🐛 Bugs
 - 📚 Documentation
 - ⚡ Performance
@@ -276,6 +305,7 @@ Use in notes and commit messages:
 - 🔒 Security
 
 ### Change Descriptions (jj describe)
+
 ```
 <emoji> <Short summary (50 chars)>
 
