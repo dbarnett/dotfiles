@@ -1,6 +1,6 @@
 # Chezmoi Usage Patterns & Gotchas
 
-**Last Updated:** 2025-12-15
+**Last Updated:** 2025-12-23
 
 This document contains non-obvious usage patterns and common pitfalls discovered while using chezmoi for dotfiles management.
 
@@ -88,16 +88,41 @@ When you run `chezmoi apply`:
 - Requires user decision on every conflict
 
 ### create_ File Behavior
-```shell
-chezmoi add --create ~/.bashrc
-# Creates: create_dot_bashrc
-```
 
 When you run `chezmoi apply`:
 - Checks: "Does file exist?"
   - **If NO** → Creates it with source content
   - **If YES** → **Skips entirely**, never prompts, never checks content
 - Perfect for "default files that can be customized per-machine"
+
+### Path Patterns Cheat Sheet
+
+**Source → Destination examples:**
+
+```
+# Regular files
+dot_bashrc                    → ~/.bashrc
+dot_config/app/config.yaml    → ~/.config/app/config.yaml
+
+# create_ files (only created if missing, never overwritten)
+create_dot_profile.local      → ~/.profile.local
+dot_gitconfig.d/create_local.conf → ~/.gitconfig.d/local.conf
+
+# Templates
+dot_bashrc.tmpl               → ~/.bashrc (rendered)
+dot_gitconfig.d/user.conf.tmpl → ~/.gitconfig.d/user.conf (rendered)
+
+# Empty files (when template outputs nothing)
+dot_gitconfig.d/empty_work.conf.tmpl → ~/.gitconfig.d/work.conf
+
+# Symlinks
+symlink_dot_config/app        → ~/.config/app (symlink)
+```
+
+**Key rules:**
+- `create_` prefix applies to **filename**, not directory: `dot_dir/create_file.conf` ✅, `create_dot_dir/file.conf` ❌
+- `empty_` prefix needed only when template can output nothing
+- See `dot_gitconfig.d/create_local.conf` in this repo for a real example
 
 ### Restoring create_ Files
 
@@ -320,7 +345,8 @@ chezmoi forget ~/.bashrc
 ├── dot_bashrc                   # Regular file
 ├── create_dot_profile.local     # Created once, never updated
 ├── dot_gitconfig.d/
-│   └── user.conf.tmpl          # Template file
+│   ├── user.conf.tmpl          # Template file
+│   └── create_local.conf       # create_ file in subdirectory
 ├── encrypted_private_*.age      # Encrypted file
 ├── symlink_dot_config/          # Directory with symlinks
 │   └── some-link.tmpl          # Templated symlink target
@@ -333,6 +359,9 @@ chezmoi forget ~/.bashrc
 ~/                              # Destination directory
 ├── .bashrc                     # Applied from dot_bashrc
 ├── .profile.local              # Created from create_dot_profile.local
+├── .gitconfig.d/
+│   ├── user.conf               # Applied from dot_gitconfig.d/user.conf.tmpl
+│   └── local.conf              # Created from dot_gitconfig.d/create_local.conf
 └── .config/some-link           # Symlink from symlink_dot_config/some-link.tmpl
 ```
 

@@ -28,7 +28,4 @@
     ff = only
 [include]
     path = .gitconfig.d/user.conf
-{{ if eq (or (index . "machine_profile") "personal") "work" -}}
-[url "git@github.com:"]
-    insteadOf = https://github.com/
-{{ end -}}
+    path = .gitconfig.d/local.conf
