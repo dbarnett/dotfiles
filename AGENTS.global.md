@@ -1,11 +1,11 @@
 # AGENTS.global.md - General Directives for AI Coding Assistants
 
-**Last Updated:** 2025-12-18
+**Last Updated:** 2025-12-19
 **Location:** `~/AGENTS.global.md`
 
 **Note:** If you find an old `~/AGENTS.md` file that's plausibly from a previous version of this dotfiles setup, you MUST delete it. This file (`~/AGENTS.global.md`) has replaced it.
 
-**IMPORTANT: Run `agents_project_init`** (on PATH) in new/unfamiliar projects to set up standard instructions
+**IMPORTANT: Run `agents-tool`** (on PATH) in new/unfamiliar projects to set up standard instructions
 
 ---
 
@@ -284,8 +284,8 @@ Fixes: #issue-number (if applicable)
 
 ## ⚠️ Important Reminders
 
-1. **Run `agents_project_init`** (on PATH) in new/unfamiliar projects to set up standard instructions
-2. **When starting branch work, run `agents_task_init`** (on PATH) for THIS_BRANCH.md guidance
+1. **Run `agents-tool`** (on PATH) in new/unfamiliar projects to set up standard instructions
+2. **When starting branch work, run `agents-tool --task`** (on PATH) for THIS_BRANCH.md guidance
 3. **When working with version control in repos with `.jj/`, read `~/.agents/jj-howto.md`** for commands and workflows
 4. **Always use `jj` commands**, not `git` directly (except `jj git push/fetch`)
 5. **Use ````shell` not ````bash`** in markdown unless bash-specific features required

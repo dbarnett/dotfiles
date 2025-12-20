@@ -374,33 +374,13 @@ echo ""
 
 # CRITICAL: Check for FIXME comments (must be resolved before publishing)
 echo "🔍 Scanning for FIXME comments (blocking)..."
-FIXME_COUNT=0
-FIXME_DETAILS=""
-for file in $CHECK_FILES; do
-    if [ -f "$file" ]; then
-        # For markdown files, exclude FIXME in code blocks
-        if echo "$file" | grep -q '\.md$'; then
-            MATCHES=$(awk '
-                /^```/ { in_code = !in_code; next }
-                !in_code && /FIXME/ { print NR ":" $0 }
-            ' "$file")
-        else
-            MATCHES=$(grep -n "FIXME" "$file" 2>/dev/null || true)
-        fi
+# Single grep across all files is more efficient
+FIXME_RESULTS=$(grep -n "FIXME" $CHECK_FILES 2>/dev/null || true)
 
-        if [ -n "$MATCHES" ]; then
-            FIXME_COUNT=$((FIXME_COUNT + 1))
-            FIXME_DETAILS="$FIXME_DETAILS
-  $file:
-$MATCHES
-"
-        fi
-    fi
-done
-
-if [ $FIXME_COUNT -gt 0 ]; then
-    echo "❌ ERROR: Found FIXME comments in $FIXME_COUNT file(s)"
-    echo "$FIXME_DETAILS"
+if [ -n "$FIXME_RESULTS" ]; then
+    echo "$FIXME_RESULTS"
+    echo ""
+    echo "❌ ERROR: Found FIXME comments"
     echo ""
     echo "   FIXME comments MUST be resolved before publishing"
     echo "   Either fix them or convert to TODO if acceptable to defer"
@@ -413,21 +393,12 @@ echo ""
 
 # INFORMATIONAL: List TODO comments for awareness
 echo "📋 TODO comments in branch files (informational)..."
-TODO_COUNT=0
-for file in $CHECK_FILES; do
-    if [ -f "$file" ]; then
-        # Suppress known out-of-scope TODOs:
-        # Example: | grep -v "TODO.*out-of-scope-pattern"
-        MATCHES=$(grep -n "TODO" "$file" 2>/dev/null | grep -v "FIXME" || true)
-        if [ -n "$MATCHES" ]; then
-            echo "  $file:"
-            echo "$MATCHES"
-            TODO_COUNT=$((TODO_COUNT + 1))
-        fi
-    fi
-done
+# Single grep across all files is more efficient
+TODO_RESULTS=$(grep -n "TODO" $CHECK_FILES 2>/dev/null | grep -v "FIXME" || true)
 
-if [ $TODO_COUNT -eq 0 ]; then
+if [ -n "$TODO_RESULTS" ]; then
+    echo "$TODO_RESULTS"
+else
     echo "   (none found)"
 fi
 echo ""

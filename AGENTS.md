@@ -2,9 +2,10 @@
 
 **Filename:** `AGENTS.md` (you may access this via `CLAUDE.md` symlink)
 **Location:** This file is repo-specific (not deployed to `~/`)
-**Last Updated:** 2025-12-16
 
 **Note:** The `CLAUDE.md` → `AGENTS.md` symlink exists for Claude Code compatibility until Claude Code officially supports `AGENTS.md` ([#6235](https://github.com/anthropics/claude-code/issues/6235)). This is a **local symlink within the repo**, not in `~/`.
+
+**Maintenance:** Run `agents-tool` regularly (checks file mtimes automatically)
 
 ---
 
@@ -40,11 +41,32 @@ This is a chezmoi-managed dotfiles repository containing shell configs, editor s
 - **Destination:** `~/` (where files are deployed)
 - **Remote:** `git@github.com:dbarnett/dotfiles.git`
 
-**Path Resolution Note:**
-When this file references dotfile paths (`.agents/`, `.config/`, `.bashrc`, etc.), they resolve to:
-- **In repo:** `./dot_*` prefix (e.g., `.agents/` → `./dot_agents/`, `.bashrc` → `./dot_bashrc`)
-- **Deployed:** `~/.*` (after chezmoi apply, e.g., `~/.agents/`, `~/.bashrc`)
-- **Best practice:** Check `./dot_*` child paths first (fresher content), fall back to `~/*` (deployed) if needed
+**Path Resolution & Reading Files:**
+
+**CRITICAL - Read this carefully:**
+
+In this dotfiles repository, file references use HOME paths (`~/foo`) but you should generally read from repo source paths (`./dot_foo`).
+
+**Chezmoi naming convention:**
+- **In repo:** Files/dirs use `dot_*` prefix
+  - `.agents/` → `./dot_agents/`
+  - `.bashrc` → `./dot_bashrc`
+  - `.config/hypr/` → `./dot_config/hypr/`
+- **Deployed:** After `chezmoi apply`, files appear in `~/` with actual dotfile names
+  - `~/.agents/`, `~/.bashrc`, `~/.config/hypr/`
+
+**What to read - Examples:**
+- Documentation says `~/AGENTS.global.md` → **Read `./AGENTS.global.md`** (repo source may have uncommitted changes)
+- Documentation says `~/.agents/foo.md` → **Read `./dot_agents/foo.md`** (fresh source, not stale deployed)
+- Documentation says `~/.config/hypr/hyprland.conf` → **Read `./dot_config/hypr/hyprland.conf`** (current working state)
+- Documentation says `~/.bashrc` → **Read `./dot_bashrc`** (latest edits before deployment)
+
+**When to read from `~/` (deployed) instead:**
+- Explicitly checking deployed state: "verify ~/.bashrc was deployed correctly"
+- File ONLY exists in home, not tracked: `~/.bash_history`, `~/.cache/`
+- Instructions specifically say "deployed version" (rare)
+
+**Default rule:** If unsure, prefer repo source (`./dot_*`) over deployed (`~/`).
 
 **Files in this repo that DON'T deploy to home:**
 - `AGENTS.md` (this file - repo-specific instructions)
@@ -181,6 +203,63 @@ jj new -m "Description" # Start new change
 jj describe            # Update change description
 jj git push            # Push bookmark to GitHub
 ```
+
+---
+
+## 🏠 Dotfiles Repository Conventions
+
+### Change Description Convention (WIP: prefix)
+
+**WIP: prefix usage:**
+- **Single change:** Prefix with `WIP:` and include detailed task notes
+- **Multi-change series:** Prefix ALL changes in the series with `WIP:`
+  - Example: `main -> WIP: refactor X -> WIP: add Y -> WIP: fix Z (@)`
+  - Walking backwards through WIP: changes from @ = the "current work series"
+  - Each change has its own detailed description with scope, TODOs, progress
+- **Ready to push:**
+  - Remove `WIP:` prefix from all changes in the series
+  - Condense each description to 10-15 lines max
+  - Keep only: what changed, why, important notes
+  - Remove TODOs (already done or tracked in AGENTS.local.md)
+  - Usually squash series into one or a few logical commits
+
+### Bookmark Conventions
+
+**Stacked series (multiple topics in development):**
+- Use multiple bookmarks to make topics explicit
+- Example: `main -> WIP: aaa -> WIP: bbb (_somechange) -> WIP: zzz (_anotherchange)`
+- Each bookmark marks a separate logical topic
+- Prevents ambiguity about what's grouped together
+
+**Dotfiles-specific bookmarks:**
+- **`_local`**: Miscellaneous uncurated local changes on top of main
+  - Use for changes that still need to be consolidated and made pushable
+  - Like a "staging area" for uncommitted ideas
+  - Eventually split out into proper topic bookmarks or push directly
+- **`_<topic>`**: Specific WIP topics (e.g., `_fix_hyprland`, `_agents_refactor`)
+  - Prefix with `_` to indicate work-in-progress
+  - Use lowercase with underscores
+
+### agents-tool Usage
+
+**In dotfiles context:**
+- `agents-tool` - Check/refresh AGENTS files, get dotfiles-specific guidance
+- `agents-tool --task` - Shows dotfiles workflow guidance (no THIS_BRANCH.md needed)
+
+**Why no THIS_BRANCH.md in dotfiles:**
+- Dotfiles changes should be small, focused, single-purpose
+- Use `jj describe` to document WIP change scope (keep detailed while working)
+- Condense descriptions to 10-15 lines max before pushing
+- For multi-step work, track TODOs in AGENTS.local.md "Current Roadmap" section
+
+### Chezmoi Path Preferences
+
+**When reading files in this repository:**
+- **Prefer `./AGENTS.global.md`** over `~/AGENTS.global.md` (repo source is fresher)
+- **Prefer `./dot_agents/`** over `~/.agents/` (read from source, not deployed)
+- **Exception:** When checking deployed state, read `~/` paths explicitly
+
+**Why:** Source files in repo may have uncommitted changes. Reading repo source ensures you see current state.
 
 ---
 

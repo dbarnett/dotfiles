@@ -1,0 +1,888 @@
+#!/usr/bin/env bash
+# agents-tool - Idempotent check/setup tool for agent-friendly projects
+# Usage:
+#   agents-tool        # Check/setup project basics
+#   agents-tool --task # Also initialize task/branch metadata files
+
+set -e
+
+# Configuration
+SEED_VERSION="2025-12-19"  # Match ~/AGENTS.global.md Last Updated
+REFRESH_DAYS=1  # Daily refresh is cheap, script detects if updates needed
+GLOBAL_AGENTS_FILE="$HOME/AGENTS.global.md"
+
+# Colors for output (if terminal supports it)
+if [ -t 1 ]; then
+    BOLD='\033[1m'
+    GREEN='\033[0;32m'
+    YELLOW='\033[0;33m'
+    BLUE='\033[0;34m'
+    RED='\033[0;31m'
+    RESET='\033[0m'
+else
+    BOLD='' GREEN='' YELLOW='' BLUE='' RED='' RESET=''
+fi
+
+# Parse arguments
+TASK_MODE=false
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --task)
+            TASK_MODE=true
+            shift
+            ;;
+        *)
+            printf "${RED}Unknown argument: $1${RESET}\n\n"
+            printf "Usage:\n"
+            printf "  agents-tool        # Check/setup project basics\n"
+            printf "  agents-tool --task # Also initialize task/branch metadata files\n"
+            exit 1
+            ;;
+    esac
+done
+
+# ============================================================================
+# COMMON SETUP
+# ============================================================================
+
+# Helper functions
+break_refresh_mode() {
+    IS_REFRESH=false
+}
+
+verbose() {
+    if [ "$IS_REFRESH" = false ]; then
+        printf "$@"
+    fi
+}
+
+warn() {
+    printf "${YELLOW}⚠️  $1${RESET}\n"
+    shift
+    while [ $# -gt 0 ]; do
+        printf "   $1\n"
+        shift
+    done
+}
+
+# Helper: Calculate date N days in future
+date_plus_days() {
+    if result=$(date -d "+$1 days" '+%Y-%m-%d' 2>/dev/null); then
+        printf "%s" "$result"
+    elif result=$(date -v "+${1}d" '+%Y-%m-%d' 2>/dev/null); then
+        printf "%s" "$result"
+    else
+        warn "Could not calculate future date, using today"
+        date '+%Y-%m-%d'
+    fi
+}
+
+# Get today and refresh dates
+TODAY=$(date '+%Y-%m-%d')
+REFRESH_BY=$(date_plus_days "$REFRESH_DAYS")
+
+printf "${BOLD}🔧 Checking for AGENTS files${RESET}\n\n"
+
+# Check if we're in a repository
+if [ ! -d .git ] && [ ! -d .jj ]; then
+    printf "${BLUE}ℹ️  Not in a git or jj repository${RESET}\n\n"
+    printf "agents-tool is most useful when run from a project root directory.\n\n"
+    printf "If you're working on a project:\n"
+    printf "  1. Navigate to your project root (where .git or .jj exists)\n"
+    printf "  2. Run ${GREEN}agents-tool${RESET} to set up or refresh AGENTS files\n"
+    if [ "$TASK_MODE" = true ]; then
+        printf "  3. Run ${GREEN}agents-tool --task${RESET} to initialize branch metadata\n"
+    fi
+    printf "\nOtherwise, nothing special needed here. Carry on!\n"
+    exit 0
+fi
+
+# Detect dotfiles/chezmoi repositories
+IS_DOTFILES=false
+if [ -f .chezmoiignore ] || [ -f .chezmoi.toml.tmpl ] || \
+   [ "$PWD" = "$HOME/.local/share/chezmoi" ] || [ "$PWD" = "$HOME/.dotfiles" ]; then
+    IS_DOTFILES=true
+    verbose "${BLUE}ℹ️  Dotfiles repository detected - using specialized handling${RESET}\n\n"
+fi
+
+# Get bookmark info if jj is available
+BOOKMARK_NAME=""
+if command -v jj >/dev/null 2>&1; then
+    BOOKMARK_NAME=$(jj log -r @ --no-graph -T 'bookmarks' 2>/dev/null | head -1 || echo "")
+    if [ "$BOOKMARK_NAME" = "(no bookmarks)" ]; then
+        BOOKMARK_NAME=""
+    fi
+fi
+
+# ============================================================================
+# PROJECT MODE
+# ============================================================================
+
+run_project_mode() {
+    # Check if ~/AGENTS.global.md has been updated recently
+    GLOBAL_UPDATED=""
+    if [ -f "$GLOBAL_AGENTS_FILE" ] && [ -f AGENTS.local.md ]; then
+        if [ "$GLOBAL_AGENTS_FILE" -nt AGENTS.local.md ]; then
+            global_mtime=$(stat -c %Y "$GLOBAL_AGENTS_FILE" 2>/dev/null || stat -f %m "$GLOBAL_AGENTS_FILE" 2>/dev/null || echo "")
+            local_mtime=$(stat -c %Y AGENTS.local.md 2>/dev/null || stat -f %m AGENTS.local.md 2>/dev/null || echo "")
+            if [ -n "$global_mtime" ] && [ -n "$local_mtime" ] && [ "$global_mtime" -gt 0 ] && [ "$local_mtime" -gt 0 ]; then
+                days_diff=$(( (global_mtime - local_mtime) / 86400 ))
+                GLOBAL_UPDATED="yes (${days_diff}d ago)"
+            fi
+        fi
+    fi
+
+    # Detect if this is a refresh (all files already exist) or first-time setup
+    IS_REFRESH=false
+    if [ -f AGENTS.local.md ] && [ -e AGENTS.md ] && [ -L CLAUDE.md ]; then
+        IS_REFRESH=true
+    fi
+
+    # === 1. Create/update AGENTS.local.md ===
+    if [ "$IS_REFRESH" = false ]; then
+        printf "${BLUE}📝 Setting up AGENTS.local.md...${RESET}\n"
+    fi
+
+    if [ -f AGENTS.local.md ]; then
+        if [ "$IS_REFRESH" = false ]; then
+            printf "   Already exists\n"
+        fi
+        if [ -n "$GLOBAL_UPDATED" ] && [ "$IS_REFRESH" = false ]; then
+            printf "   ${YELLOW}⚠️  ~/AGENTS.global.md updated $GLOBAL_UPDATED - consider refreshing${RESET}\n"
+        fi
+        LOCAL_EXISTS=true
+    else
+        cat > AGENTS.local.md <<EOF
+# Project-Specific Agent Instructions (Local)
+
+**Last Updated:** $TODAY
+**Refresh By:** $REFRESH_BY  (run agents-tool daily, update this date when refreshing)
+**Seed Version:** $SEED_VERSION  (template version from ~/AGENTS.global.md "Last Updated")
+
+**Note:** See bottom of file for usage guidelines (what belongs here, file length conventions)
+
+---
+
+## 📋 Current Task Context
+
+**Active Focus:** [Brief note - reference bookmark/change ID, THIS_BRANCH.md, inline TODOs, docs/, issues]
+
+**Recent Changes:**
+- [$TODAY] [What you did - keep brief, link to commits/issues/docs where appropriate]
+
+---
+
+## 📌 GitHub Issues
+
+**⚠️ TODO: AGENTS MUST ASK USER - Should we track GitHub issues for this project?**
+
+**If YES:**
+- See \`~/.agents/agents-files-howto.md\` section "GitHub Issue Tracking" for commands
+- Structure with inline expiry: "Next refresh: YYYY-MM-DD (update weekly, +7d from fetch)"
+- File length convention: Keep under ~20 issues, extract to .agents/issues/ if growing
+
+**If NO:**
+- Replace this TODO with explanation (e.g., "Not tracked - using Jira" or "Not maintained")
+
+---
+
+## 📚 Codebase Knowledge
+
+<!-- Architecture notes, patterns, gotchas discovered during work -->
+<!-- Prefer updating existing notes over creating new files -->
+
+---
+
+## 📖 Usage Guidelines
+
+**What belongs in this file:**
+- Machine-specific setup (paths, environment on THIS machine)
+- Personal session context (what you're working on right now)
+- Cached data that changes frequently (GitHub issues, recent changes)
+- Project-specific architecture/patterns knowledge
+
+**What does NOT belong here:**
+- Info all team members should see → Put in docs/ or committed AGENTS.md
+- Tool usage patterns/configs → Put in ~/AGENTS.TOOLS.local.md
+
+**File management:**
+- Keep this file scannable (< 200 lines recommended)
+- ${BOLD}Prefer updating existing notes over creating new files${RESET}
+- When growing: Extract detailed content to .agents/TOPIC.md, leave brief summary + link here
+- Example: "See .agents/database-schema.md for DB architecture"
+
+---
+
+**End of AGENTS.local.md**
+EOF
+        printf "   ${GREEN}✅ Created AGENTS.local.md${RESET}\n"
+        LOCAL_EXISTS=false
+    fi
+
+    # === 2. Create CLAUDE.md symlink ===
+    if [ "$IS_REFRESH" = false ]; then
+        printf "${BLUE}🔗 Setting up CLAUDE.md symlink...${RESET}\n"
+    fi
+
+    if [ -L CLAUDE.md ]; then
+        existing_target=$(readlink CLAUDE.md)
+        if [ "$existing_target" = "AGENTS.md" ]; then
+            [ "$IS_REFRESH" = false ] && printf "   Already points to AGENTS.md\n"
+        else
+            printf "   ${YELLOW}⚠️  Points to: $existing_target (expected: AGENTS.md)${RESET}\n"
+            IS_REFRESH=false
+        fi
+    elif [ -f CLAUDE.md ]; then
+        printf "   ${RED}❌ CLAUDE.md exists but is not a symlink${RESET}\n"
+        printf "   Manual action needed: Check if it should be removed or renamed\n"
+        IS_REFRESH=false
+    else
+        ln -s AGENTS.md CLAUDE.md
+        printf "   ${GREEN}✅ Created CLAUDE.md → AGENTS.md${RESET}\n"
+    fi
+
+    # === 3. Handle AGENTS.md ===
+    if [ "$IS_REFRESH" = false ]; then
+        printf "${BLUE}📄 Checking AGENTS.md...${RESET}\n"
+    fi
+
+    AGENTS_ACTION=""
+
+    if [ -L AGENTS.md ]; then
+        existing_target=$(readlink AGENTS.md)
+        if [ "$IS_REFRESH" = false ]; then
+            printf "   Exists as symlink → $existing_target\n"
+        fi
+        if [ "$existing_target" = "AGENTS.local.md" ]; then
+            AGENTS_ACTION="verify_symlink"
+        else
+            printf "   ${YELLOW}⚠️  Points to unexpected target (expected: AGENTS.local.md)${RESET}\n"
+            AGENTS_ACTION="verify_symlink"
+            IS_REFRESH=false
+        fi
+    elif [ -f AGENTS.md ]; then
+        if [ "$IS_REFRESH" = false ]; then
+            printf "   Exists as regular file (shared pattern)\n"
+        fi
+        if ! grep -q "AGENTS\.local\.md" AGENTS.md 2>/dev/null; then
+            printf "   ${YELLOW}⚠️  AGENTS.md doesn't reference AGENTS.local.md - prelude missing${RESET}\n"
+            AGENTS_ACTION="update_prelude"
+            IS_REFRESH=false
+        else
+            AGENTS_ACTION="verify_shared"
+        fi
+    else
+        ln -s AGENTS.local.md AGENTS.md
+        printf "   ${GREEN}✅ Created AGENTS.md → AGENTS.local.md${RESET}\n"
+        AGENTS_ACTION="default_setup"
+    fi
+
+    # === 4. Update .git/info/exclude ===
+    if [ "$IS_REFRESH" = false ]; then
+        printf "${BLUE}🙈 Updating .git/info/exclude...${RESET}\n"
+    fi
+
+    if [ -f .git/info/exclude ]; then
+        EXCLUDE_FILE=".git/info/exclude"
+    elif [ -f .jj/repo/store/git/.git/info/exclude ]; then
+        EXCLUDE_FILE=".jj/repo/store/git/.git/info/exclude"
+    else
+        printf "   ${YELLOW}⚠️  Could not find exclude file, skipping${RESET}\n"
+        EXCLUDE_FILE=""
+    fi
+
+    if [ -n "$EXCLUDE_FILE" ]; then
+        added_any=false
+
+        if ! grep -q '^# AGENTS files' "$EXCLUDE_FILE" 2>/dev/null; then
+            cat >> "$EXCLUDE_FILE" <<'EOF'
+
+# AGENTS files (added by agents-tool)
+# To convert to shared pattern: remove AGENTS.md and optionally CLAUDE.md from this list
+AGENTS.local.md
+EOF
+            added_any=true
+        elif ! grep -q '^AGENTS\.local\.md$' "$EXCLUDE_FILE" 2>/dev/null; then
+            printf "AGENTS.local.md\n" >> "$EXCLUDE_FILE"
+            added_any=true
+        fi
+
+        if ! grep -q '^CLAUDE\.md$' "$EXCLUDE_FILE" 2>/dev/null; then
+            printf "CLAUDE.md\n" >> "$EXCLUDE_FILE"
+            added_any=true
+        fi
+
+        if [ -L AGENTS.md ]; then
+            if ! grep -q '^AGENTS\.md$' "$EXCLUDE_FILE" 2>/dev/null; then
+                printf "AGENTS.md\n" >> "$EXCLUDE_FILE"
+                added_any=true
+            fi
+        fi
+
+        if [ "$added_any" = true ]; then
+            [ "$IS_REFRESH" = false ] && printf "   ${GREEN}✅ Updated $EXCLUDE_FILE${RESET}\n"
+        else
+            [ "$IS_REFRESH" = false ] && printf "   All entries already present\n"
+        fi
+    fi
+
+    # === Final summary and next steps ===
+
+    if [ "$IS_REFRESH" = true ]; then
+        printf "\n${GREEN}✅ Verified AGENTS files exist (AGENTS.md, AGENTS.local.md, CLAUDE.md) with appropriate git excludes.${RESET}\n\n"
+
+        # Check if we're editing a non-WIP change
+        if command -v jj >/dev/null 2>&1; then
+            CURRENT_DESC=$(jj log -r @ --no-graph -T 'description' 2>/dev/null || echo "")
+            if [ -n "$CURRENT_DESC" ]; then
+                check_wip_status "$CURRENT_DESC"
+                if [ "$HAS_WIP_PREFIX" = false ] && [ "$HAS_WIP_CONTENT" = false ]; then
+                    printf "${YELLOW}⚠️  Careful:${RESET} You're editing a non-WIP change.\n"
+                    printf "If making new changes, consider: ${GREEN}jj new${RESET} to create a new change first.\n\n"
+                fi
+            fi
+        fi
+
+        if [ -n "$GLOBAL_UPDATED" ]; then
+            printf "${BOLD}🤖 AGENTS:${RESET} ${YELLOW}~/AGENTS.global.md was updated $GLOBAL_UPDATED${RESET}\n"
+            printf "   You MUST read it now to check for new conventions or template changes.\n"
+            printf "   After reviewing: Apply edits to AGENTS.local.md if relevant, OR\n"
+            printf "   ${GREEN}touch AGENTS.local.md${RESET} to clear this warning if nothing to add.\n\n"
+        fi
+
+        # Only suggest THIS_BRANCH.md for non-dotfiles repos
+        if [ "$IS_DOTFILES" = false ] && [ ! -f THIS_BRANCH.md ]; then
+            printf "${BOLD}🤖 AGENTS: Check if you should create THIS_BRANCH.md for current work${RESET}\n"
+            printf "   If working on a task/change (not just exploring):\n"
+            printf "   ${BLUE}Ask user:${RESET} \"Should we create THIS_BRANCH.md to track this work?\"\n"
+            printf "   ${BLUE}If yes:${RESET} Run ${GREEN}agents-tool --task${RESET} to bootstrap it\n\n"
+        fi
+
+        # If task mode requested, continue to that; otherwise we're done
+        if [ "$TASK_MODE" = false ]; then
+            printf "${GREEN}Done!${RESET} ${BLUE}(Script is idempotent - run as frequently as needed)${RESET}\n"
+        fi
+        return
+    else
+        printf "\n${BOLD}${GREEN}✅ Setup complete!${RESET}\n\n"
+
+        printf "${BOLD}📁 Files created/verified:${RESET}\n"
+        for f in AGENTS.md CLAUDE.md AGENTS.local.md; do
+            if [ -e "$f" ] || [ -L "$f" ]; then
+                ls -lh "$f" | awk '{print "   " $0}'
+            else
+                printf "   ${YELLOW}[missing] $f${RESET}\n"
+            fi
+        done
+
+        printf "\n"
+    fi
+
+    # Only show "Next Steps" header if there are actual next steps
+    if [ "$AGENTS_ACTION" = "default_setup" ] || [ "$AGENTS_ACTION" = "update_prelude" ]; then
+        printf "${BOLD}🚨 Next Steps:${RESET}\n\n"
+    fi
+
+    case "$AGENTS_ACTION" in
+        default_setup)
+            printf "${BOLD}🤖 AGENTS: You MUST ask the user:${RESET}
+   ${YELLOW}\"Should the AGENTS.md symlink be converted to a shared/committed AGENTS.md file?\"${RESET}
+
+   ${BOLD}If user says NO:${RESET}
+      → Current setup is correct (private pattern)
+      → All content stays in AGENTS.local.md (gitignored)
+
+   ${BOLD}If user says YES:${RESET}
+      1. rm AGENTS.md  # Remove symlink
+      2. Create real AGENTS.md file with repo-specific instructions
+         - Include project setup, architecture notes, conventions, etc.
+         - ${BOLD}MUST include prelude:${RESET} \"CRITICAL: You MUST read AGENTS.local.md if it exists\"
+      3. Edit .git/info/exclude: Remove AGENTS.md line (see comment in file)
+      4. Commit AGENTS.md to repo
+      → Result: AGENTS.md (committed) + AGENTS.local.md (gitignored, both real files)
+
+   ${BOLD}Maintenance:${RESET} Expiry dates embedded in AGENTS.local.md sections
+
+"
+            ;;
+        update_prelude)
+            printf "${YELLOW}⚠️  AGENTS.md missing required prelude${RESET}
+
+   ${BOLD}ACTION REQUIRED:${RESET} Add this prelude to AGENTS.md (near top, after title):
+
+   ${BLUE}---${RESET}
+   ${BOLD}**CRITICAL: You MUST read AGENTS.local.md if it exists in this repository.**${RESET}
+   ${BLUE}---${RESET}
+
+"
+            ;;
+        verify_shared)
+            ;;
+        verify_symlink)
+            printf "   AGENTS.md symlink exists - verify it points to correct location\n\n"
+            ;;
+    esac
+
+    if [ -n "$GLOBAL_UPDATED" ] && [ "$AGENTS_ACTION" != "default_setup" ]; then
+        printf "\n${BOLD}${YELLOW}⚠️  ~/AGENTS.global.md was recently updated${RESET}
+
+   Your AGENTS.local.md seed template may be stale.
+   Check ~/AGENTS.global.md for new conventions and update Seed Version → $SEED_VERSION
+
+"
+    fi
+
+    # Provide guidance for non-dotfiles repos in setup mode
+    if [ "$IS_DOTFILES" = false ]; then
+        printf "\n${BLUE}ℹ️  For branch-based development:${RESET}\n"
+        printf "   Run ${GREEN}agents-tool --task${RESET} to set up THIS_BRANCH.md and check_this_branch.sh\n\n"
+    fi
+
+    printf "\n${GREEN}Done!${RESET} ${BLUE}(Script is idempotent - run as frequently as needed)${RESET}\n"
+}
+
+# ============================================================================
+# TASK MODE
+# ============================================================================
+
+# Helper: Check if description has WIP indicators or should be WIP
+# Sets: HAS_WIP_PREFIX, HAS_WIP_CONTENT (verbose notes, FIXME, TODO, sections)
+check_wip_status() {
+    local desc="$1"
+
+    HAS_WIP_PREFIX=false
+    HAS_WIP_CONTENT=false
+
+    # Check for WIP: prefix
+    if echo "$desc" | grep -q "^WIP:"; then
+        HAS_WIP_PREFIX=true
+    fi
+
+    # Check for WIP-style content (verbose implementation notes, FIXME, multiple sections)
+    if echo "$desc" | grep -qE '(^##|^FIXME|^TODO|Previous work|Out of scope|Changes:|Notes:)'; then
+        HAS_WIP_CONTENT=true
+    fi
+}
+
+run_task_mode() {
+    printf "${BOLD}🔧 Task Mode${RESET}\n\n"
+
+    # Dotfiles repos use jj describe instead of THIS_BRANCH.md
+    if [ "$IS_DOTFILES" = true ]; then
+        if ! command -v jj >/dev/null 2>&1; then
+            printf "${YELLOW}Note: jj not available, skipping change validation${RESET}\n\n"
+            return
+        fi
+
+        CURRENT_DESC=$(jj log -r @ --no-graph -T 'description' 2>/dev/null || echo "")
+
+        if [ -z "$CURRENT_DESC" ]; then
+            printf "${BOLD}🤖 AGENTS:${RESET} ${RED}You MUST add a description to the current change!${RESET}\n\n"
+            printf "Run ${GREEN}jj describe${RESET} to add a WIP: prefixed description.\n\n"
+            return
+        fi
+
+        # Analyze WIP status
+        check_wip_status "$CURRENT_DESC"
+
+        if [ "$HAS_WIP_PREFIX" = true ]; then
+            # WIP mode - ask agent to review if description is current
+            printf "${BOLD}🤖 AGENTS:${RESET} Change is in WIP mode. You MUST review this description.\n\n"
+            printf "Current description:\n"
+            printf "========================================\n"
+            printf "%s\n" "$CURRENT_DESC"
+            printf "========================================\n\n"
+
+            printf "${YELLOW}Does this still capture your current focus?${RESET}\n"
+            printf "If NOT, you ${BOLD}MUST${RESET} update it now: ${GREEN}jj describe${RESET}\n\n"
+
+        elif [ "$HAS_WIP_CONTENT" = true ]; then
+            # Has WIP content but no WIP prefix - WARN LOUDLY
+            printf "${BOLD}🤖 AGENTS:${RESET} ${RED}You MUST fix this description before pushing!${RESET}\n\n"
+            printf "${RED}🚨 WARNING: Verbose description without WIP: prefix${RESET}\n\n"
+            printf "Current description:\n"
+            printf "========================================\n"
+            printf "%s\n" "$CURRENT_DESC"
+            printf "========================================\n\n"
+
+            printf "${RED}${BOLD}PROBLEM:${RESET} Description contains verbose notes/sections (FIXME, TODO, ##, etc.)\n"
+            printf "but lacks WIP: prefix. This is not ready to push.\n\n"
+            printf "${BOLD}You MUST run ${GREEN}jj describe${RESET} to either:${RESET}\n"
+            printf "  1. Add WIP: prefix if you're still working on this, OR\n"
+            printf "  2. Condense to 10-15 lines for pushing (remove TODOs, sections, verbose notes)\n\n"
+
+        else
+            # Clean, concise description - ready to push
+            printf "${GREEN}✓${RESET} Description looks ready to push (concise, no WIP: prefix)\n\n"
+        fi
+
+        # Provide dotfiles-specific workflow guidelines
+        printf "${BLUE}ℹ️  For dotfiles work:${RESET}\n"
+        printf "   ${BOLD}WIP changes:${RESET} Prefix description with 'WIP:' and keep detailed\n"
+        printf "   ${BOLD}Before push:${RESET} Remove 'WIP:' prefix and condense to 10-15 lines max\n"
+
+        # Special guidance for _local bookmark
+        if [ "$BOOKMARK_NAME" = "_local" ]; then
+            printf "\n   ${YELLOW}📌 On _local bookmark:${RESET}\n"
+            printf "   This is for miscellaneous uncurated local changes\n"
+            printf "   Eventually: split into topic bookmarks or push directly\n"
+        fi
+
+        printf "\n   Track multi-step TODOs in AGENTS.local.md \"Current Roadmap\" section\n\n"
+
+        return
+    fi
+
+    # TODO: Apply WIP detection logic to non-dotfiles repos (check THIS_BRANCH.md or jj description)
+
+    # Detect if files already exist
+    FILES_EXIST=false
+    if [ -f THIS_BRANCH.md ] && [ -f check_this_branch.sh ]; then
+        FILES_EXIST=true
+    fi
+
+    # Get jj context if available
+    CURRENT_CHANGE=""
+    BOOKMARK_NAME=""
+    BOOKMARK_LOCATION=""
+    if command -v jj >/dev/null 2>&1; then
+        CURRENT_CHANGE=$(jj log -r @ --no-graph -T 'change_id.short(7)' 2>/dev/null || echo "")
+        CURRENT_DESC=$(jj log -r @ --no-graph -T 'description.first_line()' 2>/dev/null || echo "")
+
+        # Check for bookmarks on @ first
+        BOOKMARK_NAME=$(jj log -r @ --no-graph -T 'bookmarks' 2>/dev/null | head -1 || echo "")
+        if [ "$BOOKMARK_NAME" != "(no bookmarks)" ] && [ -n "$BOOKMARK_NAME" ]; then
+            BOOKMARK_LOCATION="@"
+        else
+            # Check for bookmarks in trunk()::@ range (excluding @)
+            BOOKMARK_NAME=$(jj log -r 'trunk()::@ & bookmarks()' --no-graph -T 'bookmarks' 2>/dev/null | head -1 || echo "")
+            if [ "$BOOKMARK_NAME" != "(no bookmarks)" ] && [ -n "$BOOKMARK_NAME" ]; then
+                BOOKMARK_LOCATION="ancestor"
+            else
+                BOOKMARK_NAME=""
+                BOOKMARK_LOCATION=""
+            fi
+        fi
+    fi
+
+    # === 1. Create THIS_BRANCH.md ===
+    if [ "$FILES_EXIST" = false ]; then
+        printf "${BLUE}📝 Creating THIS_BRANCH.md...${RESET}\n"
+    fi
+
+    if [ -f THIS_BRANCH.md ]; then
+        if [ "$FILES_EXIST" = false ]; then
+            printf "   Already exists - skipping\n"
+        fi
+    else
+        # Determine branch name for template
+        BRANCH_NAME="${BOOKMARK_NAME:-<bookmark-name>}"
+        if [ -z "$BOOKMARK_NAME" ]; then
+            BRANCH_NAME="<bookmark-name or change description>"
+        fi
+
+        cat > THIS_BRANCH.md <<EOF
+# Branch: ${BRANCH_NAME}
+
+**Created:** $TODAY
+**Last Updated:** $TODAY
+**Change ID:** ${CURRENT_CHANGE:-<jj change-id>}
+
+## Scope
+
+What changes are in scope for this branch/lineage?
+
+## Out of Scope
+
+What explicitly will NOT be done here?
+
+## How to Use check_this_branch.sh
+
+**When to run:**
+- Before each \`jj new\` (creating new change)
+- Before \`jj describe\` (updating change description)
+- Before \`jj git push\` (pushing bookmark)
+- After adding new files to the branch
+
+**What it checks:**
+- FIXME comments (blocking - MUST fix before publishing)
+- TODO comments (informational only)
+- Branch metadata files not included in changes
+
+**If it fails:**
+1. Read error messages carefully
+2. Fix FIXME comments or convert to TODO
+3. Re-run until it passes
+4. DO NOT push if check fails
+
+**Updating the file list:**
+- Current scope: Files matching your pattern(s)
+- Use globs in CHECK_FILES for cleaner, more maintainable lists:
+  \`CHECK_FILES=\$(echo src/feature/*.ts tests/*.test.ts docs/*.md)\`
+- If you start editing files outside this pattern, update CHECK_FILES
+- Keep CHECK_FILES as a static list - do NOT use dynamic VCS queries
+
+## TODO
+
+- [ ] Define scope and out-of-scope sections above
+- [ ] Update CHECK_FILES in check_this_branch.sh with relevant files
+- [ ] Run check_this_branch.sh to verify it works
+- [ ] Add project-specific checks to check_this_branch.sh as needed
+
+## Consolidation Plan
+
+**Checks to migrate to permanent project infrastructure:**
+- (Add checks here as they stabilize during branch work)
+- Example: SVG validation → Create \`scripts/validate-svgs.sh\`
+
+**Migration should happen:**
+- Throughout branch work when checks stabilize
+- Before publishing, ensure all useful checks have permanent homes
+
+## Notes
+
+- (Add notes about decisions, discoveries, etc.)
+
+## Cleanup Checklist (before publish)
+
+- [ ] All in-scope TODOs completed or moved elsewhere
+- [ ] Useful checks migrated to permanent project infrastructure
+- [ ] Remove/exclude THIS_BRANCH.md from final change(s)
+- [ ] Remove/exclude check_this_branch.sh from final change(s)
+EOF
+        printf "   ${GREEN}✅ Created THIS_BRANCH.md${RESET}\n"
+    fi
+
+    # === 2. Create check_this_branch.sh ===
+    if [ "$FILES_EXIST" = false ]; then
+        printf "${BLUE}🔍 Creating check_this_branch.sh...${RESET}\n"
+    fi
+
+    if [ -f check_this_branch.sh ]; then
+        if [ "$FILES_EXIST" = false ]; then
+            printf "   Already exists - skipping\n"
+        fi
+    else
+        cat > check_this_branch.sh <<'SCRIPT_EOF'
+#!/usr/bin/env sh
+# Branch-specific checks - DO NOT COMMIT TO MAIN
+
+set -e
+
+ERRORS=0
+
+# Start timing
+START_TIME=$(python3 -c 'import time; print(int(time.time() * 1000))' 2>/dev/null || echo "0")
+
+printf "=== Branch Checks ===\n\n"
+
+# Get current change info
+if command -v jj >/dev/null 2>&1; then
+    CURRENT_ID=$(jj log -r @ --no-graph -T 'change_id.short(7)' 2>&1)
+    CURRENT_EXIT=$?
+    if [ $CURRENT_EXIT -ne 0 ]; then
+        printf "Current: ERROR - %s\n" "$CURRENT_ID" >&2
+    else
+        CURRENT_DESC=$(jj log -r @ --no-graph -T 'description.first_line()' 2>&1)
+        CURRENT_EMPTY=$(jj log -r @ --no-graph -T 'if(empty, " (empty)", "")' 2>&1)
+        printf "Current: %s%s - %s\n" "$CURRENT_ID" "$CURRENT_EMPTY" "$CURRENT_DESC"
+    fi
+
+    # Get parent change info
+    PARENT_ID=$(jj log -r @- --no-graph -T 'change_id.short(7)' 2>&1)
+    PARENT_EXIT=$?
+    if [ $PARENT_EXIT -ne 0 ]; then
+        printf "Parent:  ERROR - %s\n" "$PARENT_ID" >&2
+    else
+        PARENT_DESC=$(jj log -r @- --no-graph -T 'description.first_line()' 2>&1)
+        printf "Parent:  %s - %s\n" "$PARENT_ID" "$PARENT_DESC"
+    fi
+
+    # Show distance from main
+    DISTANCE=$(jj log -r '::@ ~ ::main' --no-graph -T '' 2>/dev/null | wc -l || echo "0")
+    if [ "$DISTANCE" -gt 0 ] 2>/dev/null; then
+        printf "Ahead:   main+%s\n" "$DISTANCE"
+    fi
+
+    # Show bookmark/branch name if set
+    BOOKMARK=$(jj log -r @ --no-graph -T 'bookmarks' 2>&1 || echo "")
+    if [ -n "$BOOKMARK" ] && [ "$BOOKMARK" != "(no bookmarks)" ]; then
+        printf "Branch:  %s\n" "$BOOKMARK"
+    fi
+    printf "\n"
+fi
+
+# STATIC FILE LIST - Update when branch scope changes
+# DO NOT use dynamic VCS queries like $(jj diff --name-only)
+# See THIS_BRANCH.md for instructions
+#
+# PREFER GLOBS for cleaner, more maintainable file lists:
+#   CHECK_FILES=$(echo src/components/*.tsx src/lib/*.ts docs/*.md)
+#   CHECK_FILES=$(echo posts/*.md public/images/posts/*.{svg,png})
+#   CHECK_FILES=$(echo *.py tests/*.py)  # All Python files in root and tests/
+#
+# Or list files explicitly if needed:
+#   CHECK_FILES="src/main.ts src/utils.ts README.md"
+CHECK_FILES=""
+
+if [ -z "$CHECK_FILES" ]; then
+    printf "⚠️  WARNING: CHECK_FILES is empty\n"
+    printf "   Update CHECK_FILES in this script with files relevant to this branch\n\n"
+    printf "   Examples using globs (recommended):\n"
+    printf "     CHECK_FILES=\$(echo src/feature/*.js tests/*.test.js)\n"
+    printf "     CHECK_FILES=\$(echo docs/*.md public/*.{html,css})\n"
+    printf "     CHECK_FILES=\$(echo *.py lib/**/*.py)\n\n"
+    printf "   Or list files explicitly:\n"
+    printf "     CHECK_FILES=\"main.ts utils.ts README.md\"\n\n"
+fi
+
+# CRITICAL: Verify branch metadata files won't be published
+printf "🔍 Checking branch metadata cleanup...\n"
+METADATA_IN_CHANGE=0
+if command -v jj >/dev/null 2>&1; then
+    # Check if any metadata files are tracked in current change
+    FOUND_FILES=$(jj file list -r @ -- check_this_branch.sh THIS_BRANCH.md THIS_GIT_BRANCH.md 2>/dev/null || echo "")
+    if [ -n "$FOUND_FILES" ]; then
+        for file in $FOUND_FILES; do
+            printf "⚠️  WARNING: %s is tracked in current change\n" "$file"
+        done
+        METADATA_IN_CHANGE=1
+    fi
+fi
+
+if [ $METADATA_IN_CHANGE -eq 1 ]; then
+    printf "❌ ERROR: THIS CHANGE INCLUDES BRANCH METADATA FILES\n\n"
+    printf "   This change is NOT READY FOR PUBLICATION until:\n"
+    printf "   - THIS_BRANCH.md is removed/excluded\n"
+    printf "   - check_this_branch.sh is removed/excluded\n\n"
+    printf "   Use: rm THIS_BRANCH.md check_this_branch.sh\n"
+    printf "   Or create these files in a separate change that won't be published\n\n"
+    ERRORS=$((ERRORS + 1))
+else
+    printf "✅ Branch metadata files excluded from change\n"
+fi
+printf "\n"
+
+# CRITICAL: Check for FIXME comments (must be resolved before publishing)
+if [ -n "$CHECK_FILES" ]; then
+    printf "🔍 Scanning for FIXME comments (blocking)...\n"
+    # Single grep across all files is more efficient
+    FIXME_RESULTS=$(grep -n "FIXME" $CHECK_FILES 2>/dev/null || true)
+
+    if [ -n "$FIXME_RESULTS" ]; then
+        printf "%s\n" "$FIXME_RESULTS"
+        printf "\n❌ ERROR: Found FIXME comments\n\n"
+        printf "   FIXME comments MUST be resolved before publishing\n"
+        printf "   Either fix them or convert to TODO if acceptable to defer\n\n"
+        ERRORS=$((ERRORS + 1))
+    else
+        printf "✅ No FIXME comments found\n"
+    fi
+    printf "\n"
+fi
+
+# End timing
+if [ "$START_TIME" != "0" ]; then
+    END_TIME=$(python3 -c 'import time; print(int(time.time() * 1000))' 2>/dev/null || echo "$START_TIME")
+    ELAPSED_MS=$((END_TIME - START_TIME))
+    printf "Checks finished after %d.%03d seconds\n\n" $((ELAPSED_MS / 1000)) $((ELAPSED_MS % 1000))
+fi
+
+# Summary
+printf "=== Summary ===\n"
+if [ $ERRORS -gt 0 ]; then
+    printf "❌ %d error(s) found - NOT READY FOR PUBLICATION\n" "$ERRORS"
+    exit 1
+else
+    printf "✅ All checks passed\n"
+    exit 0
+fi
+SCRIPT_EOF
+        chmod +x check_this_branch.sh
+        printf "   ${GREEN}✅ Created check_this_branch.sh${RESET}\n"
+    fi
+
+    # === Final instructions ===
+    printf "\n${BOLD}${GREEN}✅ Setup complete!${RESET}\n\n"
+
+    if [ "$FILES_EXIST" = true ]; then
+        printf "${BLUE}Files already existed - no changes made${RESET}\n\n"
+    else
+        printf "${BOLD}📁 Files created:${RESET}\n"
+        ls -lh THIS_BRANCH.md check_this_branch.sh | awk '{print "   " $0}'
+        printf "\n"
+    fi
+
+    # Check bookmark status and provide guidance
+    if command -v jj >/dev/null 2>&1; then
+        if [ -n "$BOOKMARK_NAME" ]; then
+            printf "\n"
+            printf "${BLUE}${BOLD}========================================${RESET}\n"
+            printf "${BLUE}${BOLD}📌 CURRENT BOOKMARK: ${GREEN}%s${RESET}\n" "$BOOKMARK_NAME"
+            printf "${BLUE}${BOLD}========================================${RESET}\n"
+            printf "\n"
+            if [ "$BOOKMARK_LOCATION" = "ancestor" ]; then
+                printf "Note: Bookmark is on an ancestor change, not ${BOLD}@${RESET}\n"
+                printf "      This is normal if ${BOLD}@${RESET} is an empty change\n\n"
+            fi
+            printf "${BOLD}Is this bookmark still your current focus?${RESET}\n\n"
+            printf "  • If YES: Continue working and update THIS_BRANCH.md\n"
+            printf "  • If NO:  Ask user whether to:\n"
+            printf "            1. Create new bookmark: ${GREEN}jj bookmark create _new_task${RESET}\n"
+            printf "            2. Switch to different task: ${GREEN}jj edit <change>${RESET}\n\n"
+            printf "Bookmark naming convention:\n"
+            printf "  • Prefix with ${BOLD}_${RESET} for WIP: ${BLUE}_fix_auth_bug${RESET}, ${BLUE}_add_feature${RESET}\n"
+            printf "\n"
+        else
+            printf "\n"
+            printf "${YELLOW}${BOLD}========================================${RESET}\n"
+            printf "${YELLOW}${BOLD}⚠️  NO BOOKMARK FOUND${RESET}\n"
+            printf "${YELLOW}${BOLD}========================================${RESET}\n"
+            printf "\n"
+            printf "${BOLD}Recommended: Create a bookmark for this work${RESET}\n\n"
+            printf "    ${GREEN}jj bookmark create _describe_your_work_here${RESET}\n\n"
+            printf "Bookmark naming convention:\n"
+            printf "  • Prefix with ${BOLD}_${RESET} to indicate WIP\n"
+            printf "  • Use lowercase with underscores\n"
+            printf "  • Examples: ${BLUE}_fix_auth_bug${RESET}, ${BLUE}_add_dark_mode${RESET}, ${BLUE}_refactor_api${RESET}\n\n"
+            printf "After creating, update THIS_BRANCH.md with the bookmark name.\n"
+            printf "\n"
+        fi
+    fi
+
+    # Prominent mandatory instruction
+    printf "\n"
+    printf "${RED}${BOLD}========================================${RESET}\n"
+    printf "${RED}${BOLD}🤖 AGENTS: MANDATORY NEXT STEP${RESET}\n"
+    printf "${RED}${BOLD}========================================${RESET}\n"
+    printf "\n"
+    printf "${BOLD}YOU MUST RUN THIS COMMAND NOW:${RESET}\n"
+    printf "    ${GREEN}./check_this_branch.sh${RESET}\n"
+    printf "\n"
+    printf "This is ${BOLD}NOT${RESET} optional. Run it before doing anything else.\n"
+    printf "\n"
+
+    printf "${BOLD}After running check_this_branch.sh:${RESET}\n\n"
+    printf "1. Update THIS_BRANCH.md:\n"
+    printf "   - Fill in scope and out-of-scope sections\n"
+    printf "   - List your TODOs\n"
+    printf "   - Update CHECK_FILES pattern when you know which files you'll modify\n\n"
+    printf "2. Update check_this_branch.sh:\n"
+    printf "   - Set CHECK_FILES to match files in this branch\n"
+    printf "   - Add project-specific checks as needed\n\n"
+    printf "3. Run check_this_branch.sh regularly:\n"
+    printf "   - Before each 'jj new' or 'jj describe'\n"
+    printf "   - Before pushing to remote\n\n"
+    printf "${BLUE}See ~/.agents/rules/branch-metadata.md for detailed guidance${RESET}\n"
+}
+
+# ============================================================================
+# MAIN
+# ============================================================================
+
+run_project_mode
+
+if [ "$TASK_MODE" = true ]; then
+    printf "\n"
+    run_task_mode
+fi
