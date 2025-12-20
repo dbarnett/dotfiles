@@ -1,0 +1,14 @@
+{{ if eq (or (index . "machine_profile") "personal") "work" -}}
+Include ~/.colima/ssh_config
+
+{{ end -}}
+AddKeysToAgent yes
+{{ if eq (or (index . "machine_profile") "personal") "work" -}}
+# BEGIN ANSIBLE MANAGED BLOCK
+Host *
+  IgnoreUnknown UseKeychain
+  AddKeysToAgent yes
+  UseKeychain yes
+  IdentityFile ~/.ssh/id_ed25519
+# END ANSIBLE MANAGED BLOCK
+{{ end -}}

@@ -143,7 +143,7 @@ fi
 For work machines, set your machine type in `~/.config/chezmoi/chezmoi.toml`:
 ```toml
 [data]
-    machine_type = "work"
+    machine_profile = "work"
 ```
 
 This controls various work-specific behaviors:

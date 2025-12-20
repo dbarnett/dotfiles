@@ -100,12 +100,20 @@ chezmoi cd                  # Jump to source directory
 chezmoi add --encrypt ~/.gmailctl/config.personal.jsonnet
 ```
 
-**Template syntax:**
+**Template syntax (safe patterns):**
 ```
-{{ if eq .machine_type "work" }}
+{{ if eq (or (index . "machine_profile") "personal") "work" }}
 work-specific content
 {{ end }}
 ```
+
+**⚠️ Important:** Always use safe patterns to avoid hard dependencies:
+- ✅ **Safe:** `{{ or (index . "key") "default" }}` - returns default if key missing
+- ✅ **Safe:** `{{ if hasKey . "key" }}{{ .key }}{{ end }}` - explicit check
+- ❌ **Unsafe:** `{{ .key | default "value" }}` - accesses key first, errors if missing
+- ❌ **Unsafe:** `{{ .key }}` - direct access, errors if missing
+
+See `_dev/check_templates.sh` for validation.
 
 ---
 
@@ -115,7 +123,7 @@ Configure machine-specific settings in `~/.config/chezmoi/chezmoi.toml`:
 
 ```toml
 [data]
-    machine_type = "work"  # or "personal"
+    machine_profile = "work"  # or "personal"
     vcs_author_email = "work@example.com"  # Optional override
 
 [encryption]
@@ -174,11 +182,14 @@ chezmoi add ~/.bashrc
 
 **In source:** `dot_bashrc.tmpl`
 ```shell
-{{ if eq .machine_type "work" }}
+{{ if eq (or (index . "machine_profile") "personal") "work" }}
 export WORK_SPECIFIC=value
 {{ else }}
 export PERSONAL_SPECIFIC=value
 {{ end }}
+```
+
+**Note:** Always use safe template patterns (see Template syntax section above). The pre-commit hook validates templates automatically.
 ```
 
 ### Adding Encrypted Files

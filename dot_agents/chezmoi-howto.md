@@ -161,15 +161,27 @@ chezmoi apply --no-tty          # Don't attempt TTY prompts
 # Error: map has no entry for key "some_key"
 ```
 
-**✅ CORRECT - Use `hasKey` check:**
+**✅ CORRECT - Use safe patterns:**
+
+**Option 1: `index` with `or` (cleanest for simple defaults):**
+```
+{{ or (index . "some_key") "fallback" }}
+```
+
+**Option 2: `hasKey` check (explicit, good for complex logic):**
 ```
 {{ if hasKey . "some_key" }}{{ .some_key }}{{ else }}fallback{{ end }}
 ```
 
 **Why:**
 - Chezmoi's template engine errors on missing keys before filters are applied
-- Always use `hasKey` to check existence first
+- `index` returns empty/nil if key doesn't exist, then `or` provides default
+- `hasKey` explicitly checks existence before access
 - This is different from some other template systems
+
+**Validation:**
+- Run `./_dev/check_templates.sh` to validate all templates
+- Pre-commit hook automatically checks templates before commits
 
 ### Common Template Patterns
 

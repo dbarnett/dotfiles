@@ -1,0 +1,69 @@
+if [ -d "$HOME/.local/bin" ] ; then
+  PATH="$HOME/.local/bin:$PATH"
+fi
+
+# Set up local env vars, etc
+if [ -f "$HOME/.profile.local" ] ; then
+  . "$HOME/.profile.local"
+fi
+
+{{ if eq (or (index . "machine_profile") "personal") "work" -}}
+if [ -f "/opt/homebrew/bin/brew" ] ; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+fi
+
+{{ end -}}
+if [ -f "$HOME/.cargo/env" ] ; then
+  . "$HOME/.cargo/env"
+fi
+
+{{ if eq (or (index . "machine_profile") "personal") "work" -}}
+# Work: Use nvm for Node version management
+export NVM_DIR="$HOME/.nvm"
+#[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+
+{{ else -}}
+# Personal: Use npm directly (no nvm)
+if [ -d "$HOME/.npm-global/bin" ] ; then
+  PATH="$HOME/.npm-global/bin:$PATH"
+fi
+{{ end -}}
+if [ -d "$HOME/go" ] ; then
+  PATH="$HOME/go/bin:$PATH"
+fi
+
+#WASMTIME_HOME="$HOME/.wasmtime"
+#PATH="$WASMTIME_HOME/bin:$PATH"
+
+# added by Nix installer
+if [ -e $HOME/.nix-profile/etc/profile.d/nix.sh ]; then
+  . $HOME/.nix-profile/etc/profile.d/nix.sh
+fi
+
+#PNPM_HOME="$HOME/.local/share/pnpm"
+#PATH="$PNPM_HOME:$PATH"
+
+export BUN_INSTALL="$HOME/.bun"
+if [ -d "$BUN_INSTALL/bin" ] ; then
+  export PATH="$BUN_INSTALL/bin:$PATH"
+fi
+{{ if eq (or (index . "machine_profile") "personal") "work" -}}
+
+# Work: Use pyenv for Python version management
+export PYENV_ROOT=~/pyenv
+export PATH="$PYENV_ROOT/bin:$PATH"
+
+#source ~/pyenv/.pyenvrc
+export DOCKER_CLIENT_TIMEOUT=120
+export COMPOSE_HTTP_TIMEOUT=120
+export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
+export PATH=/Users/david.erich/.bin:$PATH
+
+
+# Added by Toolbox App
+export PATH="$PATH:/usr/local/bin"
+{{- else }}
+
+#export PYENV_ROOT="$HOME/.pyenv"
+#export PATH="$PYENV_ROOT/bin:$PATH"
+{{ end }}

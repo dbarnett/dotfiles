@@ -126,3 +126,14 @@ if [ -x "$(command -v keychain)" ]; then
   # Override $SHELL for fish-shell/fish-shell#4583.
   SHELL=bash; eval "$(keychain --eval --agents ssh --quiet)"
 fi
+{{ if eq (or (index . "machine_profile") "personal") "work" -}}
+# BEGIN ANSIBLE MANAGED BLOCK
+# Disabled: causes bash to hang on macOS due to bug in sdkman-init.sh
+# export SDKMAN_DIR="/Users/david.erich/.sdkman"
+# Disabled because it hangs indefinitely at `read -a SDKMAN_CANDIDATES` (https://github.com/sdkman/sdkman-cli/issues/568 ?)
+# [[ -s "/Users/david.erich/.sdkman/bin/sdkman-init.sh" ]] && source "/Users/david.erich/.sdkman/bin/sdkman-init.sh"
+# END ANSIBLE MANAGED BLOCK
+export SDKMAN_OFFLINE_MODE=false
+analyze_java_file() { local file="$1"; echo "=== Analysis of: $file ==="; echo "ENDPOINTS:"; awk "/^@Path/ && /class/{match(\$0,/@Path\\s*\\(\\s*\"([^\"]*)\"/,a); class_path=a[1]} /@Path.*class/{match(\$0,/@Path\\s*\\(\\s*\"([^\"]*)\"/,a); class_path=a[1]} /^[[:space:]]*@Path/ && !/class/{match(\$0,/@Path\\s*\\(\\s*\"([^\"]*)\"/,a); print \"  - \" class_path a[1]} /^public class|^class/{class_path=\"\"}" "$file"; echo "SQS QUEUES:"; grep -oP "queueName\\s*=\\s*\"[^\"]*\"" "$file" | sed -n "s/.*queueName\\s*=\\s*\"#{\x27\\?\\${\([^}]*\)}.*$/  - \\1/p" | sort -u; echo ""; }
+alias analyze_java="python3 /tmp/analyze_java.py"
+{{ end -}}

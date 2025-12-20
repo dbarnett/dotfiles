@@ -23,3 +23,27 @@ if status is-interactive
     eval (keychain --eval id_ed25519 --quiet)
   end
 end
+
+# Set NVM_DIR if not already set
+set -q NVM_DIR; or set -gx NVM_DIR ~/.nvm
+
+# Configure fish-nvm to use standard nvm location
+set -gx nvm_data $NVM_DIR/versions/node
+
+# Platform-specific paths
+if test (uname) = Darwin
+  # macOS
+  set -l PNPM_HOME "$HOME/Library/pnpm"
+else
+  # Linux
+  set -l PNPM_HOME "$HOME/.local/share/pnpm"
+end
+
+# pnpm
+if test -d $PNPM_HOME
+  set -gx PNPM_HOME $PNPM_HOME
+  if not string match -q -- $PNPM_HOME $PATH
+    set -gx PATH "$PNPM_HOME" $PATH
+  end
+end
+# pnpm end

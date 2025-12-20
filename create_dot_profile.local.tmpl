@@ -1,3 +1,4 @@
 export VCS_AUTHOR_EMAIL={{ if hasKey . "vcs_author_email" }}{{ .vcs_author_email }}{{ else }}{{ output "git" "config" "user.email" | trim }}{{ end }}
-export PYENV_ROOT=~/pyenv
-export PATH="$PYENV_ROOT/bin:$PATH"
+
+# Add any machine-specific local overrides here
+# This file is a create_ file, so you can edit it freely without chezmoi overwriting
