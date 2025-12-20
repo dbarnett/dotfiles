@@ -50,7 +50,7 @@ fi
 
 EDITOR=hx
 VISUAL=hx
-{{- if eq (or (index . "machine_profile") "personal") "work" -}}
+{{- if eq (or (index . "machine_profile") "personal") "work"}}
 
 # Work: Use pyenv for Python version management
 export PYENV_ROOT=~/pyenv
