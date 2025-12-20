@@ -26,6 +26,13 @@ formatter = { command = "taplo", args = ["fmt", "-"] }
 # (https://github.com/helix-editor/helix/issues/3897#issuecomment-2361674437)
 root_dir = [".git", "*.toml"]
 
+# Fish
+[[language]]
+name = "fish"
+# Disable auto-format to prevent fish_indent from reformatting with 4 spaces on save
+# (Note: if fish_indent is actually useful at all it's a shame they don't respect editorconfig)
+auto-format = false
+
 # Vim
 [[language]]
 name = "vim"
