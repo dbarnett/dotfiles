@@ -31,11 +31,27 @@ while [ $# -gt 0 ]; do
             TASK_MODE=true
             shift
             ;;
+        --help|-h)
+            printf "${BOLD}agents-tool${RESET} - Setup and refresh AGENTS files for AI-friendly projects\n\n"
+            printf "${BOLD}Usage:${RESET}\n"
+            printf "  agents-tool        ${BLUE}# Check/setup project basics${RESET}\n"
+            printf "  agents-tool --task ${BLUE}# Also initialize task/branch metadata${RESET}\n"
+            printf "  agents-tool --help ${BLUE}# Show this help${RESET}\n\n"
+            printf "${BOLD}What it does:${RESET}\n"
+            printf "  • Creates/verifies AGENTS.md, AGENTS.local.md, CLAUDE.md\n"
+            printf "  • Sets up .git/info/exclude for private files\n"
+            printf "  • Warns when ~/AGENTS.global.md has been updated\n"
+            printf "  • With --task: Reviews current task context and sets up/validates branch metadata\n\n"
+            printf "${BOLD}For more info:${RESET}\n"
+            printf "  See ~/.agents/agents-files-howto.md for detailed documentation\n"
+            exit 0
+            ;;
         *)
             printf "${RED}Unknown argument: $1${RESET}\n\n"
             printf "Usage:\n"
             printf "  agents-tool        # Check/setup project basics\n"
             printf "  agents-tool --task # Also initialize task/branch metadata files\n"
+            printf "  agents-tool --help # Show help\n"
             exit 1
             ;;
     esac
@@ -108,10 +124,7 @@ fi
 # Get bookmark info if jj is available
 BOOKMARK_NAME=""
 if command -v jj >/dev/null 2>&1; then
-    BOOKMARK_NAME=$(jj log -r @ --no-graph -T 'bookmarks' 2>/dev/null | head -1 || echo "")
-    if [ "$BOOKMARK_NAME" = "(no bookmarks)" ]; then
-        BOOKMARK_NAME=""
-    fi
+    BOOKMARK_NAME=$(jj log -r @ --no-graph -T 'bookmarks ++ "\n"' 2>/dev/null | head -1 || echo "")
 fi
 
 # ============================================================================
@@ -350,12 +363,16 @@ EOF
             printf "   ${GREEN}touch AGENTS.local.md${RESET} to clear this warning if nothing to add.\n\n"
         fi
 
-        # Only suggest THIS_BRANCH.md for non-dotfiles repos
-        if [ "$IS_DOTFILES" = false ] && [ ! -f THIS_BRANCH.md ]; then
-            printf "${BOLD}🤖 AGENTS: Check if you should create THIS_BRANCH.md for current work${RESET}\n"
-            printf "   If working on a task/change (not just exploring):\n"
-            printf "   ${BLUE}Ask user:${RESET} \"Should we create THIS_BRANCH.md to track this work?\"\n"
-            printf "   ${BLUE}If yes:${RESET} Run ${GREEN}agents-tool --task${RESET} to bootstrap it\n\n"
+        # Suggest when to use --task mode
+        if [ "$IS_DOTFILES" = false ]; then
+            printf "${BOLD}🤖 AGENTS: Consider: should I run ${GREEN}agents-tool --task${RESET}${BOLD} now?${RESET}\n\n"
+            printf "   It reviews your current task context and sets up/validates branch metadata.\n\n"
+            printf "   Run it if:\n"
+            printf "      • Starting a new task or change\n"
+            printf "      • Don't remember which task you're working on\n"
+            printf "      • It's been a while since you last ran it\n"
+            printf "      • Need to review/update branch scope and metadata\n"
+            printf "\n"
         fi
 
         # If task mode requested, continue to that; otherwise we're done
@@ -550,13 +567,13 @@ run_task_mode() {
         CURRENT_DESC=$(jj log -r @ --no-graph -T 'description.first_line()' 2>/dev/null || echo "")
 
         # Check for bookmarks on @ first
-        BOOKMARK_NAME=$(jj log -r @ --no-graph -T 'bookmarks' 2>/dev/null | head -1 || echo "")
-        if [ "$BOOKMARK_NAME" != "(no bookmarks)" ] && [ -n "$BOOKMARK_NAME" ]; then
+        BOOKMARK_NAME=$(jj log -r @ --no-graph -T 'bookmarks ++ "\n"' 2>/dev/null | head -1 || echo "")
+        if [ -n "$BOOKMARK_NAME" ]; then
             BOOKMARK_LOCATION="@"
         else
             # Check for bookmarks in trunk()::@ range (excluding @)
-            BOOKMARK_NAME=$(jj log -r 'trunk()::@ & bookmarks()' --no-graph -T 'bookmarks' 2>/dev/null | head -1 || echo "")
-            if [ "$BOOKMARK_NAME" != "(no bookmarks)" ] && [ -n "$BOOKMARK_NAME" ]; then
+            BOOKMARK_NAME=$(jj log -r 'trunk()::@ & bookmarks()' --no-graph -T 'bookmarks ++ "\n"' 2>/dev/null | head -1 || echo "")
+            if [ -n "$BOOKMARK_NAME" ]; then
                 BOOKMARK_LOCATION="ancestor"
             else
                 BOOKMARK_NAME=""
@@ -803,15 +820,71 @@ SCRIPT_EOF
     fi
 
     # === Final instructions ===
-    printf "\n${BOLD}${GREEN}✅ Setup complete!${RESET}\n\n"
 
+    # When files already exist, give minimal output
     if [ "$FILES_EXIST" = true ]; then
+        printf "\n${BOLD}${GREEN}✅ Setup complete!${RESET}\n\n"
         printf "${BLUE}Files already existed - no changes made${RESET}\n\n"
-    else
-        printf "${BOLD}📁 Files created:${RESET}\n"
-        ls -lh THIS_BRANCH.md check_this_branch.sh | awk '{print "   " $0}'
+
+        # Show current repository state
+        if command -v jj >/dev/null 2>&1; then
+            printf "${BOLD}Current repository state:${RESET}\n\n"
+
+            # Current change
+            CURRENT_ID=$(jj log -r @ --no-graph -T 'change_id.short(7)' 2>/dev/null || echo "")
+            if [ -n "$CURRENT_ID" ]; then
+                CURRENT_DESC=$(jj log -r @ --no-graph -T 'description.first_line()' 2>/dev/null || echo "(no description)")
+                CURRENT_EMPTY=$(jj log -r @ --no-graph -T 'if(empty, " (empty)", "")' 2>/dev/null || echo "")
+                CURRENT_BOOKMARKS=$(jj log -r @ --no-graph -T 'bookmarks ++ "\n"' 2>/dev/null | head -1 || echo "")
+                printf "Current: %s%s - %s" "$CURRENT_ID" "$CURRENT_EMPTY" "$CURRENT_DESC"
+                if [ -n "$CURRENT_BOOKMARKS" ]; then
+                    printf " [%s]" "$CURRENT_BOOKMARKS"
+                fi
+                printf "\n"
+
+                # Parent change
+                PARENT_ID=$(jj log -r @- --no-graph -T 'change_id.short(7)' 2>/dev/null || echo "")
+                if [ -n "$PARENT_ID" ]; then
+                    PARENT_DESC=$(jj log -r @- --no-graph -T 'description.first_line()' 2>/dev/null || echo "(no description)")
+                    PARENT_BOOKMARKS=$(jj log -r @- --no-graph -T 'bookmarks ++ "\n"' 2>/dev/null | head -1 || echo "")
+                    printf "Parent:  %s - %s" "$PARENT_ID" "$PARENT_DESC"
+                    if [ -n "$PARENT_BOOKMARKS" ]; then
+                        printf " [%s]" "$PARENT_BOOKMARKS"
+                    fi
+                    printf "\n"
+                fi
+            fi
+            printf "\n"
+        fi
+
+        # Show bookmark guidance if we found one
+        if [ -n "$BOOKMARK_NAME" ]; then
+            printf "${BOLD}Found bookmark: ${GREEN}%s${RESET}\n\n" "$BOOKMARK_NAME"
+            printf "Review THIS_BRANCH.md and verify:\n"
+            printf "  • The scope matches your current focus\n"
+            printf "  • The bookmark name aligns with the work described\n\n"
+            printf "If this bookmark is ${BOLD}NOT${RESET} your current focus:\n"
+            printf "  • Check if THIS_BRANCH.md is fully committed before @\n"
+            printf "  • If so, delete THIS_BRANCH.md and check_this_branch.sh\n"
+            printf "  • Then rerun ${GREEN}agents-tool --task${RESET} to start fresh\n"
+            printf "\n"
+        fi
+
+        # Simple next step
+        printf "${BOLD}========================================${RESET}\n"
+        printf "${BOLD}📌 Next Step${RESET}\n"
+        printf "${BOLD}========================================${RESET}\n"
         printf "\n"
+        printf "Run ${GREEN}./check_this_branch.sh${RESET} and follow any instructions it provides.\n"
+        printf "\n"
+        return
     fi
+
+    # First-time setup - show more detail
+    printf "\n${BOLD}${GREEN}✅ Setup complete!${RESET}\n\n"
+    printf "${BOLD}📁 Files created:${RESET}\n"
+    ls -lh THIS_BRANCH.md check_this_branch.sh | awk '{print "   " $0}'
+    printf "\n"
 
     # Check bookmark status and provide guidance
     if command -v jj >/dev/null 2>&1; then
@@ -850,30 +923,14 @@ SCRIPT_EOF
         fi
     fi
 
-    # Prominent mandatory instruction
+    # Next step instruction
     printf "\n"
-    printf "${RED}${BOLD}========================================${RESET}\n"
-    printf "${RED}${BOLD}🤖 AGENTS: MANDATORY NEXT STEP${RESET}\n"
-    printf "${RED}${BOLD}========================================${RESET}\n"
+    printf "${BOLD}========================================${RESET}\n"
+    printf "${BOLD}📌 Next Step${RESET}\n"
+    printf "${BOLD}========================================${RESET}\n"
     printf "\n"
-    printf "${BOLD}YOU MUST RUN THIS COMMAND NOW:${RESET}\n"
-    printf "    ${GREEN}./check_this_branch.sh${RESET}\n"
+    printf "Run ${GREEN}./check_this_branch.sh${RESET} and follow any instructions it provides.\n"
     printf "\n"
-    printf "This is ${BOLD}NOT${RESET} optional. Run it before doing anything else.\n"
-    printf "\n"
-
-    printf "${BOLD}After running check_this_branch.sh:${RESET}\n\n"
-    printf "1. Update THIS_BRANCH.md:\n"
-    printf "   - Fill in scope and out-of-scope sections\n"
-    printf "   - List your TODOs\n"
-    printf "   - Update CHECK_FILES pattern when you know which files you'll modify\n\n"
-    printf "2. Update check_this_branch.sh:\n"
-    printf "   - Set CHECK_FILES to match files in this branch\n"
-    printf "   - Add project-specific checks as needed\n\n"
-    printf "3. Run check_this_branch.sh regularly:\n"
-    printf "   - Before each 'jj new' or 'jj describe'\n"
-    printf "   - Before pushing to remote\n\n"
-    printf "${BLUE}See ~/.agents/rules/branch-metadata.md for detailed guidance${RESET}\n"
 }
 
 # ============================================================================
