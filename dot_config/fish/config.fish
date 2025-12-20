@@ -33,10 +33,10 @@ set -gx nvm_data $NVM_DIR/versions/node
 # Platform-specific paths
 if test (uname) = Darwin
   # macOS
-  set -l PNPM_HOME "$HOME/Library/pnpm"
+  set -g PNPM_HOME "$HOME/Library/pnpm"
 else
   # Linux
-  set -l PNPM_HOME "$HOME/.local/share/pnpm"
+  set -g PNPM_HOME "$HOME/.local/share/pnpm"
 end
 
 # pnpm
