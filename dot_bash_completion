@@ -15,5 +15,7 @@ fi
 PATH="$OLDPATH"
 
 # Begin added by argcomplete
-source "/usr/lib/python3/dist-packages/argcomplete/bash_completion.d/_python-argcomplete"
+if [ -f "/usr/lib/python3/dist-packages/argcomplete/bash_completion.d/_python-argcomplete" ]; then
+  source "/usr/lib/python3/dist-packages/argcomplete/bash_completion.d/_python-argcomplete"
+fi
 # End added by argcomplete
