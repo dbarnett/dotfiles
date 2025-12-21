@@ -81,6 +81,15 @@ warn() {
     done
 }
 
+show_task_mode_suggestion() {
+    printf "${BOLD}🤖 AGENTS: You MUST run ${GREEN}agents-tool --task${RESET}${BOLD} now${RESET}
+
+   It will evaluate whether there's a task you should be focused on and set up
+   branch metadata if needed.
+
+"
+}
+
 # Helper: Calculate date N days in future
 date_plus_days() {
     if result=$(date -d "+$1 days" '+%Y-%m-%d' 2>/dev/null); then
@@ -363,16 +372,9 @@ EOF
             printf "   ${GREEN}touch AGENTS.local.md${RESET} to clear this warning if nothing to add.\n\n"
         fi
 
-        # Suggest when to use --task mode
+        # Suggest when to use --task mode (non-dotfiles only)
         if [ "$IS_DOTFILES" = false ]; then
-            printf "${BOLD}🤖 AGENTS: Consider: should I run ${GREEN}agents-tool --task${RESET}${BOLD} now?${RESET}\n\n"
-            printf "   It reviews your current task context and sets up/validates branch metadata.\n\n"
-            printf "   Run it if:\n"
-            printf "      • Starting a new task or change\n"
-            printf "      • Don't remember which task you're working on\n"
-            printf "      • It's been a while since you last ran it\n"
-            printf "      • Need to review/update branch scope and metadata\n"
-            printf "\n"
+            show_task_mode_suggestion
         fi
 
         # If task mode requested, continue to that; otherwise we're done
@@ -449,13 +451,13 @@ EOF
 "
     fi
 
-    # Provide guidance for non-dotfiles repos in setup mode
+    # Suggest when to use --task mode (same function as refresh mode, non-dotfiles only)
     if [ "$IS_DOTFILES" = false ]; then
-        printf "\n${BLUE}ℹ️  For branch-based development:${RESET}\n"
-        printf "   Run ${GREEN}agents-tool --task${RESET} to set up THIS_BRANCH.md and check_this_branch.sh\n\n"
+        printf "\n"
+        show_task_mode_suggestion
     fi
 
-    printf "\n${GREEN}Done!${RESET} ${BLUE}(Script is idempotent - run as frequently as needed)${RESET}\n"
+    printf "${GREEN}Done!${RESET} ${BLUE}(Script is idempotent - run as frequently as needed)${RESET}\n"
 }
 
 # ============================================================================
@@ -580,6 +582,60 @@ run_task_mode() {
                 BOOKMARK_LOCATION=""
             fi
         fi
+    fi
+
+    # === Handle "no clear task" case ===
+    # If no bookmark and no files exist, create tripwire setup
+    if [ "$FILES_EXIST" = false ] && [ -z "$BOOKMARK_NAME" ]; then
+        printf "\n${YELLOW}⚠️  No bookmark detected${RESET}\n\n"
+        printf "Creating tripwire check_this_branch.sh that will detect when you start making changes\n"
+        printf "and prompt you to set up proper task tracking.\n\n"
+
+        # Create tripwire check_this_branch.sh
+        cat > check_this_branch.sh <<'TRIPWIRE_EOF'
+#!/usr/bin/env sh
+# Tripwire: Detects when work starts and prompts for proper task setup
+
+set -e
+
+printf "=== Checking for changes ===\n\n"
+
+# Check if there are any uncommitted changes
+if command -v jj >/dev/null 2>&1; then
+    CHANGES=$(jj diff --stat 2>/dev/null || echo "")
+
+    if [ -n "$CHANGES" ]; then
+        printf "❌ ERROR: You've started making changes but haven't set up task tracking!\n\n"
+        printf "🤖 AGENTS: You MUST do this NOW:\n\n"
+        printf "1. Create a bookmark for this task:\n"
+        printf "   jj bookmark create _your_task_name\n\n"
+        printf "2. Run agents-tool --task to set up THIS_BRANCH.md:\n"
+        printf "   agents-tool --task\n\n"
+        printf "3. Then run this script again to verify setup\n\n"
+        printf "Changes detected:\n"
+        printf "%s\n" "$CHANGES"
+        exit 1
+    else
+        printf "✅ No changes yet - you're good to explore\n\n"
+        printf "When you start making changes, this script will prompt you to set up\n"
+        printf "a bookmark and THIS_BRANCH.md for proper task tracking.\n"
+        exit 0
+    fi
+else
+    printf "⚠️  jj not available, skipping change detection\n"
+    exit 0
+fi
+TRIPWIRE_EOF
+        chmod +x check_this_branch.sh
+
+        printf "${GREEN}✅ Created tripwire check_this_branch.sh${RESET}\n\n"
+        printf "${BOLD}🤖 AGENTS: Next steps:${RESET}\n"
+        printf "   • Run ${GREEN}./check_this_branch.sh${RESET} before making any changes\n"
+        printf "   • It will detect when you start work and prompt for proper setup\n"
+        printf "   • Or if you know you're starting a task now, create a bookmark first:\n"
+        printf "     ${GREEN}jj bookmark create _your_task_name${RESET}\n"
+        printf "     Then run ${GREEN}agents-tool --task${RESET} again\n\n"
+        return
     fi
 
     # === 1. Create THIS_BRANCH.md ===
@@ -753,7 +809,7 @@ if [ -z "$CHECK_FILES" ]; then
     printf "     CHECK_FILES=\"main.ts utils.ts README.md\"\n\n"
 fi
 
-# CRITICAL: Verify branch metadata files won't be published
+# Check branch metadata cleanup status
 printf "🔍 Checking branch metadata cleanup...\n"
 METADATA_IN_CHANGE=0
 if command -v jj >/dev/null 2>&1; then
@@ -761,36 +817,46 @@ if command -v jj >/dev/null 2>&1; then
     FOUND_FILES=$(jj file list -r @ -- check_this_branch.sh THIS_BRANCH.md THIS_GIT_BRANCH.md 2>/dev/null || echo "")
     if [ -n "$FOUND_FILES" ]; then
         for file in $FOUND_FILES; do
-            printf "⚠️  WARNING: %s is tracked in current change\n" "$file"
+            printf "   Found: %s\n" "$file"
         done
         METADATA_IN_CHANGE=1
     fi
 fi
 
 if [ $METADATA_IN_CHANGE -eq 1 ]; then
-    printf "❌ ERROR: THIS CHANGE INCLUDES BRANCH METADATA FILES\n\n"
-    printf "   This change is NOT READY FOR PUBLICATION until:\n"
-    printf "   - THIS_BRANCH.md is removed/excluded\n"
-    printf "   - check_this_branch.sh is removed/excluded\n\n"
-    printf "   Use: rm THIS_BRANCH.md check_this_branch.sh\n"
-    printf "   Or create these files in a separate change that won't be published\n\n"
+    printf "⚠️  This change is in WIP mode (includes branch metadata files)
+
+   Before publishing, you MUST clean up:
+   • Remove THIS_BRANCH.md and check_this_branch.sh from this change
+   • See THIS_BRANCH.md \"Cleanup Checklist\" section for full instructions
+
+   Quick fix: rm THIS_BRANCH.md check_this_branch.sh
+
+"
     ERRORS=$((ERRORS + 1))
 else
     printf "✅ Branch metadata files excluded from change\n"
 fi
 printf "\n"
 
-# CRITICAL: Check for FIXME comments (must be resolved before publishing)
+# Check for FIXME comments (must be resolved before publishing)
 if [ -n "$CHECK_FILES" ]; then
-    printf "🔍 Scanning for FIXME comments (blocking)...\n"
+    printf "🔍 Scanning for FIXME comments...\n"
     # Single grep across all files is more efficient
     FIXME_RESULTS=$(grep -n "FIXME" $CHECK_FILES 2>/dev/null || true)
 
     if [ -n "$FIXME_RESULTS" ]; then
         printf "%s\n" "$FIXME_RESULTS"
-        printf "\n❌ ERROR: Found FIXME comments\n\n"
-        printf "   FIXME comments MUST be resolved before publishing\n"
-        printf "   Either fix them or convert to TODO if acceptable to defer\n\n"
+        printf "
+⚠️  Found FIXME comments - change is in WIP mode
+
+   FIXME comments MUST be resolved before publishing:
+   • Fix the issues they mark, OR
+   • Convert to TODO if acceptable to defer
+
+   See THIS_BRANCH.md for tracking these items.
+
+"
         ERRORS=$((ERRORS + 1))
     else
         printf "✅ No FIXME comments found\n"
@@ -808,10 +874,11 @@ fi
 # Summary
 printf "=== Summary ===\n"
 if [ $ERRORS -gt 0 ]; then
-    printf "❌ %d error(s) found - NOT READY FOR PUBLICATION\n" "$ERRORS"
+    printf "⚠️  Change is in WIP mode - %d item(s) need attention before publishing\n" "$ERRORS"
+    printf "See above for details and refer to THIS_BRANCH.md cleanup checklist.\n"
     exit 1
 else
-    printf "✅ All checks passed\n"
+    printf "✅ All checks passed - ready to publish\n"
     exit 0
 fi
 SCRIPT_EOF
