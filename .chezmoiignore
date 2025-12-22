@@ -6,6 +6,7 @@ CLAUDE.md
 .claude/
 .env
 _dev/
+_dev/**
 
 # Ignore yadm-specific files
 .config/yadm/
