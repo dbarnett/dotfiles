@@ -1,2 +1,9 @@
+root = true
+
+# General preference (where not otherwise configured): 2 sp indent
+[*]
+indent_style = space
+indent_size = 2
+
 [.gitconfig]
 indent_size = 4
