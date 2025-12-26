@@ -286,7 +286,9 @@ EOF
         if [ "$IS_REFRESH" = false ]; then
             printf "   Exists as regular file (shared pattern)\n"
         fi
-        if ! grep -q "AGENTS\.local\.md" AGENTS.md 2>/dev/null; then
+        # Check if it references AGENTS.local.md (only for regular files, not symlinks)
+        # Symlinks to AGENTS.local.md don't need to reference themselves
+        if [ ! -L AGENTS.md ] && ! grep -q "AGENTS\.local\.md" AGENTS.md 2>/dev/null; then
             printf "   ${YELLOW}⚠️  AGENTS.md doesn't reference AGENTS.local.md - prelude missing${RESET}\n"
             AGENTS_ACTION="update_prelude"
             IS_REFRESH=false
@@ -295,7 +297,8 @@ EOF
         fi
     else
         ln -s AGENTS.local.md AGENTS.md
-        printf "   ${GREEN}✅ Created AGENTS.md → AGENTS.local.md${RESET}\n"
+        printf "   ${GREEN}✅ Created AGENTS.md → AGENTS.local.md${RESET} (private pattern)\n"
+        printf "   ${BLUE}ℹ️  Can convert to committed file later if sharing with team${RESET}\n"
         AGENTS_ACTION="default_setup"
     fi
 
@@ -372,13 +375,9 @@ EOF
             printf "   ${GREEN}touch AGENTS.local.md${RESET} to clear this warning if nothing to add.\n\n"
         fi
 
-        # Suggest when to use --task mode (non-dotfiles only)
-        if [ "$IS_DOTFILES" = false ]; then
+        # Suggest when to use --task mode (non-dotfiles only, and not already in task mode)
+        if [ "$IS_DOTFILES" = false ] && [ "$TASK_MODE" = false ]; then
             show_task_mode_suggestion
-        fi
-
-        # If task mode requested, continue to that; otherwise we're done
-        if [ "$TASK_MODE" = false ]; then
             printf "${GREEN}Done!${RESET} ${BLUE}(Script is idempotent - run as frequently as needed)${RESET}\n"
         fi
         return
@@ -397,14 +396,15 @@ EOF
         printf "\n"
     fi
 
-    # Only show "Next Steps" header if there are actual next steps
-    if [ "$AGENTS_ACTION" = "default_setup" ] || [ "$AGENTS_ACTION" = "update_prelude" ]; then
-        printf "${BOLD}🚨 Next Steps:${RESET}\n\n"
-    fi
+    # Only show "Next Steps" if not continuing to task mode
+    if [ "$TASK_MODE" = false ]; then
+        if [ "$AGENTS_ACTION" = "default_setup" ] || [ "$AGENTS_ACTION" = "update_prelude" ]; then
+            printf "${BOLD}🚨 Next Steps:${RESET}\n\n"
+        fi
 
-    case "$AGENTS_ACTION" in
-        default_setup)
-            printf "${BOLD}🤖 AGENTS: You MUST ask the user:${RESET}
+        case "$AGENTS_ACTION" in
+            default_setup)
+                printf "${BOLD}🤖 AGENTS: You MUST ask the user:${RESET}
    ${YELLOW}\"Should the AGENTS.md symlink be converted to a shared/committed AGENTS.md file?\"${RESET}
 
    ${BOLD}If user says NO:${RESET}
@@ -423,9 +423,9 @@ EOF
    ${BOLD}Maintenance:${RESET} Expiry dates embedded in AGENTS.local.md sections
 
 "
-            ;;
-        update_prelude)
-            printf "${YELLOW}⚠️  AGENTS.md missing required prelude${RESET}
+                ;;
+            update_prelude)
+                printf "${YELLOW}⚠️  AGENTS.md missing required prelude${RESET}
 
    ${BOLD}ACTION REQUIRED:${RESET} Add this prelude to AGENTS.md (near top, after title):
 
@@ -434,13 +434,14 @@ EOF
    ${BLUE}---${RESET}
 
 "
-            ;;
-        verify_shared)
-            ;;
-        verify_symlink)
-            printf "   AGENTS.md symlink exists - verify it points to correct location\n\n"
-            ;;
-    esac
+                ;;
+            verify_shared)
+                ;;
+            verify_symlink)
+                printf "   AGENTS.md symlink exists - verify it points to correct location\n\n"
+                ;;
+        esac
+    fi
 
     if [ -n "$GLOBAL_UPDATED" ] && [ "$AGENTS_ACTION" != "default_setup" ]; then
         printf "\n${BOLD}${YELLOW}⚠️  ~/AGENTS.global.md was recently updated${RESET}
@@ -451,13 +452,12 @@ EOF
 "
     fi
 
-    # Suggest when to use --task mode (same function as refresh mode, non-dotfiles only)
-    if [ "$IS_DOTFILES" = false ]; then
+    # Suggest when to use --task mode (same function as refresh mode, non-dotfiles only, not already in task mode)
+    if [ "$IS_DOTFILES" = false ] && [ "$TASK_MODE" = false ]; then
         printf "\n"
         show_task_mode_suggestion
+        printf "${GREEN}Done!${RESET} ${BLUE}(Script is idempotent - run as frequently as needed)${RESET}\n"
     fi
-
-    printf "${GREEN}Done!${RESET} ${BLUE}(Script is idempotent - run as frequently as needed)${RESET}\n"
 }
 
 # ============================================================================
@@ -484,8 +484,6 @@ check_wip_status() {
 }
 
 run_task_mode() {
-    printf "${BOLD}🔧 Task Mode${RESET}\n\n"
-
     # Dotfiles repos use jj describe instead of THIS_BRANCH.md
     if [ "$IS_DOTFILES" = true ]; then
         if ! command -v jj >/dev/null 2>&1; then
@@ -584,12 +582,48 @@ run_task_mode() {
         fi
     fi
 
+    # === Detect if we're on top of published work ===
+    # Check for pushed bookmark in ancestry (excluding trunk)
+    PUSHED_BOOKMARK=""
+    if command -v jj >/dev/null 2>&1; then
+        # Find bookmarks between trunk and @ that are also remote bookmarks
+        PUSHED_BOOKMARK=$(jj log -r 'trunk()+::@ & remote_bookmarks()' --no-graph -T 'bookmarks ++ "\n"' 2>/dev/null | head -1 || echo "")
+    fi
+
+    # Check if @ has a WIP bookmark (starts with _)
+    HAS_WIP_BOOKMARK=false
+    if [ -n "$BOOKMARK_NAME" ]; then
+        case "$BOOKMARK_NAME" in
+            _*) HAS_WIP_BOOKMARK=true ;;
+        esac
+    fi
+
+    # If pushed bookmark exists AND @ doesn't have WIP bookmark, suggest creating one
+    if [ "$FILES_EXIST" = false ] && [ -n "$PUSHED_BOOKMARK" ] && [ "$HAS_WIP_BOOKMARK" = false ]; then
+        printf "
+ℹ️  Detected published bookmark: %s
+
+To work on something new, create a WIP bookmark (starts with _):
+  jj bookmark create _your_work_description
+
+Then re-run: agents-tool --task
+
+This signals intentional new work and will create branch metadata files.
+
+" "$PUSHED_BOOKMARK"
+        return
+    fi
+
     # === Handle "no clear task" case ===
     # If no bookmark and no files exist, create tripwire setup
     if [ "$FILES_EXIST" = false ] && [ -z "$BOOKMARK_NAME" ]; then
-        printf "\n${YELLOW}⚠️  No bookmark detected${RESET}\n\n"
-        printf "Creating tripwire check_this_branch.sh that will detect when you start making changes\n"
-        printf "and prompt you to set up proper task tracking.\n\n"
+        printf "
+${YELLOW}⚠️  No bookmark detected${RESET}
+
+Creating tripwire check_this_branch.sh that will detect when you start making changes
+and prompt you to set up proper task tracking.
+
+"
 
         # Create tripwire check_this_branch.sh
         cat > check_this_branch.sh <<'TRIPWIRE_EOF'
@@ -600,11 +634,12 @@ set -e
 
 printf "=== Checking for changes ===\n\n"
 
-# Check if there are any uncommitted changes
+# Check if there are any uncommitted changes (excluding metadata files)
 if command -v jj >/dev/null 2>&1; then
-    CHANGES=$(jj diff --stat 2>/dev/null || echo "")
+    # Get list of changed files, excluding the metadata files themselves
+    CHANGED_FILES=$(jj diff --name-only 2>/dev/null | grep -v '^check_this_branch\.sh$' | grep -v '^THIS_BRANCH\.md$' || true)
 
-    if [ -n "$CHANGES" ]; then
+    if [ -n "$CHANGED_FILES" ]; then
         printf "❌ ERROR: You've started making changes but haven't set up task tracking!\n\n"
         printf "🤖 AGENTS: You MUST do this NOW:\n\n"
         printf "1. Create a bookmark for this task:\n"
@@ -613,7 +648,7 @@ if command -v jj >/dev/null 2>&1; then
         printf "   agents-tool --task\n\n"
         printf "3. Then run this script again to verify setup\n\n"
         printf "Changes detected:\n"
-        printf "%s\n" "$CHANGES"
+        printf "%s\n" "$CHANGED_FILES"
         exit 1
     else
         printf "✅ No changes yet - you're good to explore\n\n"
@@ -628,13 +663,16 @@ fi
 TRIPWIRE_EOF
         chmod +x check_this_branch.sh
 
-        printf "${GREEN}✅ Created tripwire check_this_branch.sh${RESET}\n\n"
-        printf "${BOLD}🤖 AGENTS: Next steps:${RESET}\n"
-        printf "   • Run ${GREEN}./check_this_branch.sh${RESET} before making any changes\n"
-        printf "   • It will detect when you start work and prompt for proper setup\n"
-        printf "   • Or if you know you're starting a task now, create a bookmark first:\n"
-        printf "     ${GREEN}jj bookmark create _your_task_name${RESET}\n"
-        printf "     Then run ${GREEN}agents-tool --task${RESET} again\n\n"
+        printf "${GREEN}✅ Created tripwire check_this_branch.sh${RESET}
+
+${BOLD}🤖 AGENTS: Next steps:${RESET}
+   • Run ${GREEN}./check_this_branch.sh${RESET} before making any changes
+   • It will detect when you start work and prompt for proper setup
+   • Or if you know you're starting a task now, create a bookmark first:
+     ${GREEN}jj bookmark create _your_task_name${RESET}
+     Then run ${GREEN}agents-tool --task${RESET} again
+
+"
         return
     fi
 
@@ -716,12 +754,36 @@ What explicitly will NOT be done here?
 
 - (Add notes about decisions, discoveries, etc.)
 
-## Cleanup Checklist (before publish)
+## What is a "WIP Change"?
 
-- [ ] All in-scope TODOs completed or moved elsewhere
+A WIP (Work In Progress) change is **not ready for review or publishing**. It may contain:
+- FIXME comments marking issues that MUST be fixed before publishing
+- TODO items still in progress
+- Verbose implementation notes and decision logs in change description
+- Experimental code or incomplete features
+- THIS_BRANCH.md and check_this_branch.sh files tracked in the change
+
+## Exit Checklist (transitioning WIP → Ready to Publish)
+
+**IMPORTANT:** Before deleting branch metadata files, ask user what context to preserve!
+
+- [ ] All FIXME comments fixed or converted to TODO
+- [ ] All in-scope TODO items completed or moved to project docs/issues
+- [ ] Tests passing
 - [ ] Useful checks migrated to permanent project infrastructure
-- [ ] Remove/exclude THIS_BRANCH.md from final change(s)
-- [ ] Remove/exclude check_this_branch.sh from final change(s)
+
+**Interactive cleanup workflow:**
+1. Review THIS_BRANCH.md "Notes" section with user:
+   - What should go in final commit message?
+   - What should become GitHub issues for follow-up work?
+   - What should be added to project docs (README, architecture notes)?
+   - What can be discarded (temporary notes, resolved issues)?
+
+2. After preserving context:
+   - Remove THIS_BRANCH.md from change: \`jj restore THIS_BRANCH.md\` or delete it
+   - Remove check_this_branch.sh from change: \`jj restore check_this_branch.sh\` or delete it
+   - Update change description: Remove "WIP:" prefix, condense to 10-15 lines
+   - Remove verbose implementation details from description, keep only what/why
 EOF
         printf "   ${GREEN}✅ Created THIS_BRANCH.md${RESET}\n"
     fi
@@ -785,29 +847,16 @@ if command -v jj >/dev/null 2>&1; then
     printf "\n"
 fi
 
-# STATIC FILE LIST - Update when branch scope changes
+# STATIC FILE LIST - CRITICAL: Update this when scope changes!
 # DO NOT use dynamic VCS queries like $(jj diff --name-only)
-# See THIS_BRANCH.md for instructions
 #
-# PREFER GLOBS for cleaner, more maintainable file lists:
-#   CHECK_FILES=$(echo src/components/*.tsx src/lib/*.ts docs/*.md)
-#   CHECK_FILES=$(echo posts/*.md public/images/posts/*.{svg,png})
-#   CHECK_FILES=$(echo *.py tests/*.py)  # All Python files in root and tests/
-#
-# Or list files explicitly if needed:
-#   CHECK_FILES="src/main.ts src/utils.ts README.md"
-CHECK_FILES=""
-
-if [ -z "$CHECK_FILES" ]; then
-    printf "⚠️  WARNING: CHECK_FILES is empty\n"
-    printf "   Update CHECK_FILES in this script with files relevant to this branch\n\n"
-    printf "   Examples using globs (recommended):\n"
-    printf "     CHECK_FILES=\$(echo src/feature/*.js tests/*.test.js)\n"
-    printf "     CHECK_FILES=\$(echo docs/*.md public/*.{html,css})\n"
-    printf "     CHECK_FILES=\$(echo *.py lib/**/*.py)\n\n"
-    printf "   Or list files explicitly:\n"
-    printf "     CHECK_FILES=\"main.ts utils.ts README.md\"\n\n"
-fi
+# DEFAULT: Check all files - narrow down if getting out-of-scope results
+# Examples of narrowing:
+#   CHECK_FILES=$(echo src/feature/*.js tests/*.test.js)  # Specific dirs
+#   CHECK_FILES=$(echo posts/*.md public/images/*.svg)    # File types in dirs
+#   CHECK_FILES=$(echo *.py lib/**/*.py)                  # Pattern matching
+#   CHECK_FILES="src/main.ts src/utils.ts README.md"      # Explicit list
+CHECK_FILES=$(echo **/*)
 
 # Check branch metadata cleanup status
 printf "🔍 Checking branch metadata cleanup...\n"
@@ -826,11 +875,20 @@ fi
 if [ $METADATA_IN_CHANGE -eq 1 ]; then
     printf "⚠️  This change is in WIP mode (includes branch metadata files)
 
-   Before publishing, you MUST clean up:
-   • Remove THIS_BRANCH.md and check_this_branch.sh from this change
-   • See THIS_BRANCH.md \"Cleanup Checklist\" section for full instructions
+   WIP mode means this change is NOT ready for review/publishing.
+   Before publishing, you MUST:
 
-   Quick fix: rm THIS_BRANCH.md check_this_branch.sh
+   1. Review THIS_BRANCH.md with user - ask what context to preserve:
+      • What goes in final commit message?
+      • What becomes GitHub issues for follow-up?
+      • What should be added to project docs?
+
+   2. After preserving context, clean up:
+      • Fix all FIXME comments (or convert to TODO if deferrable)
+      • Remove WIP: prefix from change description
+      • Remove branch metadata files from change
+
+   See THIS_BRANCH.md \"Exit Checklist\" for interactive cleanup workflow.
 
 "
     ERRORS=$((ERRORS + 1))
@@ -850,11 +908,13 @@ if [ -n "$CHECK_FILES" ]; then
         printf "
 ⚠️  Found FIXME comments - change is in WIP mode
 
-   FIXME comments MUST be resolved before publishing:
-   • Fix the issues they mark, OR
-   • Convert to TODO if acceptable to defer
+   WIP mode = not ready for publishing. FIXME comments mark blocking issues.
 
-   See THIS_BRANCH.md for tracking these items.
+   You MUST either:
+   • Fix the issues they mark (resolve the underlying problem), OR
+   • Convert to TODO if the issue is deferrable (not blocking)
+
+   Do NOT publish with unresolved FIXME comments.
 
 "
         ERRORS=$((ERRORS + 1))
@@ -874,16 +934,21 @@ fi
 # Summary
 printf "=== Summary ===\n"
 if [ $ERRORS -gt 0 ]; then
-    printf "⚠️  Change is in WIP mode - %d item(s) need attention before publishing\n" "$ERRORS"
-    printf "See above for details and refer to THIS_BRANCH.md cleanup checklist.\n"
+    printf "⚠️  Change is in WIP mode - %d item(s) blocking publish\n" "$ERRORS"
+    printf "\nWIP mode means NOT ready for review. See above for specific issues.\n"
+    printf "Refer to THIS_BRANCH.md \"Exit Checklist\" for cleanup workflow.\n"
     exit 1
 else
-    printf "✅ All checks passed - ready to publish\n"
+    printf "✅ All checks passed - ready to remove branch metadata and publish\n"
+    printf "\nNext: Review THIS_BRANCH.md \"Exit Checklist\" to preserve important context\n"
+    printf "before deleting branch metadata files.\n"
     exit 0
 fi
 SCRIPT_EOF
         chmod +x check_this_branch.sh
         printf "   ${GREEN}✅ Created check_this_branch.sh${RESET}\n"
+        printf "   ${YELLOW}⚠️  AGENTS: You MUST update CHECK_FILES in check_this_branch.sh!${RESET}\n"
+        printf "   ${YELLOW}   Default is **/* (all files). Narrow to branch scope if needed.${RESET}\n"
     fi
 
     # === Final instructions ===
@@ -1007,6 +1072,7 @@ SCRIPT_EOF
 run_project_mode
 
 if [ "$TASK_MODE" = true ]; then
-    printf "\n"
+    printf "\n${BOLD}🔧 Task Mode${RESET}\n\n"
     run_task_mode
+    printf "\n${GREEN}Done!${RESET} ${BLUE}(Script is idempotent - run as frequently as needed)${RESET}\n"
 fi

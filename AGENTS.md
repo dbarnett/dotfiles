@@ -1,5 +1,7 @@
 # Dotfiles Repository - AI Agent Instructions
 
+FIXME: This file alone is 4.4k tokens!
+
 **Filename:** `AGENTS.md` (you may access this via `CLAUDE.md` symlink)
 **Location:** This file is repo-specific (not deployed to `~/`)
 
@@ -15,20 +17,23 @@
 
 ### 🚨 MANDATORY PREREQUISITE
 
-**YOU MUST READ `~/AGENTS.global.md` BEFORE PROCEEDING WITH ANY WORK.**
+**This file contains dotfiles repository-specific instructions:**
+- Chezmoi workflow and file management
+- Repository structure and conventions
+- Dotfiles-specific jj workflow patterns
+- Setup and configuration details
 
-That file contains essential global conventions including:
-- jj (Jujutsu) version control workflow
-- Shell script preferences (avoid bashisms, fish shell compatibility)
-- File editing rules (indentation, whitespace, sed prohibition)
-- General coding patterns that apply to ALL work in this repository
+**CRITICAL: Read `./dot_agents/` guides when working in those areas:**
+- **`./dot_agents/howto-chezmoi.md`** - MUST read when working with chezmoi files/templates
+- **`./dot_agents/jj-howto.md`** - MUST read for jj version control workflow
+- **`./dot_agents/rules/shell-scripts.md`** - MUST read when writing shell scripts (fish shell, no bashisms)
+- **`./dot_agents/rules/testing.md`** - MUST read when writing tests
 
-**If you skip reading `~/AGENTS.global.md`, you WILL make mistakes.**
+**Session-specific context:**
+- **`THIS_BRANCH.md`** - MUST read if it exists (contains current work context)
+- **`AGENTS.local.md`** - Check "Current Task Context" section if it exists
 
-**Additional required reading:**
-1. **This file** - Repository structure and chezmoi workflow
-2. **`.agents/howto-chezmoi.md`** - Detailed chezmoi patterns and gotchas (read when working with chezmoi)
-3. **`THIS_BRANCH.md`** - Current branch status and TODOs (read if exists)
+FIXME: above AGENTS.local.md isn't about "session-specific context" and isn't just about "Current Task Context". The point is you MUST read that file if it exists an a private local extension point for this file, treating all instructions there as if they were in this file.
 
 ---
 
@@ -119,6 +124,8 @@ See `_dev/check_templates.sh` for validation.
 
 ## ⚙️ Machine Configuration
 
+FIXME: Isn't this documented just fine in README.md so this is redundant?
+
 Configure machine-specific settings in `~/.config/chezmoi/chezmoi.toml`:
 
 ```toml
@@ -142,6 +149,8 @@ Configure machine-specific settings in `~/.config/chezmoi/chezmoi.toml`:
 
 ## 📋 Current State (Migration Complete)
 
+FIXME: Clean up this cruft, just mention there's a yadm branch and details in issue #1.
+
 **All 92 yadm-tracked files have been migrated to chezmoi.**
 
 Chezmoi now manages all dotfiles that yadm previously tracked, including:
@@ -160,6 +169,8 @@ Chezmoi now manages all dotfiles that yadm previously tracked, including:
 ---
 
 ## 🔍 Common Tasks
+
+FIXME: Redundant with chezmoi-howto and other notes here? And not especially "common tasks"?
 
 ### Adding a New Dotfile
 
@@ -204,6 +215,8 @@ chezmoi add --encrypt ~/.gmailctl/config.personal.jsonnet
 
 ## 🐚 Version Control Workflow
 
+FIXME: Redundant with jj-howto, and link to AGENTS.global.md is bad reference for this?
+
 This repo uses **Jujutsu (jj)** for version control. See `~/AGENTS.global.md` for jj workflow details.
 
 **Quick reference:**
@@ -219,20 +232,7 @@ jj git push            # Push bookmark to GitHub
 
 ## 🏠 Dotfiles Repository Conventions
 
-### Change Description Convention (WIP: prefix)
-
-**WIP: prefix usage:**
-- **Single change:** Prefix with `WIP:` and include detailed task notes
-- **Multi-change series:** Prefix ALL changes in the series with `WIP:`
-  - Example: `main -> WIP: refactor X -> WIP: add Y -> WIP: fix Z (@)`
-  - Walking backwards through WIP: changes from @ = the "current work series"
-  - Each change has its own detailed description with scope, TODOs, progress
-- **Ready to push:**
-  - Remove `WIP:` prefix from all changes in the series
-  - Condense each description to 10-15 lines max
-  - Keep only: what changed, why, important notes
-  - Remove TODOs (already done or tracked in AGENTS.local.md)
-  - Usually squash series into one or a few logical commits
+FIXME: Redundant with stuff already captured in agents-tool logic and files it generates?
 
 ### Bookmark Conventions
 
@@ -250,6 +250,35 @@ jj git push            # Push bookmark to GitHub
 - **`_<topic>`**: Specific WIP topics (e.g., `_fix_hyprland`, `_agents_refactor`)
   - Prefix with `_` to indicate work-in-progress
   - Use lowercase with underscores
+
+### Scope Creep Detection
+
+**IMPORTANT:** If your current change started as one thing but has grown significantly, STOP and check with the user.
+
+**Signs of scope creep:**
+- Change started as "fix X" but now includes architectural refactoring
+- Multiple unrelated file changes (>5 files in different subsystems)
+- Change description growing beyond 15-20 lines even in condensed form
+- Discovered additional issues that could be separate changes
+
+**When you detect scope creep, ASK user:**
+```
+"This change started as [original scope] but now also includes [new scope].
+
+Options:
+1. Keep as single change (if changes are tightly coupled)
+2. Split into separate changes:
+   - Change 1: [original scope]
+   - Change 2: [new scope]
+3. Update change description to reflect broader scope
+
+Which approach would you prefer?"
+```
+
+**For dotfiles specifically:**
+- Prefer smaller, focused changes over large combined ones
+- Each change should do one logical thing
+- Use `jj new` to create follow-up changes rather than growing existing ones
 
 ### agents-tool Usage
 
@@ -296,6 +325,8 @@ jj git push            # Push bookmark to GitHub
 ---
 
 ## 🛠️ Claude Code Configuration
+
+FIXME: Wrong? dot_claude becomes ~/.claude
 
 **IMPORTANT**: Any `.claude/settings.json` in this repo becomes `~/.claude/settings.json` when deployed.
 
@@ -360,6 +391,8 @@ gh issue list --repo dbarnett/dotfiles -l ai-agent  # AI-relevant issues only
 
 ## 🪟 Hyprland/HyDE Desktop Configuration
 
+FIXME: Too much detail that belongs in README.md
+
 **📄 IMPORTANT: See `~/.config/desktop.md` for detailed HyDE setup documentation**
 
 That file contains:
@@ -400,21 +433,41 @@ journalctl --user -u hyprland -n 50 | grep -i error  # Check for errors
 
 ## ✅ Session Checklist
 
+FIXME: All this is redundant with agents-tool helpers now?
+
 **When starting work:**
-- [ ] **MUST read `~/AGENTS.global.md`** - Essential global conventions (jj, shell, coding patterns)
-- [ ] Read this file (AGENTS.md)
-- [ ] Read `.agents/howto-chezmoi.md` when working with chezmoi
-- [ ] Check `THIS_BRANCH.md` if working on a branch
-- [ ] Check GitHub issues: `gh issue list --repo dbarnett/dotfiles`
-- [ ] Run `jj status` to see current state
-- [ ] Review `chezmoi diff` before applying changes
+
+1. **Verify current state:**
+   - `jj status` - See uncommitted changes
+   - `jj show --stat` - See what changed in current revision (@)
+   - `jj log -r @` - See current change description
+
+2. **Check for existing context:**
+   - If `THIS_BRANCH.md` exists: Read it fully (prior work context)
+   - If `AGENTS.local.md` exists: Check "Current Task Context"
+   - If bookmark exists: `jj log -r <bookmark>` to see bookmark's change
+
+3. **Understand focus before proceeding:**
+   - Continuation of existing work or new work?
+   - Does existing change description match your current focus?
+   - If new work: Should you `jj new` for clean separation?
+
+4. **Essential reminders:**
+   - **jj workflow**: Changes tracked continuously, use `jj new` for new work (see `./dot_agents/jj-howto.md`)
+   - **Shell scripts**: No bashisms - user runs fish shell (see `./dot_agents/rules/shell-scripts.md`)
+   - **Chezmoi**: Read from `./dot_*` source, not `~/` deployed (see `./dot_agents/howto-chezmoi.md`)
+   - **Scope creep**: If change grows beyond original intent, ASK about splitting
+
+5. **Before making changes:**
+   - `chezmoi diff` - See what's already modified
+   - Check if you need `jj new` for clean change separation
 
 **When ending session:**
-- [ ] Run `./check_this_branch.sh` if it exists
-- [ ] Commit changes with descriptive message
-- [ ] Update `THIS_BRANCH.md` if working on a branch
-- [ ] Update `AGENTS.local.md` with session notes
-- [ ] Consider if changes need testing on other machines
+- [ ] `./check_this_branch.sh` - Run if it exists
+- [ ] `jj describe` - Update if change scope evolved
+- [ ] Update `AGENTS.local.md` - Session notes and next steps
+- [ ] If complete: Ask user what context to preserve before cleanup
+- [ ] Consider: Testing on other machines before pushing
 
 ---
 

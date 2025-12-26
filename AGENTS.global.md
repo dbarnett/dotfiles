@@ -18,14 +18,14 @@ This file contains general preferences and conventions for AI coding assistants 
 - **🐚 Version Control: Jujutsu (jj)** - Introduction (detailed howto in separate file)
 - **🎯 General Coding Preferences** - Core principles
 
-**Specialized guides (you MUST read when relevant):**
-- **`~/.agents/agents-files-howto.md`** - READ when creating/modifying ~/.agents files OR when setting up project-specific AGENTS.local.md (includes GitHub issue tracking)
-- **`~/.agents/jj-howto.md`** - READ when working with version control in repos with `.jj/`
-- **`~/.agents/configuring-mcp-tools.md`** - READ when MCP context usage is high or when configuring MCP servers
-- **`~/.agents/rules/shell-scripts.md`** - READ when writing/debugging shell scripts
-- **`~/.agents/rules/testing.md`** - READ when writing/reviewing tests
-- **`~/.agents/rules/branch-metadata.md`** - READ when starting branch work or using THIS_BRANCH.md/check_this_branch.sh
-- **`~/.agents/rules/obsidian.md`** - READ when working with Obsidian vault (`~/.myvault`)
+**Specialized guides - MUST read when relevant:**
+- **`~/.agents/agents-files-howto.md`** - **MUST read when creating/modifying ~/.agents files** OR when setting up project-specific AGENTS.local.md (includes GitHub issue tracking)
+- **`~/.agents/jj-howto.md`** - **MUST read when working with version control** in repos with `.jj/` - you WILL make mistakes if you skip this
+- **`~/.agents/configuring-mcp-tools.md`** - **MUST read when MCP context usage is high** or when configuring MCP servers
+- **`~/.agents/rules/shell-scripts.md`** - **MUST read when writing/debugging shell scripts** - user runs fish shell, requires specific patterns
+- **`~/.agents/rules/testing.md`** - **MUST read when writing/reviewing tests**
+- **`~/.agents/rules/branch-metadata.md`** - **MUST read when starting branch work** or using THIS_BRANCH.md/check_this_branch.sh
+- **`~/.agents/rules/obsidian.md`** - **MUST read when working with Obsidian vault** (`~/.myvault`)
 
 **See also:**
 - `~/AGENTS.TOOLS.local.md` - Tool/MCP server configurations (if exists)
@@ -58,7 +58,9 @@ This file contains general preferences and conventions for AI coding assistants 
 
 ### Maintaining .agents Files
 
-**➡️ When creating, modifying, or organizing AGENTS.md or ~/.agents/ files, you MUST read `~/.agents/agents-files-howto.md` for guidelines and patterns.**
+**CRITICAL: When creating, modifying, or organizing AGENTS.md or ~/.agents/ files, you MUST read `~/.agents/agents-files-howto.md` for guidelines and patterns.**
+
+**If you're about to create or significantly modify an AGENTS file, STOP and read the howto first.**
 
 **Key principle:** Keep this file scannable by extracting detailed content to separate howto/rule files.
 
@@ -68,13 +70,16 @@ This file contains general preferences and conventions for AI coding assistants 
 
 All my projects use **Jujutsu** ([jj-vcs.dev](https://jj-vcs.dev/)) instead of direct git commands.
 
-**➡️ When working with jj or working with version control in a repository that has `.jj/`, you MUST read `~/.agents/jj-howto.md` for commands, workflows, and key concepts.**
+**CRITICAL: When working with version control in a repository that has `.jj/`, you MUST read `~/.agents/jj-howto.md` BEFORE making any changes.**
 
-**Quick overview:**
+**If you try to use git commands directly or don't understand jj concepts, you WILL make mistakes that are hard to recover from.**
+
+**Quick overview (NOT a substitute for reading the howto):**
 - Jujutsu provides a friendlier interface to Git with automatic snapshotting
 - Changes are tracked continuously without explicit staging
 - You work with "changes" (stable IDs) rather than commits
 - Use `jj status`, `jj show --stat`, and `jj log` to understand current state
+- **Read the howto** for full workflow details - this is just a reminder
 
 ---
 
@@ -82,17 +87,19 @@ All my projects use **Jujutsu** ([jj-vcs.dev](https://jj-vcs.dev/)) instead of d
 
 ### Shell Scripts
 
-**CRITICAL: User runs fish shell - avoid bashisms**
+**CRITICAL: User runs fish shell - bashisms will break the system**
 
-**➡️ When writing/debugging shell scripts, you MUST read `~/.agents/rules/shell-scripts.md` for detailed guidelines.**
+**IMPORTANT: When writing/debugging shell scripts, you MUST read `~/.agents/rules/shell-scripts.md` for detailed guidelines.**
+
+**If you write bashisms, the scripts WILL fail on this system. STOP and read the guide if you're unsure.**
 
 - **Always use ````shell` markdown fence**, not ````bash`, unless specifically requiring bash
 - Start scripts with `#!/usr/bin/env sh` for portability
 
-**Quick reference - avoid these bashisms:**
-- ❌ Heredocs (`cat <<EOF`)
-- ❌ Process substitution (`<(command)`)
-- ❌ Bash arrays
+**Quick reference - MUST avoid these bashisms:**
+- ❌ Heredocs (`cat <<EOF`) - Will fail on fish shell
+- ❌ Process substitution (`<(command)`) - Not portable
+- ❌ Bash arrays - Not POSIX
 - ❌ `[[` conditionals - use `[` instead
 
 ### Output Formatting in Shell Scripts
@@ -217,9 +224,9 @@ Logger.log('Finished');
 
 ### Testing
 
-**➡️ When writing/reviewing tests, you MUST read `~/.agents/rules/testing.md` for detailed guidelines.**
+**IMPORTANT: When writing/reviewing tests, you MUST read `~/.agents/rules/testing.md` for detailed guidelines.**
 
-**Core Principles (quick reference):**
+**Core Principles (NOT a substitute for reading the full guide):**
 - **One test = one thing** - Each test should verify a single behavior
 - **Use parameterized tests** for variations of the same test logic
 - **Test real behavior, not mocks** - Only mock external dependencies (APIs, databases, file systems, time)

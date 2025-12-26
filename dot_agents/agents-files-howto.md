@@ -119,6 +119,34 @@ and workflows to separate howto file.
 
 ---
 
+## Directive Strength Levels
+
+**When writing AGENTS.md, CLAUDE.md, or other instruction files for AI agents:**
+
+Use escalating directive strength to communicate priority:
+
+- **"Recommended"** - Nice to have, best practice
+- **"You should"** - Normal priority, follow unless you have good reason
+- **"IMPORTANT: You MUST"** - High priority, will cause issues if skipped
+- **"CRITICAL: If you don't X, STOP"** - Blocking requirement, do not proceed without doing X
+
+**Examples:**
+```markdown
+Recommended: Use type hints in Python code
+You should check tests pass before committing
+IMPORTANT: You MUST read jj-howto.md when working with version control
+CRITICAL: If you haven't read ~/AGENTS.global.md, STOP and read it now
+```
+
+**Applies to these instruction files:**
+- `AGENTS.md` (committed or private)
+- `CLAUDE.md` (usually symlink to AGENTS.md)
+- `AGENTS.local.md` (private notes)
+- `AGENTS.global.md` (global conventions)
+- `THIS_BRANCH.md` (branch-specific context)
+
+---
+
 ## Common Patterns
 
 ### Adding a new howto file
