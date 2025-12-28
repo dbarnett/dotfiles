@@ -1,0 +1,223 @@
+#!/usr/bin/env python3
+"""
+agents-fuzzy-edit-args - Fix Edit tool arguments by re-reading actual file
+
+Works around Read tool indentation bugs. Takes the old_string and new_string
+you'd normally pass to Edit tool, re-reads the actual file to find the correct
+old_string with proper indentation, and outputs corrected arguments.
+
+This is informational only - it doesn't edit files. Use the corrected args
+with the Edit tool to get interactive approval.
+
+Usage:
+  agents-fuzzy-edit-args --file PATH --old 'approximate old text' --new 'new text'
+
+Output (JSON):
+  {"old_string": "corrected text", "new_string": "new text"}
+
+Exit codes:
+  0 = Found match, corrected args in stdout
+  1 = No match found or error
+"""
+
+import argparse
+import difflib
+import json
+import re
+import sys
+from pathlib import Path
+from typing import Optional, Tuple
+
+
+def read_file(path: Path) -> str:
+    """Read file preserving exact bytes/encoding."""
+    with open(path, 'r', encoding='utf-8') as f:
+        return f.read()
+
+
+def normalize_whitespace(text: str) -> str:
+    """Normalize whitespace for fuzzy matching."""
+    # Convert tabs to 4 spaces for comparison
+    text = text.replace('\t', '    ')
+    # Normalize line endings
+    text = text.replace('\r\n', '\n')
+    return text
+
+
+def fuzzy_find_exact_match(content: str, target: str, threshold: float = 0.8) -> Optional[str]:
+    """
+    Find closest match to target in content, return the EXACT text from content.
+    Returns None if no good match found.
+
+    This preserves the actual indentation from the file, fixing what Read tool
+    showed incorrectly.
+    """
+    content_norm = normalize_whitespace(content)
+    target_norm = normalize_whitespace(target)
+
+    # Try exact match first (normalized)
+    if target_norm in content_norm:
+        start = content_norm.index(target_norm)
+        end = start + len(target_norm)
+
+        # Map back to original content positions (approximately)
+        # This is tricky because normalization changed lengths
+        # We'll search for the actual content around this position
+
+        # For now, simple approach: find in normalized, extract from original
+        # Count newlines to find line range
+        lines_before = content_norm[:start].count('\n')
+        lines_in_match = target_norm.count('\n')
+
+        content_lines = content.splitlines(keepends=True)
+        matched_lines = content_lines[lines_before:lines_before + lines_in_match + 1]
+
+        exact_match = ''.join(matched_lines)
+
+        # Verify this is actually close to our target
+        if difflib.SequenceMatcher(None, normalize_whitespace(exact_match), target_norm).ratio() >= threshold:
+            return exact_match
+
+    # Fall back to fuzzy line-by-line matching
+    content_lines = content.splitlines(keepends=True)
+    target_lines = target.splitlines(keepends=False)
+
+    if not target_lines:
+        return None
+
+    best_match_lines = None
+    best_ratio = 0.0
+
+    # Slide a window over content looking for best match
+    for i in range(len(content_lines) - len(target_lines) + 1):
+        candidate_lines = content_lines[i:i + len(target_lines)]
+        candidate_text = ''.join(candidate_lines)
+
+        # Compare normalized versions
+        ratio = difflib.SequenceMatcher(
+            None,
+            normalize_whitespace(candidate_text),
+            target_norm
+        ).ratio()
+
+        if ratio > best_ratio and ratio >= threshold:
+            best_ratio = ratio
+            best_match_lines = candidate_lines
+
+    if best_match_lines:
+        # Return exact text from file, preserving actual indentation
+        exact_match = ''.join(best_match_lines)
+
+        # Trim trailing newline if target didn't have one
+        if not target.endswith('\n') and exact_match.endswith('\n'):
+            exact_match = exact_match.rstrip('\n')
+
+        print(f"Match confidence: {best_ratio:.1%}", file=sys.stderr)
+        return exact_match
+
+    return None
+
+
+def get_indentation(line: str) -> str:
+    """Extract leading whitespace from a line."""
+    match = re.match(r'^(\s*)', line)
+    return match.group(1) if match else ''
+
+
+def fix_new_string_indentation(old_exact: str, new_string: str) -> str:
+    """
+    Apply indentation from old_exact to new_string.
+
+    Preserves the indentation style (tabs/spaces) from the actual file.
+    """
+    old_lines = old_exact.splitlines()
+    new_lines = new_string.splitlines()
+
+    if not old_lines or not new_lines:
+        return new_string
+
+    # Get base indentation from first non-empty line of old text
+    base_indent = ''
+    for line in old_lines:
+        if line.strip():
+            base_indent = get_indentation(line)
+            break
+
+    # Apply base indentation to new lines
+    fixed_lines = []
+    for line in new_lines:
+        if line.strip():  # Non-empty line
+            # Remove any existing indentation, apply base indent
+            fixed_lines.append(base_indent + line.lstrip())
+        else:
+            fixed_lines.append(line)
+
+    result = '\n'.join(fixed_lines)
+
+    # Preserve trailing newline if old text had it
+    if old_exact.endswith('\n') and not result.endswith('\n'):
+        result += '\n'
+
+    return result
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Fix Edit tool arguments by re-reading actual file",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=__doc__
+    )
+
+    parser.add_argument('--file', required=True, type=Path,
+                       help='File path (same as Edit tool file_path)')
+    parser.add_argument('--old', required=True,
+                       help='Approximate old_string (from Read tool, possibly wrong indentation)')
+    parser.add_argument('--new', required=True,
+                       help='New string (replacement text)')
+    parser.add_argument('--json', action='store_true',
+                       help='Output as JSON (default: shell-eval format)')
+
+    args = parser.parse_args()
+
+    if not args.file.exists():
+        print(f"Error: File not found: {args.file}", file=sys.stderr)
+        return 1
+
+    try:
+        # Read actual file
+        content = read_file(args.file)
+
+        # Find exact match with correct indentation
+        old_exact = fuzzy_find_exact_match(content, args.old)
+
+        if old_exact is None:
+            print(f"Error: Could not find fuzzy match for old_string in {args.file}", file=sys.stderr)
+            print(f"Searched for (first 100 chars): {args.old[:100]!r}", file=sys.stderr)
+            return 1
+
+        # Fix indentation in new_string to match file style
+        new_fixed = fix_new_string_indentation(old_exact, args.new)
+
+        # Output corrected arguments
+        if args.json:
+            result = {
+                "old_string": old_exact,
+                "new_string": new_fixed
+            }
+            print(json.dumps(result, indent=2))
+        else:
+            # Shell-eval friendly format
+            print(f"OLD_STRING={json.dumps(old_exact)}")
+            print(f"NEW_STRING={json.dumps(new_fixed)}")
+
+        return 0
+
+    except Exception as e:
+        print(f"Error: {e}", file=sys.stderr)
+        import traceback
+        traceback.print_exc(file=sys.stderr)
+        return 1
+
+
+if __name__ == '__main__':
+    sys.exit(main())

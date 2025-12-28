@@ -3,7 +3,6 @@ AGENTS.md  # Note: AGENTS.global.md isn't ignored
 AGENTS.local.md
 CLAUDE.md
 *.code-workspace
-.claude/
 .env
 _dev/
 _dev/**
