@@ -126,37 +126,21 @@ def get_indentation(line: str) -> str:
 
 def fix_new_string_indentation(old_exact: str, new_string: str) -> str:
     """
-    Apply indentation from old_exact to new_string.
+    Return new_string unchanged.
 
-    Preserves the indentation style (tabs/spaces) from the actual file.
+    The tool's job is to fix old_string (which Read tool may have broken),
+    not to mess with new_string. User is responsible for providing new_string
+    with correct indentation.
+
+    Preserve trailing newline to match old_exact if needed.
     """
-    old_lines = old_exact.splitlines()
-    new_lines = new_string.splitlines()
+    result = new_string
 
-    if not old_lines or not new_lines:
-        return new_string
-
-    # Get base indentation from first non-empty line of old text
-    base_indent = ''
-    for line in old_lines:
-        if line.strip():
-            base_indent = get_indentation(line)
-            break
-
-    # Apply base indentation to new lines
-    fixed_lines = []
-    for line in new_lines:
-        if line.strip():  # Non-empty line
-            # Remove any existing indentation, apply base indent
-            fixed_lines.append(base_indent + line.lstrip())
-        else:
-            fixed_lines.append(line)
-
-    result = '\n'.join(fixed_lines)
-
-    # Preserve trailing newline if old text had it
+    # Preserve trailing newline behavior from old text
     if old_exact.endswith('\n') and not result.endswith('\n'):
         result += '\n'
+    elif not old_exact.endswith('\n') and result.endswith('\n'):
+        result = result.rstrip('\n')
 
     return result
 

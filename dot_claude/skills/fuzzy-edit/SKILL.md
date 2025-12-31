@@ -62,10 +62,9 @@ Edit(
 
 ### Location
 
-The utility is bundled with this skill at:
-- `~/.claude/skills/fuzzy-edit/scripts/agents-fuzzy-edit-args`
+The utility is installed at `~/.local/bin/agents-fuzzy-edit-args` (which is in PATH).
 
-### Usage
+Call it directly by name - no path needed:
 
 ```shell
 agents-fuzzy-edit-args --file PATH --old 'approximate old' --new 'replacement'
