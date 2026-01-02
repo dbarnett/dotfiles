@@ -5,6 +5,7 @@ dotfiles_profiling/
 dotfiles_profiling/**
 .local/bin/agents_project_init.sh
 .local/bin/agents_task_init.sh
+.claude/skills/fuzzy-edit/**
 
 # Old yadm template files
 .config/jj/config.toml##template
