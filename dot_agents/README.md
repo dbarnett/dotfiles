@@ -13,7 +13,6 @@ This directory contains detailed guides that supplement `~/AGENTS.global.md` wit
 ### Howto Guides
 
 - **`jj-howto.md`** - Jujutsu (jj) version control commands, workflows, and concepts
-- **`git-howto.md`** - Git workflows and conventions (when not using jj)
 - **`chezmoi-howto.md`** - Dotfiles management with chezmoi
 - **`agents-files-howto.md`** - Guidelines for creating/modifying AGENTS.md files and organizing this directory
 - **`configuring-mcp-tools.md`** - MCP server setup and usage patterns

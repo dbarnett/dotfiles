@@ -39,7 +39,7 @@ This guide explains how to create, organize, and maintain AGENTS.md and ~/.agent
 ### 3. File organization patterns
 
 **Directory structure:**
-- `~/.agents/X-howto.md` - How-to guides (jj-howto, git-howto, mcp-project-overrides, agents-files-howto)
+- `~/.agents/X-howto.md` - How-to guides (jj-howto, mcp-project-overrides, agents-files-howto)
 - `~/.agents/rules/X.md` - Rules and conventions (shell-scripts, testing, branch-metadata, obsidian)
 
 **Content distinction:**
