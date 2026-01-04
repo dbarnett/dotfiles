@@ -7,7 +7,6 @@
 **Active issues to fix:**
 1. ⚠️ **Icon rendering broken** - All waybar icons show as blanks/text instead of icons
 2. ❓ **HyDE module override mechanism unclear** - Don't know how to properly override `~/.local/share` modules
-3. 📝 **~/dotfiles/ cruft** - Old directory needs consolidation with yadm worktree
 
 **Key context:**
 - Waybar appearance: `[3% 60%] [deactivated 22:49] ... [74% wlan0 40%]` ← should have icons, not text/blanks
@@ -117,48 +116,35 @@ To customize a module:
 
 ## Known Issues & Fixes
 
-### Issue: Dunst vs Swaync Conflict
-
+### Issue: Notification Center Configuration
 > **✅ PORTABLE:** This is a general Linux desktop issue, not HyDE-specific.
 
-**Problem:** Dunst auto-starts via DBus activation, preventing swaync from running.
+**Status:** ✅ **RESOLVED** - Swaync now running correctly
 
-**Solution Applied:**
-```shell
-# Masked systemd service
-systemctl --user mask dunst.service
+**Fix Applied:** Swaync configured in hyprland.conf variables with dunst properly masked via DBus.
 
-# Masked DBus activation
-ln -sf /dev/null ~/.local/share/dbus-1/services/org.knopwob.dunst.service
-```
+### Issue: Hyprland Configuration Cleanup
 
-**Verify swaync is running:**
-```shell
-ps aux | grep "[s]waync"
-busctl --user list | grep Notifications
-```
+**Problem:** Previously added invalid windowrule parameters.
 
-### Issue: Hyprland Window Rule Errors
+**Solution:** Cleaned up window rules to use only valid Hyprland syntax.
 
-**Problem:** Added invalid `urgent` parameter to windowrulev2 (doesn't exist in Hyprland).
+### Issue: Waybar Icon Rendering
+> **❓ ROOT CAUSE:** May be HyDE-specific (early startup timing) or general waybar/font issue.
 
-**Solution:** Removed the broken rule. Web notification click-to-focus is a known Wayland limitation.
+**Current Symptoms:**
+- Battery shows "74%" with blank space instead of battery icon
+- Some modules show literal text instead of icons
+- Network/Bluetooth: Some icons work, others show blank spaces
+- Icons verified present in both HyDE defaults and custom configs
 
-### Issue: Module Overrides Not Working (2025-11-30)
+**Investigation Status:**
+- Font services: JetBrainsMono Nerd Font installed and detected
+- Icons present in configs: Verified with hexdump
+- Issue affects both Nerd Font glyphs and Unicode emojis
+- Similar behavior across different HyDE versions
 
-> **🚨 HyDE-SPECIFIC:** This is caused by HyDE's auto-generation system.
-
-**Problem:** Edited modules in `~/.config/waybar/modules/` but changes not appearing.
-
-**Root cause:** HyDE's `hyde-shell waybar` scans BOTH `~/.config` and `~/.local/share` directories and includes everything in `includes.json`. When a module exists in both locations, the **last loaded wins** (system default overrides custom).
-
-**Solution (INCORRECT - see below):** ~~Remove system defaults~~ This was wrong - fighting HyDE's design.
-
-**CRITICAL LESSON LEARNED:** HyDE's `waybar.py` intentionally scans BOTH directories. The system files in `~/.local/share` are NOT managed by packages - they're copied from `~/HyDE/Configs/` during installation. Deleting them fights HyDE's architecture.
-
-**Proper override mechanism:** UNKNOWN - need to investigate how HyDE handles duplicate module definitions (JSON merging? last-wins? key-level override?)
-
-**Current state:** Both copies exist again (restored from `~/HyDE/Configs/.local/share/waybar/modules/`). Custom versions in `~/.config` may or may not be taking effect.
+**Likely Cause:** Waybar startup timing conflicts in HyDE's initialization sequence.
 
 ### Issue: Icons Not Rendering (2025-11-30) ⚠️ ACTIVE PROBLEM
 
@@ -193,19 +179,29 @@ busctl --user list | grep Notifications
 **Hypothesis:** Waybar starts before font services fully initialize, causing all icon rendering to fail. May be HyDE-specific if it launches waybar very early in startup.
 
 **Next steps:**
-- Test delayed waybar startup
-- Examine Pango font config for waybar process
-- Try on non-HyDE Hyprland setup to isolate
-- Check if HyDE's Unicode escape format works better than direct UTF-8
+- [ ] Choose migration path (manual vs ML4W vs stay with HyDE)
+- [ ] Test waybar configuration in chosen environment
+- [ ] Verify all custom modules work correctly after migration
 
-## Next Steps / TODO
+## Migration Decision Framework
 
-- [ ] Add `custom/keyboard` to HyDE's waybar layout config
-- [ ] Configure swaync appearance (currently using default with large bell icon)
-- [ ] Investigate HyDE config.ctl system for permanent waybar layout changes
-- [ ] Fix notification click behavior (currently shows kitty terminal popup)
-- [ ] Configure wallbash to use `--vibrant` profile for better color contrast
-- [ ] Remove/configure hidden waybar modules (custom/wallchange, custom/theme, etc.)
+**Key considerations for your choice:**
+- **Working icons:** Primary issue to resolve
+- **Customization ease:** How much framework fighting you'll tolerate  
+- **Learning curve:** Initial setup vs long-term maintenance
+- **Flexibility:** Ability to migrate between setups in future
+
+## Current Desktop Status
+
+**Working correctly:**
+- ✅ Notification center (swaync)
+- ✅ Hyprland window rules
+- ✅ Custom scripts and fonts
+- ✅ Dunst properly masked
+
+**Needs resolution:**
+- ❌ Waybar icon rendering
+- ❓ Module override clarity (HyDE-specific)
 
 ## HyDE Color System (Wallbash)
 
@@ -250,42 +246,6 @@ fc-match "JetBrainsMono Nerd Font"
 fc-list | grep -i nerd
 ```
 
-## Dotfiles Workflow
-
-**Repository:** `~/.local/share/yadm/repo.git` (bare repo managed by yadm)
-
-**Worktrees:**
-- `$HOME` (main branch) - Live environment
-- `~/.dotfiles/` (staging branch) - Safe editing environment (THIS directory where Claude edits)
-
-**Editing workflow:**
-1. Edit files in `~/.dotfiles/` (staging worktree) OR directly in `$HOME` paths
-2. Use `yadm add <file>` to stage changes
-3. Use `yadm commit` to commit
-4. If edited in staging: merge `staging → main` to apply to live environment
-
-**IMPORTANT:** Prefer editing files directly in their real `$HOME` paths and using yadm to commit. The staging worktree is for safety when unsure, but creates sync complexity.
-
-**Known issue:** `~/dotfiles/` exists - likely old cruft from before yadm migration. Need to investigate and consolidate.
-
-## Files Modified in Dotfiles (yadm status)
-
-**Staged (ready to commit):**
-- `~/.config/waybar/modules/battery.jsonc`
-- `~/.config/waybar/modules/custom-keyboard.jsonc`
-- `~/.config/waybar/modules/hyprland-language.jsonc`
-- `~/.config/waybar/modules/idle_inhibitor.jsonc`
-- `~/.config/waybar/modules/pulseaudio#microphone.jsonc`
-
-**Modified (staged):**
-- `~/.config/desktop.md` - This documentation file
-
-**Previously committed:**
-- `~/.config/hypr/windowrules.conf` - Hyprland window rules
-- `~/.local/bin/waybar-keyboard-layout` - Custom keyboard layout script
-- `~/.local/share/dbus-1/services/org.knopwob.dunst.service` - Dunst DBus mask
-
-**Note:** The waybar module files may not be overriding HyDE's system defaults correctly - override mechanism still unclear.
 
 ## References
 
