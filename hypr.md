@@ -1,4 +1,4 @@
-# Desktop Environment Configuration
+# Hyprland Desktop Environment Configuration
 
 **Last updated:** 2025-11-30
 

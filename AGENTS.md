@@ -393,7 +393,7 @@ gh issue list --repo dbarnett/dotfiles -l ai-agent  # AI-relevant issues only
 
 FIXME: Too much detail that belongs in README.md
 
-**📄 IMPORTANT: See `~/.config/desktop.md` for detailed HyDE setup documentation**
+**📄 IMPORTANT: See `~/hypr.md` for detailed HyDE setup documentation**
 
 That file contains:
 - Complete HyDE configuration system explanation

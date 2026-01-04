@@ -105,7 +105,7 @@ On Arch Linux, this setup includes [HyDE](https://github.com/prasanthrangan/HyDE
 
 HyDE configs are located in `~/.config/hypr/` and `~/.config/hyde/`.
 
-See [#2](https://github.com/dbarnett/dotfiles/issues/2) for known issues and configuration details.
+See details in `~/hypr.md`.
 
 ### 🔧 Configuration architecture
 
