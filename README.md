@@ -281,26 +281,3 @@ chmod g+w -R /usr/local
 ```
 
 and check paths and user has groups admin and staff.
-
-### For i3 (legacy)
-
-**Note**: This section is legacy - currently using Hyprland instead of i3.
-
-Kill ugly dunst notifications:
-```sh
-$ sudo apt install notify-osd
-$ sudo apt purge dunst
-```
-
-Tolerable launcher:
-```sh
-$ sudo apt remove suckless-tools
-$ sudo apt install rofi
-$ sudo ln -s /usr/bin/rofi /usr/local/bin/dmenu
-```
-
-Prevent weird Nautilus desktop window
-(https://faq.i3wm.org/question/1/how-can-i-get-rid-of-the-nautilus-desktop-window.1.html).
-```sh
-$ gsettings set org.gnome.desktop.background show-desktop-icons false
-```

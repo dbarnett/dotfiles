@@ -1,21 +1,5 @@
 # Hyprland Desktop Environment Configuration
 
-**Last updated:** 2025-11-30
-
-## 🚀 Quick Start for New Claude Sessions
-
-**Active issues to fix:**
-1. ⚠️ **Icon rendering broken** - All waybar icons show as blanks/text instead of icons
-2. ❓ **HyDE module override mechanism unclear** - Don't know how to properly override `~/.local/share` modules
-
-**Key context:**
-- Waybar appearance: `[3% 60%] [deactivated 22:49] ... [74% wlan0 40%]` ← should have icons, not text/blanks
-- HyDE scans BOTH `~/.config/waybar/modules/` and `~/.local/share/waybar/modules/`
-- System files in `~/.local/share` come from `~/HyDE/Configs/`, not packages
-- Edit files in real `$HOME` paths, commit with `yadm add` + `yadm commit`
-
-**Jump to:** [Icon rendering issue](#issue-icons-not-rendering-2025-11-30--active-problem) | [Module override problem](#issue-module-overrides-not-working-2025-11-30) | [HyDE config system](#hyde-configuration-system)
-
 ## Overview
 
 Desktop setup using Hyprland via the HyDE (Hyprland Desktop Environment) framework on Arch Linux.
@@ -116,12 +100,8 @@ To customize a module:
 
 ## Known Issues & Fixes
 
-### Issue: Notification Center Configuration
-> **✅ PORTABLE:** This is a general Linux desktop issue, not HyDE-specific.
-
-**Status:** ✅ **RESOLVED** - Swaync now running correctly
-
-**Fix Applied:** Swaync configured in hyprland.conf variables with dunst properly masked via DBus.
+- [#3](https://github.com/dbarnett/dotfiles/issues/3) - waybar missing icons and rich content
+- (FIXED) [#2](https://github.com/dbarnett/dotfiles/issues/2) - wrong notification center (kept starting dunst vs swaync)
 
 ### Issue: Hyprland Configuration Cleanup
 
@@ -146,7 +126,7 @@ To customize a module:
 
 **Likely Cause:** Waybar startup timing conflicts in HyDE's initialization sequence.
 
-### Issue: Icons Not Rendering (2025-11-30) ⚠️ ACTIVE PROBLEM
+### Issue: Icons Not Rendering (#3) ⚠️ ACTIVE PROBLEM
 
 > **❓ UNCLEAR:** May be HyDE-specific (early startup timing) or general waybar/font issue.
 
@@ -154,34 +134,20 @@ To customize a module:
 ```
 [3% 60%] [deactivated 22:49]  [1 2 3 claude ~/.dotfiles]  [74% wlan0 40% 40%] [🛜 B 62%] [  ] [  ]
 ```
-- Battery: "74%" with blank space instead of battery icon
-- idle_inhibitor: literal text "deactivated" instead of caffeine icon
+
+**Current symptoms:**
+- Battery shows "74%" with blank space instead of battery icon
+- idle_inhibitor shows literal text "deactivated" instead of caffeine icon  
 - Network/Bluetooth: Some icons work (🛜 wifi, B for bluetooth glyph)
 - Other modules: Empty boxes/blanks where icons should be
 
-**Symptoms:**
-- Battery shows "74%" but no battery icon (blank space before percentage)
-- idle_inhibitor shows literal text "deactivated" instead of caffeine icon
-- Even Unicode emojis (☕ 💤) fail to render when tested
-- Nerd Font icons in config files (verified present with `cat -A`, hexdump)
+**Investigation findings:**
+- Font services: JetBrainsMono Nerd Font installed and detected
+- Icons verified present in both HyDE defaults and custom configs  
+- Affects both Nerd Font glyphs and Unicode emojis
+- Issue persists across different HyDE versions
 
-**Investigation:**
-- JetBrainsMono Nerd Font installed and detected by fontconfig
-- Font file: `~/.local/share/fonts/JetBrains/JetBrainsMonoNerdFont-Regular.ttf`
-- Icons ARE in both HyDE's defaults and our custom configs
-- Waybar has correct libraries (pango, cairo, fontconfig)
-- Standard emojis also fail → not just Nerd Font private-use-area glyphs
-
-**HyDE's original configs use Unicode escapes:**
-- `idle_inhibitor.jsonc`: `\udb80\udd76` (activated), `\udb81\udeca` (deactivated)
-- These are Nerd Font Material Design Icons in UTF-16 surrogate pair format
-
-**Hypothesis:** Waybar starts before font services fully initialize, causing all icon rendering to fail. May be HyDE-specific if it launches waybar very early in startup.
-
-**Next steps:**
-- [ ] Choose migration path (manual vs ML4W vs stay with HyDE)
-- [ ] Test waybar configuration in chosen environment
-- [ ] Verify all custom modules work correctly after migration
+**Likely cause:** Waybar startup timing conflicts in HyDE's initialization sequence.
 
 ## Migration Decision Framework
 
