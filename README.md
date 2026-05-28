@@ -21,6 +21,11 @@ This dotfiles config uses [chezmoi](https://www.chezmoi.io/) for templating and 
    brew install chezmoi age
    ```
 
+   **Arch Linux only:** Also install Nix (used alongside pacman for dev tools — see [Package management](#-package-management-arch-linux) below). Use the Determinate Systems installer; the official installer has quirks on Arch. After installing, symlink the fish integration:
+   ```sh
+   sudo ln -s /etc/profile.d/nix-daemon.fish /etc/fish/conf.d/nix-daemon.fish
+   ```
+
 2. **Set up age encryption key:**
 
    **First machine (generate new key):**
@@ -94,6 +99,23 @@ Or use chezmoi commands from anywhere:
 ```sh
 chezmoi edit ~/.bashrc  # Opens in editor, auto-applies on save
 chezmoi add ~/.new_config  # Track new file
+```
+
+## 📦 Package management (Arch Linux)
+
+Packages are split between **pacman/yay** (system-level) and **Nix** (dev tools). Nix is not used on macOS.
+
+| Tool | Manager | Reason |
+|------|---------|--------|
+| pandoc, shellcheck | Nix | Avoid Haskell rebuild cascade in pacman |
+| ruff, marksman | Nix | Dev tools, no system integration needed |
+| pipewire, qt6, bluez, etc. | pacman | System-integrated, must stay system-managed |
+| docker, networkmanager | pacman | System integration |
+
+**Updating:**
+```sh
+yay -Syu                   # system packages
+nix profile upgrade --all  # nix packages
 ```
 
 ## 🖥️ Desktop environment
