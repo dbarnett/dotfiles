@@ -48,8 +48,8 @@ if [ -d "$BUN_INSTALL/bin" ] ; then
   export PATH="$BUN_INSTALL/bin:$PATH"
 fi
 
-EDITOR=hx
-VISUAL=hx
+export EDITOR=hx
+export VISUAL=hx
 {{- if eq (or (index . "machine_profile") "personal") "work"}}
 
 # Work: Use pyenv for Python version management
