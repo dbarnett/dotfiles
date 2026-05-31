@@ -25,7 +25,6 @@ This file contains general preferences and conventions for AI coding assistants 
 - **`~/.agents/configuring-mcp-tools.md`** - **MUST read when MCP context usage is high** or when configuring MCP servers
 - **`~/.agents/rules/shell-scripts.md`** - **MUST read when writing/debugging shell scripts** - user runs fish shell, requires specific patterns
 - **`~/.agents/rules/testing.md`** - **MUST read when writing/reviewing tests**
-- **`~/.agents/rules/branch-metadata.md`** - **MUST read when starting branch work** or using THIS_BRANCH.md/check_this_branch.sh
 - **`~/.agents/rules/obsidian.md`** - **MUST read when working with Obsidian vault** (`~/.myvault`)
 
 **See also:**
@@ -162,13 +161,13 @@ echo "$output"
 - **`FIXME`** - MUST be resolved **BEFORE** publishing to version control
   - Use for broken code, temporary hacks, security issues, data corruption risks
   - Treat as blocking issues that make code not production-ready
-  - `check_this_branch.sh` will fail if any FIXME comments remain
+  - `agents-tool --task` will flag any FIXME comments as blocking
   - Either fix the issue or downgrade to TODO if it's acceptable to defer
 
 - **`TODO`** - Can be published, represents future work
   - Use for enhancements, optimizations, refactoring ideas
-  - `check_this_branch.sh` will list these for awareness but not fail
-  - Add to TODO list in THIS_BRANCH.md if in scope
+  - `agents-tool --task` will list these for awareness but not fail
+  - Add to open TODOs in WIP description if in scope
 
 ### Logging Patterns
 
@@ -322,12 +321,12 @@ Fixes: #issue-number (if applicable)
 ## ⚠️ Important Reminders
 
 1. **Run `agents-tool`** (on PATH) in new/unfamiliar projects to set up standard instructions
-2. **When starting branch work, run `agents-tool --task`** (on PATH) for THIS_BRANCH.md guidance
+2. **When starting branch work, run `agents-tool --task`** (on PATH) to scaffold/check WIP description
 3. **When working with version control in repos with `.jj/`, read `~/.agents/jj-howto.md`** for commands and workflows
 4. **Always use `jj` commands**, not `git` directly (except `jj git push/fetch`)
 5. **Use ````shell` not ````bash`** in markdown unless bash-specific features required
 6. **Avoid bashisms** (heredocs, process substitution, etc.) - user runs fish shell
-7. **FIXME = blocking, TODO = deferrable** - check_this_branch.sh enforces this
+7. **FIXME = blocking, TODO = deferrable** - `agents-tool --task` enforces this
 8. **When writing tests, read `~/.agents/rules/testing.md`** for detailed guidelines
 9. **When writing shell scripts, read `~/.agents/rules/shell-scripts.md`** for detailed guidelines
 10. **Update this file's timestamp** when making changes

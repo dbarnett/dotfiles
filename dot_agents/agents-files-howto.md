@@ -40,7 +40,7 @@ This guide explains how to create, organize, and maintain AGENTS.md and ~/.agent
 
 **Directory structure:**
 - `~/.agents/X-howto.md` - How-to guides (jj-howto, mcp-project-overrides, agents-files-howto)
-- `~/.agents/rules/X.md` - Rules and conventions (shell-scripts, testing, branch-metadata, obsidian)
+- `~/.agents/rules/X.md` - Rules and conventions (shell-scripts, testing, obsidian)
 
 **Content distinction:**
 - **Howtos:** Reference documentation, commands, workflows, step-by-step instructions
@@ -105,17 +105,21 @@ and workflows to separate howto file.
 - Use `---` separators between major sections
 - Include examples, not just prose
 
-### 8. Don't duplicate - reference
+### 8. Reference vs. pass-by-value for project rules
 
-**Avoid duplication:**
+**Within `~/.agents/`: reference, don't duplicate.**
 - If content exists in a howto file, reference it from AGENTS.global.md
-- Don't copy-paste between files
-- Keep single source of truth for each topic
+- Keep a single source of truth for each topic
 
-**Acceptable duplication:**
+**For project `.agents/rules/` files: pass-by-value is intentional.**
+Projects often adapt global rules with project-specific additions (language examples, codebase patterns, framework-specific guidance). In that case:
+- Copy relevant sections from `~/.agents/rules/X.md` into the project's `.agents/rules/X.md`
+- Add project-specific content below (do not intersperse — makes diffing easier)
+- Track sync state in AGENTS.local.md via a Derived Resources table (see below)
+
+**Acceptable duplication within `~/.agents/`:**
 - Quick reference examples in main file (2-3 lines)
 - Critical security warnings that should be seen in multiple places
-- Cross-references that add context
 
 ---
 
@@ -143,7 +147,6 @@ CRITICAL: If you haven't read ~/AGENTS.global.md, STOP and read it now
 - `CLAUDE.md` (usually symlink to AGENTS.md)
 - `AGENTS.local.md` (private notes)
 - `AGENTS.global.md` (global conventions)
-- `THIS_BRANCH.md` (branch-specific context)
 
 ---
 
@@ -211,6 +214,48 @@ EOF
 While `~/.agents/` files provide global guidance, individual projects need project-specific context:
 - Private projects: Use `AGENTS.local.md` or private `AGENTS.md` (gitignored or in `.git/info/exclude`)
 - Public projects: Use `AGENTS.local.md` (gitignored) for personal notes, public `AGENTS.md` for team conventions
+
+### Referencing vs. Copying Global Rules
+
+When bringing global `~/.agents/rules/` content into a project, pick one approach — never both:
+
+**Reference (point to the global file):**
+```markdown
+**IMPORTANT: You MUST read `~/.agents/rules/testing.md` when writing or reviewing tests.**
+```
+- One directive, no content copy
+- Agent reads the live global file; no staleness risk
+- Use when the global rules apply as-is with no project-specific additions
+
+**Copy (inline the content):**
+- Paste relevant sections into the project's `.agents/rules/X.md`
+- Adapt examples to the project's language/framework; drop irrelevant ones
+- Do NOT add "go read the source" instructions — the copy IS the instructions
+- Add a maintenance block at the bottom (not inline):
+
+```markdown
+<!-- Derived from: ~/.agents/rules/testing.md
+     Sections copied: Core Principles, Assertion Patterns, Test Doubles
+     Last synced: 2026-05-31
+     Recheck after: 2026-06-13
+     If past recheck date: diff source against this file, merge updates, extend date by 2w. -->
+```
+
+Or track in AGENTS.local.md as a table if multiple files need syncing:
+
+```markdown
+## Derived Resources
+
+| Destination | Source | Sections | Last synced | Recheck after |
+|---|---|---|---|---|
+| `.agents/rules/testing.md` | `~/.agents/rules/testing.md` | Core Principles, Assertion Patterns, Test Doubles | 2026-05-31 | **2026-06-13** |
+```
+
+Instruction at top of that section: "If today is past Recheck after: diff source against destination, merge updates, update Last synced, extend date by 2w."
+
+**Why not both:** mixing creates confusion — agents don't know which has the authoritative content, and the directive to "go read X" implies the copy isn't sufficient.
+
+---
 
 ### What to Include in Project-Specific Files
 

@@ -41,7 +41,7 @@ while [ $# -gt 0 ]; do
             printf "  • Creates/verifies AGENTS.md, AGENTS.local.md, CLAUDE.md\n"
             printf "  • Sets up .git/info/exclude for private files\n"
             printf "  • Warns when ~/AGENTS.global.md has been updated\n"
-            printf "  • With --task: Reviews current task context and sets up/validates branch metadata\n\n"
+            printf "  • With --task: Reviews current task context, scaffolds/validates WIP description\n\n"
             printf "${BOLD}For more info:${RESET}\n"
             printf "  See ~/.agents/agents-files-howto.md for detailed documentation\n"
             exit 0
@@ -187,7 +187,7 @@ run_project_mode() {
 
 ## 📋 Current Task Context
 
-**Active Focus:** [Brief note - reference bookmark/change ID, THIS_BRANCH.md, inline TODOs, docs/, issues]
+**Active Focus:** [Brief note - reference bookmark/change ID, WIP description, inline TODOs, docs/, issues]
 
 **Recent Changes:**
 - [$TODAY] [What you did - keep brief, link to commits/issues/docs where appropriate]
@@ -366,6 +366,16 @@ EOF
                     printf "If making new changes, consider: ${GREEN}jj new${RESET} to create a new change first.\n\n"
                 fi
             fi
+        elif [ -d .git ]; then
+            _editmsg_refresh=$(read_editmsg)
+            if [ -n "$_editmsg_refresh" ]; then
+                _first_line=$(printf "%s" "$_editmsg_refresh" | head -1)
+                check_wip_status "$_editmsg_refresh"
+                if [ "$HAS_WIP_PREFIX" = false ] && [ "$HAS_WIP_CONTENT" = false ]; then
+                    printf "${BLUE}ℹ️  Pending commit:${RESET} %s\n" "$_first_line"
+                    printf "   (Non-WIP — ready to commit, or update ${GREEN}.git/COMMIT_EDITMSG${RESET})\n\n"
+                fi
+            fi
         fi
 
         if [ -n "$GLOBAL_UPDATED" ]; then
@@ -483,8 +493,14 @@ check_wip_status() {
     fi
 }
 
+# Helper: Read .git/COMMIT_EDITMSG, stripping git comment lines and blank lines
+read_editmsg() {
+    if [ -f .git/COMMIT_EDITMSG ]; then
+        grep -v '^#' .git/COMMIT_EDITMSG | grep -v '^[[:space:]]*$'
+    fi
+}
+
 run_task_mode() {
-    # Dotfiles repos use jj describe instead of THIS_BRANCH.md
     if [ "$IS_DOTFILES" = true ]; then
         if ! command -v jj >/dev/null 2>&1; then
             printf "${YELLOW}Note: jj not available, skipping change validation${RESET}\n\n"
@@ -550,14 +566,6 @@ run_task_mode() {
         return
     fi
 
-    # TODO: Apply WIP detection logic to non-dotfiles repos (check THIS_BRANCH.md or jj description)
-
-    # Detect if files already exist
-    FILES_EXIST=false
-    if [ -f THIS_BRANCH.md ] && [ -f check_this_branch.sh ]; then
-        FILES_EXIST=true
-    fi
-
     # Get jj context if available
     CURRENT_CHANGE=""
     BOOKMARK_NAME=""
@@ -598,6 +606,19 @@ run_task_mode() {
         esac
     fi
 
+    # Trunk/base bookmarks are not feature bookmarks — treat as absent for task purposes
+    # "_" is a conventional merge-base bookmark, not a WIP feature branch
+    IS_TRUNK_BOOKMARK=false
+    case "$BOOKMARK_NAME" in
+        main|master|trunk|_) IS_TRUNK_BOOKMARK=true ;;
+    esac
+
+    # FEATURE_BOOKMARK: the bookmark to use for task/branch naming purposes
+    FEATURE_BOOKMARK=""
+    if [ -n "$BOOKMARK_NAME" ] && [ "$IS_TRUNK_BOOKMARK" = false ]; then
+        FEATURE_BOOKMARK="$BOOKMARK_NAME"
+    fi
+
     # If pushed bookmark exists AND @ doesn't have WIP bookmark, suggest creating one
     if [ "$FILES_EXIST" = false ] && [ -n "$PUSHED_BOOKMARK" ] && [ "$HAS_WIP_BOOKMARK" = false ]; then
         printf "
@@ -614,465 +635,236 @@ This signals intentional new work and will create branch metadata files.
         return
     fi
 
-    # === Handle "no clear task" case ===
-    # If no bookmark and no files exist, create tripwire setup
-    if [ "$FILES_EXIST" = false ] && [ -z "$BOOKMARK_NAME" ]; then
-        printf "
-${YELLOW}⚠️  No bookmark detected${RESET}
+    # === 0. Check/scaffold change description ===
+    if command -v jj >/dev/null 2>&1; then
+        CURRENT_DESC=$(jj log -r @ --no-graph -T 'description' 2>/dev/null || echo "")
+        CURRENT_FIRST=$(jj log -r @ --no-graph -T 'description.first_line()' 2>/dev/null || echo "")
 
-Creating tripwire check_this_branch.sh that will detect when you start making changes
-and prompt you to set up proper task tracking.
+        if [ -z "$CURRENT_DESC" ]; then
+            PARENT_DESC=$(jj log -r @- --no-graph -T 'description' 2>/dev/null || echo "")
+            PARENT_HAS_WIP=false
+            if echo "$PARENT_DESC" | grep -q "^## Scope"; then
+                PARENT_HAS_WIP=true
+            fi
 
-"
-
-        # Create tripwire check_this_branch.sh
-        cat > check_this_branch.sh <<'TRIPWIRE_EOF'
-#!/usr/bin/env sh
-# Tripwire: Detects when work starts and prompts for proper task setup
-
-set -e
-
-printf "=== Checking for changes ===\n\n"
-
-# Check if there are any uncommitted changes (excluding metadata files)
-if command -v jj >/dev/null 2>&1; then
-    # Get list of changed files, excluding the metadata files themselves
-    CHANGED_FILES=$(jj diff --name-only 2>/dev/null | grep -v '^check_this_branch\.sh$' | grep -v '^THIS_BRANCH\.md$' || true)
-
-    if [ -n "$CHANGED_FILES" ]; then
-        printf "❌ ERROR: You've started making changes but haven't set up task tracking!\n\n"
-        printf "🤖 AGENTS: You MUST do this NOW:\n\n"
-        printf "1. Create a bookmark for this task:\n"
-        printf "   jj bookmark create _your_task_name\n\n"
-        printf "2. Run agents-tool --task to set up THIS_BRANCH.md:\n"
-        printf "   agents-tool --task\n\n"
-        printf "3. Then run this script again to verify setup\n\n"
-        printf "Changes detected:\n"
-        printf "%s\n" "$CHANGED_FILES"
-        exit 1
-    else
-        printf "✅ No changes yet - you're good to explore\n\n"
-        printf "When you start making changes, this script will prompt you to set up\n"
-        printf "a bookmark and THIS_BRANCH.md for proper task tracking.\n"
-        exit 0
-    fi
-else
-    printf "⚠️  jj not available, skipping change detection\n"
-    exit 0
-fi
-TRIPWIRE_EOF
-        chmod +x check_this_branch.sh
-
-        printf "${GREEN}✅ Created tripwire check_this_branch.sh${RESET}
-
-${BOLD}🤖 AGENTS: Next steps:${RESET}
-   • Run ${GREEN}./check_this_branch.sh${RESET} before making any changes
-   • It will detect when you start work and prompt for proper setup
-   • Or if you know you're starting a task now, create a bookmark first:
-     ${GREEN}jj bookmark create _your_task_name${RESET}
-     Then run ${GREEN}agents-tool --task${RESET} again
-
-"
-        return
-    fi
-
-    # === 1. Create THIS_BRANCH.md ===
-    if [ "$FILES_EXIST" = false ]; then
-        printf "${BLUE}📝 Creating THIS_BRANCH.md...${RESET}\n"
-    fi
-
-    if [ -f THIS_BRANCH.md ]; then
-        if [ "$FILES_EXIST" = false ]; then
-            printf "   Already exists - skipping\n"
-        fi
-    else
-        # Determine branch name for template
-        BRANCH_NAME="${BOOKMARK_NAME:-<bookmark-name>}"
-        if [ -z "$BOOKMARK_NAME" ]; then
-            BRANCH_NAME="<bookmark-name or change description>"
-        fi
-
-        cat > THIS_BRANCH.md <<EOF
-# Branch: ${BRANCH_NAME}
-
-**Created:** $TODAY
-**Last Updated:** $TODAY
-**Change ID:** ${CURRENT_CHANGE:-<jj change-id>}
+            if [ "$PARENT_HAS_WIP" = true ]; then
+                printf "${BOLD}⚡ ACTION:${RESET} ${YELLOW}Parent change has WIP scope/TODOs but this child has no description.${RESET}\n"
+                printf "   Propagate relevant scope, or describe what's different: ${GREEN}jj describe${RESET}\n\n"
+                DESC_TEMPLATE="WIP: TODO - what's new/different in this change?
 
 ## Scope
+(Same as parent, or describe what's specific to this child change.)
+- TODO
 
-What changes are in scope for this branch/lineage?
-
-## Out of Scope
-
-What explicitly will NOT be done here?
-
-## How to Use check_this_branch.sh
-
-**When to run:**
-- Before each \`jj new\` (creating new change)
-- Before \`jj describe\` (updating change description)
-- Before \`jj git push\` (pushing bookmark)
-- After adding new files to the branch
-
-**What it checks:**
-- FIXME comments (blocking - MUST fix before publishing)
-- TODO comments (informational only)
-- Branch metadata files not included in changes
-
-**If it fails:**
-1. Read error messages carefully
-2. Fix FIXME comments or convert to TODO
-3. Re-run until it passes
-4. DO NOT push if check fails
-
-**Updating the file list:**
-- Current scope: Files matching your pattern(s)
-- Use globs in CHECK_FILES for cleaner, more maintainable lists:
-  \`CHECK_FILES=\$(echo src/feature/*.ts tests/*.test.ts docs/*.md)\`
-- If you start editing files outside this pattern, update CHECK_FILES
-- Keep CHECK_FILES as a static list - do NOT use dynamic VCS queries
-
-## TODO
-
-- [ ] Define scope and out-of-scope sections above
-- [ ] Update CHECK_FILES in check_this_branch.sh with relevant files
-- [ ] Run check_this_branch.sh to verify it works
-- [ ] Add project-specific checks to check_this_branch.sh as needed
-
-## Consolidation Plan
-
-**Checks to migrate to permanent project infrastructure:**
-- (Add checks here as they stabilize during branch work)
-- Example: SVG validation → Create \`scripts/validate-svgs.sh\`
-
-**Migration should happen:**
-- Throughout branch work when checks stabilize
-- Before publishing, ensure all useful checks have permanent homes
+## TODOs
+(Work remaining in this change specifically.)
+- [ ]
 
 ## Notes
+(Anything diverging from parent scope, decisions made here.)
 
-- (Add notes about decisions, discoveries, etc.)
+---
+⚡ ACTION: Fill in sections above now. Update as work evolves.
 
-## What is a "WIP Change"?
+🔚 WIP EXIT: Same as parent — move useful notes out, collapse to 2-5 lines."
+            else
+                DESC_TEMPLATE="WIP: TODO - what does this change accomplish?
 
-A WIP (Work In Progress) change is **not ready for review or publishing**. It may contain:
-- FIXME comments marking issues that MUST be fixed before publishing
-- TODO items still in progress
-- Verbose implementation notes and decision logs in change description
-- Experimental code or incomplete features
-- THIS_BRANCH.md and check_this_branch.sh files tracked in the change
+## Scope
+(What's changing: which files, features, or behaviors. Helps reviewers focus.)
+- TODO
 
-## Exit Checklist (transitioning WIP → Ready to Publish)
+## Out of Scope
+(What you're NOT doing here — prevents scope-creep questions.)
+- TODO
 
-**IMPORTANT:** Before deleting branch metadata files, ask user what context to preserve!
+## TODOs
+(Remaining work. Remove each item when complete.)
+- [ ]
 
-- [ ] All FIXME comments fixed or converted to TODO
-- [ ] All in-scope TODO items completed or moved to project docs/issues
-- [ ] Tests passing
-- [ ] Useful checks migrated to permanent project infrastructure
+## Notes
+(Decisions made, alternatives rejected, links to issues/PRs. Discoveries as you work.)
 
-**Interactive cleanup workflow:**
-1. Review THIS_BRANCH.md "Notes" section with user:
-   - What should go in final commit message?
-   - What should become GitHub issues for follow-up work?
-   - What should be added to project docs (README, architecture notes)?
-   - What can be discarded (temporary notes, resolved issues)?
+---
+⚡ ACTION: Fill in each section above now. Update as work evolves.
 
-2. After preserving context:
-   - Remove THIS_BRANCH.md from change: \`jj restore THIS_BRANCH.md\` or delete it
-   - Remove check_this_branch.sh from change: \`jj restore check_this_branch.sh\` or delete it
-   - Update change description: Remove "WIP:" prefix, condense to 10-15 lines
-   - Remove verbose implementation details from description, keep only what/why
-EOF
-        printf "   ${GREEN}✅ Created THIS_BRANCH.md${RESET}\n"
-    fi
-
-    # === 2. Create check_this_branch.sh ===
-    if [ "$FILES_EXIST" = false ]; then
-        printf "${BLUE}🔍 Creating check_this_branch.sh...${RESET}\n"
-    fi
-
-    if [ -f check_this_branch.sh ]; then
-        if [ "$FILES_EXIST" = false ]; then
-            printf "   Already exists - skipping\n"
-        fi
-    else
-        cat > check_this_branch.sh <<'SCRIPT_EOF'
-#!/usr/bin/env sh
-# Branch-specific checks - DO NOT COMMIT TO MAIN
-
-set -e
-
-ERRORS=0
-
-# Start timing
-START_TIME=$(python3 -c 'import time; print(int(time.time() * 1000))' 2>/dev/null || echo "0")
-
-printf "=== Branch Checks ===\n\n"
-
-# Get current change info
-if command -v jj >/dev/null 2>&1; then
-    CURRENT_ID=$(jj log -r @ --no-graph -T 'change_id.short(7)' 2>&1)
-    CURRENT_EXIT=$?
-    if [ $CURRENT_EXIT -ne 0 ]; then
-        printf "Current: ERROR - %s\n" "$CURRENT_ID" >&2
-    else
-        CURRENT_DESC=$(jj log -r @ --no-graph -T 'description.first_line()' 2>&1)
-        CURRENT_EMPTY=$(jj log -r @ --no-graph -T 'if(empty, " (empty)", "")' 2>&1)
-        printf "Current: %s%s - %s\n" "$CURRENT_ID" "$CURRENT_EMPTY" "$CURRENT_DESC"
-    fi
-
-    # Get parent change info
-    PARENT_ID=$(jj log -r @- --no-graph -T 'change_id.short(7)' 2>&1)
-    PARENT_EXIT=$?
-    if [ $PARENT_EXIT -ne 0 ]; then
-        printf "Parent:  ERROR - %s\n" "$PARENT_ID" >&2
-    else
-        PARENT_DESC=$(jj log -r @- --no-graph -T 'description.first_line()' 2>&1)
-        printf "Parent:  %s - %s\n" "$PARENT_ID" "$PARENT_DESC"
-    fi
-
-    # Show distance from main
-    DISTANCE=$(jj log -r '::@ ~ ::main' --no-graph -T '' 2>/dev/null | wc -l || echo "0")
-    if [ "$DISTANCE" -gt 0 ] 2>/dev/null; then
-        printf "Ahead:   main+%s\n" "$DISTANCE"
-    fi
-
-    # Show bookmark/branch name if set
-    BOOKMARK=$(jj log -r @ --no-graph -T 'bookmarks' 2>&1 || echo "")
-    if [ -n "$BOOKMARK" ] && [ "$BOOKMARK" != "(no bookmarks)" ]; then
-        printf "Branch:  %s\n" "$BOOKMARK"
-    fi
-    printf "\n"
-fi
-
-# STATIC FILE LIST - CRITICAL: Update this when scope changes!
-# DO NOT use dynamic VCS queries like $(jj diff --name-only)
-#
-# DEFAULT: Check all files - narrow down if getting out-of-scope results
-# Examples of narrowing:
-#   CHECK_FILES=$(echo src/feature/*.js tests/*.test.js)  # Specific dirs
-#   CHECK_FILES=$(echo posts/*.md public/images/*.svg)    # File types in dirs
-#   CHECK_FILES=$(echo *.py lib/**/*.py)                  # Pattern matching
-#   CHECK_FILES="src/main.ts src/utils.ts README.md"      # Explicit list
-CHECK_FILES=$(echo **/*)
-
-# Check branch metadata cleanup status
-printf "🔍 Checking branch metadata cleanup...\n"
-METADATA_IN_CHANGE=0
-if command -v jj >/dev/null 2>&1; then
-    # Check if any metadata files are tracked in current change
-    FOUND_FILES=$(jj file list -r @ -- check_this_branch.sh THIS_BRANCH.md THIS_GIT_BRANCH.md 2>/dev/null || echo "")
-    if [ -n "$FOUND_FILES" ]; then
-        for file in $FOUND_FILES; do
-            printf "   Found: %s\n" "$file"
-        done
-        METADATA_IN_CHANGE=1
-    fi
-fi
-
-if [ $METADATA_IN_CHANGE -eq 1 ]; then
-    printf "⚠️  This change is in WIP mode (includes branch metadata files)
-
-   WIP mode means this change is NOT ready for review/publishing.
-   Before publishing, you MUST:
-
-   1. Review THIS_BRANCH.md with user - ask what context to preserve:
-      • What goes in final commit message?
-      • What becomes GitHub issues for follow-up?
-      • What should be added to project docs?
-
-   2. After preserving context, clean up:
-      • Fix all FIXME comments (or convert to TODO if deferrable)
-      • Remove WIP: prefix from change description
-      • Remove branch metadata files from change
-
-   See THIS_BRANCH.md \"Exit Checklist\" for interactive cleanup workflow.
-
-"
-    ERRORS=$((ERRORS + 1))
-else
-    printf "✅ Branch metadata files excluded from change\n"
-fi
-printf "\n"
-
-# Check for FIXME comments (must be resolved before publishing)
-if [ -n "$CHECK_FILES" ]; then
-    printf "🔍 Scanning for FIXME comments...\n"
-    # Single grep across all files is more efficient
-    FIXME_RESULTS=$(grep -n "FIXME" $CHECK_FILES 2>/dev/null || true)
-
-    if [ -n "$FIXME_RESULTS" ]; then
-        printf "%s\n" "$FIXME_RESULTS"
-        printf "
-⚠️  Found FIXME comments - change is in WIP mode
-
-   WIP mode = not ready for publishing. FIXME comments mark blocking issues.
-
-   You MUST either:
-   • Fix the issues they mark (resolve the underlying problem), OR
-   • Convert to TODO if the issue is deferrable (not blocking)
-
-   Do NOT publish with unresolved FIXME comments.
-
-"
-        ERRORS=$((ERRORS + 1))
-    else
-        printf "✅ No FIXME comments found\n"
-    fi
-    printf "\n"
-fi
-
-# End timing
-if [ "$START_TIME" != "0" ]; then
-    END_TIME=$(python3 -c 'import time; print(int(time.time() * 1000))' 2>/dev/null || echo "$START_TIME")
-    ELAPSED_MS=$((END_TIME - START_TIME))
-    printf "Checks finished after %d.%03d seconds\n\n" $((ELAPSED_MS / 1000)) $((ELAPSED_MS % 1000))
-fi
-
-# Summary
-printf "=== Summary ===\n"
-if [ $ERRORS -gt 0 ]; then
-    printf "⚠️  Change is in WIP mode - %d item(s) blocking publish\n" "$ERRORS"
-    printf "\nWIP mode means NOT ready for review. See above for specific issues.\n"
-    printf "Refer to THIS_BRANCH.md \"Exit Checklist\" for cleanup workflow.\n"
-    exit 1
-else
-    printf "✅ All checks passed - ready to remove branch metadata and publish\n"
-    printf "\nNext: Review THIS_BRANCH.md \"Exit Checklist\" to preserve important context\n"
-    printf "before deleting branch metadata files.\n"
-    exit 0
-fi
-SCRIPT_EOF
-        chmod +x check_this_branch.sh
-        printf "   ${GREEN}✅ Created check_this_branch.sh${RESET}\n"
-        printf "   ${YELLOW}⚠️  AGENTS: You MUST update CHECK_FILES in check_this_branch.sh!${RESET}\n"
-        printf "   ${YELLOW}   Default is **/* (all files). Narrow to branch scope if needed.${RESET}\n"
-    fi
-
-    # === Final instructions ===
-
-    # When files already exist, give minimal output
-    if [ "$FILES_EXIST" = true ]; then
-        printf "\n${BOLD}${GREEN}✅ Setup complete!${RESET}\n\n"
-        printf "${BLUE}Files already existed - no changes made${RESET}\n\n"
-
-        # Show current repository state
-        if command -v jj >/dev/null 2>&1; then
-            printf "${BOLD}Current repository state:${RESET}\n\n"
-
-            # Current change
-            CURRENT_ID=$(jj log -r @ --no-graph -T 'change_id.short(7)' 2>/dev/null || echo "")
-            if [ -n "$CURRENT_ID" ]; then
-                CURRENT_DESC=$(jj log -r @ --no-graph -T 'description.first_line()' 2>/dev/null || echo "(no description)")
-                CURRENT_EMPTY=$(jj log -r @ --no-graph -T 'if(empty, " (empty)", "")' 2>/dev/null || echo "")
-                CURRENT_BOOKMARKS=$(jj log -r @ --no-graph -T 'bookmarks ++ "\n"' 2>/dev/null | head -1 || echo "")
-                printf "Current: %s%s - %s" "$CURRENT_ID" "$CURRENT_EMPTY" "$CURRENT_DESC"
-                if [ -n "$CURRENT_BOOKMARKS" ]; then
-                    printf " [%s]" "$CURRENT_BOOKMARKS"
-                fi
-                printf "\n"
-
-                # Parent change
-                PARENT_ID=$(jj log -r @- --no-graph -T 'change_id.short(7)' 2>/dev/null || echo "")
-                if [ -n "$PARENT_ID" ]; then
-                    PARENT_DESC=$(jj log -r @- --no-graph -T 'description.first_line()' 2>/dev/null || echo "(no description)")
-                    PARENT_BOOKMARKS=$(jj log -r @- --no-graph -T 'bookmarks ++ "\n"' 2>/dev/null | head -1 || echo "")
-                    printf "Parent:  %s - %s" "$PARENT_ID" "$PARENT_DESC"
-                    if [ -n "$PARENT_BOOKMARKS" ]; then
-                        printf " [%s]" "$PARENT_BOOKMARKS"
-                    fi
-                    printf "\n"
-                fi
+🔚 WIP EXIT (before removing WIP: prefix):
+   For each section — move useful notes to code comments, docs/, or issues. Delete the rest.
+   Final description: 2-5 lines, no sections, no TODOs, no WIP content."
             fi
-            printf "\n"
-        fi
-
-        # Show bookmark guidance if we found one
-        if [ -n "$BOOKMARK_NAME" ]; then
-            printf "${BOLD}Found bookmark: ${GREEN}%s${RESET}\n\n" "$BOOKMARK_NAME"
-            printf "Review THIS_BRANCH.md and verify:\n"
-            printf "  • The scope matches your current focus\n"
-            printf "  • The bookmark name aligns with the work described\n\n"
-            printf "If this bookmark is ${BOLD}NOT${RESET} your current focus:\n"
-            printf "  • Check if THIS_BRANCH.md is fully committed before @\n"
-            printf "  • If so, delete THIS_BRANCH.md and check_this_branch.sh\n"
-            printf "  • Then rerun ${GREEN}agents-tool --task${RESET} to start fresh\n"
-            printf "\n"
-        fi
-
-        # Simple next step
-        printf "${BOLD}========================================${RESET}\n"
-        printf "${BOLD}📌 Next Step${RESET}\n"
-        printf "${BOLD}========================================${RESET}\n"
-        printf "\n"
-        printf "Run ${GREEN}./check_this_branch.sh${RESET} and follow any instructions it provides.\n"
-        printf "\n"
-        return
-    fi
-
-    # First-time setup - show more detail
-    printf "\n${BOLD}${GREEN}✅ Setup complete!${RESET}\n\n"
-    printf "${BOLD}📁 Files created:${RESET}\n"
-    ls -lh THIS_BRANCH.md check_this_branch.sh | awk '{print "   " $0}'
-    printf "\n"
-
-    # Check bookmark status and provide guidance
-    if command -v jj >/dev/null 2>&1; then
-        if [ -n "$BOOKMARK_NAME" ]; then
-            printf "\n"
-            printf "${BLUE}${BOLD}========================================${RESET}\n"
-            printf "${BLUE}${BOLD}📌 CURRENT BOOKMARK: ${GREEN}%s${RESET}\n" "$BOOKMARK_NAME"
-            printf "${BLUE}${BOLD}========================================${RESET}\n"
-            printf "\n"
-            if [ "$BOOKMARK_LOCATION" = "ancestor" ]; then
-                printf "Note: Bookmark is on an ancestor change, not ${BOLD}@${RESET}\n"
-                printf "      This is normal if ${BOLD}@${RESET} is an empty change\n\n"
+            if jj describe -m "$DESC_TEMPLATE" 2>/dev/null; then
+                printf "${BOLD}⚡ ACTION:${RESET} WIP skeleton set. Current description:\n"
+                printf "========================================\n"
+                printf "%s\n" "$DESC_TEMPLATE"
+                printf "========================================\n"
+                printf "Fill in each TODO section now: ${GREEN}jj describe${RESET}\n"
+                printf "To review description later: ${GREEN}jj show --no-patch${RESET}\n\n"
+            else
+                printf "${BOLD}⚡ ACTION:${RESET} ${YELLOW}Could not set description. Run ${GREEN}jj describe${RESET} to add WIP skeleton manually.\n\n"
             fi
-            printf "${BOLD}Is this bookmark still your current focus?${RESET}\n\n"
-            printf "  • If YES: Continue working and update THIS_BRANCH.md\n"
-            printf "  • If NO:  Ask user whether to:\n"
-            printf "            1. Create new bookmark: ${GREEN}jj bookmark create _new_task${RESET}\n"
-            printf "            2. Switch to different task: ${GREEN}jj edit <change>${RESET}\n\n"
-            printf "Bookmark naming convention:\n"
-            printf "  • Prefix with ${BOLD}_${RESET} for WIP: ${BLUE}_fix_auth_bug${RESET}, ${BLUE}_add_feature${RESET}\n"
-            printf "\n"
+        elif echo "$CURRENT_FIRST" | grep -q "^WIP:"; then
+            printf "${BLUE}📋${RESET} ${GREEN}✓${RESET} %s\n   Review: ${GREEN}jj show --no-patch${RESET}   Update if stale: ${GREEN}jj describe${RESET}\n\n" "$CURRENT_FIRST"
         else
+            printf "${BOLD}⚡ ACTION:${RESET} ${YELLOW}No WIP: prefix:${RESET} %s\n   Add WIP: prefix + fill scope/TODOs: ${GREEN}jj describe${RESET}\n\n" "$CURRENT_FIRST"
+        fi
+
+        # === Inline WIP checks (description-driven) ===
+        CURRENT_FIRST_CHECK=$(jj log -r @ --no-graph -T 'description.first_line()' 2>/dev/null || echo "")
+        if echo "$CURRENT_FIRST_CHECK" | grep -q "^WIP:"; then
+            printf "${BLUE}--- WIP Checks ---${RESET}\n\n"
+            WIP_ERRORS=0
+
+            CHANGED_FILES=$(jj diff --name-only 2>/dev/null || echo "")
+            if [ -n "$CHANGED_FILES" ]; then
+                FIXME_RESULTS=$(printf "%s" "$CHANGED_FILES" | xargs grep -n "FIXME" 2>/dev/null || true)
+                if [ -n "$FIXME_RESULTS" ]; then
+                    printf "${RED}FIXMEs in changed files:${RESET}\n%s\n\n" "$FIXME_RESULTS"
+                    printf "${BOLD}⚡ ACTION:${RESET} Fix or convert FIXMEs to TODO before pushing.\n\n"
+                    WIP_ERRORS=$((WIP_ERRORS + 1))
+                else
+                    printf "${GREEN}✅ No FIXMEs in changed files${RESET}\n"
+                fi
+            else
+                printf "${BLUE}ℹ️  No files changed in this change yet${RESET}\n"
+            fi
+
+            CURRENT_DESC_CHECK=$(jj log -r @ --no-graph -T 'description' 2>/dev/null || echo "")
+            TODO_COUNT=$(printf "%s" "$CURRENT_DESC_CHECK" | grep -c "^- \[ \]" 2>/dev/null || true)
+            if [ "${TODO_COUNT:-0}" -gt 0 ]; then
+                printf "${YELLOW}📝 %d open TODO(s) in description${RESET}\n\n" "$TODO_COUNT"
+            else
+                printf "${GREEN}✅ No open TODOs in description${RESET}\n"
+            fi
+
+            if [ "${WIP_ERRORS:-0}" -gt 0 ]; then
+                printf "\n${YELLOW}⚠️  WIP — not ready to push (%d blocking issue(s) above)${RESET}\n\n" "$WIP_ERRORS"
+            else
+                printf "\n${GREEN}✅ WIP checks passed.${RESET} When done:\n"
+                printf "${BLUE}🔚 WIP EXIT: Move useful notes to code/docs/issues. Collapse description to 2-5 lines, remove WIP: prefix.${RESET}\n"
+            fi
             printf "\n"
-            printf "${YELLOW}${BOLD}========================================${RESET}\n"
-            printf "${YELLOW}${BOLD}⚠️  NO BOOKMARK FOUND${RESET}\n"
-            printf "${YELLOW}${BOLD}========================================${RESET}\n"
-            printf "\n"
-            printf "${BOLD}Recommended: Create a bookmark for this work${RESET}\n\n"
-            printf "    ${GREEN}jj bookmark create _describe_your_work_here${RESET}\n\n"
-            printf "Bookmark naming convention:\n"
-            printf "  • Prefix with ${BOLD}_${RESET} to indicate WIP\n"
-            printf "  • Use lowercase with underscores\n"
-            printf "  • Examples: ${BLUE}_fix_auth_bug${RESET}, ${BLUE}_add_dark_mode${RESET}, ${BLUE}_refactor_api${RESET}\n\n"
-            printf "After creating, update THIS_BRANCH.md with the bookmark name.\n"
+        fi
+    elif [ -d .git ]; then
+        CURRENT_DESC=$(read_editmsg)
+        CURRENT_FIRST=$(printf "%s" "$CURRENT_DESC" | head -1)
+
+        if [ -z "$CURRENT_DESC" ]; then
+            PARENT_DESC=$(git log -1 --format=%B HEAD 2>/dev/null || echo "")
+            PARENT_HAS_WIP=false
+            if echo "$PARENT_DESC" | grep -q "^## Scope"; then
+                PARENT_HAS_WIP=true
+            fi
+
+            if [ "$PARENT_HAS_WIP" = true ]; then
+                printf "${BOLD}⚡ ACTION:${RESET} ${YELLOW}HEAD commit has WIP scope/TODOs — propagate relevant scope, or describe what's different.${RESET}\n\n"
+                DESC_TEMPLATE="WIP: TODO - what's new/different in this commit?
+
+## Scope
+(Same as HEAD, or describe what's specific to this commit.)
+- TODO
+
+## TODOs
+(Work remaining in this commit specifically.)
+- [ ]
+
+## Notes
+(Anything diverging from HEAD scope, decisions made here.)
+
+---
+⚡ ACTION: Fill in sections above now. Update as work evolves.
+
+🔚 WIP EXIT: Same as HEAD — move useful notes out, collapse to 2-5 lines."
+            else
+                DESC_TEMPLATE="WIP: TODO - what does this commit accomplish?
+
+## Scope
+(What's changing: which files, features, or behaviors. Helps reviewers focus.)
+- TODO
+
+## Out of Scope
+(What you're NOT doing here — prevents scope-creep questions.)
+- TODO
+
+## TODOs
+(Remaining work. Remove each item when complete.)
+- [ ]
+
+## Notes
+(Decisions made, alternatives rejected, links to issues/PRs. Discoveries as you work.)
+
+---
+⚡ ACTION: Fill in each section above now. Update as work evolves.
+
+🔚 WIP EXIT (before committing):
+   For each section — move useful notes to code comments, docs/, or issues. Delete the rest.
+   Final message: 2-5 lines, no sections, no TODOs, no WIP content."
+            fi
+            printf '%s\n' "$DESC_TEMPLATE" > .git/COMMIT_EDITMSG
+            printf "${BOLD}⚡ ACTION:${RESET} WIP skeleton written to ${GREEN}.git/COMMIT_EDITMSG${RESET}. Current content:\n"
+            printf "========================================\n"
+            printf "%s\n" "$DESC_TEMPLATE"
+            printf "========================================\n"
+            printf "Fill in each TODO section now. Pre-populates ${GREEN}git commit${RESET} when ready.\n\n"
+
+        elif echo "$CURRENT_FIRST" | grep -q "^WIP:"; then
+            printf "${BLUE}📋${RESET} ${GREEN}✓${RESET} %s\n   Update if stale: edit ${GREEN}.git/COMMIT_EDITMSG${RESET}\n\n" "$CURRENT_FIRST"
+        else
+            printf "${BOLD}⚡ ACTION:${RESET} ${YELLOW}No WIP: prefix:${RESET} %s\n   Add WIP: prefix + fill scope/TODOs: edit ${GREEN}.git/COMMIT_EDITMSG${RESET}\n\n" "$CURRENT_FIRST"
+        fi
+
+        # === Inline WIP checks (git) ===
+        if echo "$CURRENT_FIRST" | grep -q "^WIP:"; then
+            printf "${BLUE}--- WIP Checks ---${RESET}\n\n"
+            WIP_ERRORS=0
+
+            CHANGED_FILES=$(git diff --name-only HEAD 2>/dev/null || echo "")
+            if [ -z "$CHANGED_FILES" ]; then
+                CHANGED_FILES=$(git diff --cached --name-only 2>/dev/null || echo "")
+            fi
+            if [ -n "$CHANGED_FILES" ]; then
+                if FIXME_RESULTS=$(printf "%s" "$CHANGED_FILES" | xargs grep -n "FIXME" 2>/dev/null); then
+                    printf "${RED}FIXMEs in changed files:${RESET}\n%s\n\n" "$FIXME_RESULTS"
+                    printf "${BOLD}⚡ ACTION:${RESET} Fix or convert FIXMEs to TODO before committing.\n\n"
+                    WIP_ERRORS=$((WIP_ERRORS + 1))
+                else
+                    printf "${GREEN}✅ No FIXMEs in changed files${RESET}\n"
+                fi
+            else
+                printf "${BLUE}ℹ️  No files changed yet${RESET}\n"
+            fi
+
+            TODO_COUNT=$(printf "%s" "$CURRENT_DESC" | grep "^- \[ \]" | wc -l)
+            if [ "${TODO_COUNT:-0}" -gt 0 ]; then
+                printf "${YELLOW}📝 %d open TODO(s) in commit message${RESET}\n\n" "$TODO_COUNT"
+            else
+                printf "${GREEN}✅ No open TODOs in commit message${RESET}\n"
+            fi
+
+            if [ "${WIP_ERRORS:-0}" -gt 0 ]; then
+                printf "\n${YELLOW}⚠️  WIP — not ready to commit (%d blocking issue(s) above)${RESET}\n\n" "$WIP_ERRORS"
+            else
+                printf "\n${GREEN}✅ WIP checks passed.${RESET} When done:\n"
+                printf "${BLUE}🔚 WIP EXIT: Move useful notes to code/docs/issues. Run git commit — .git/COMMIT_EDITMSG pre-populates. Collapse to 2-5 lines, remove WIP: prefix.${RESET}\n"
+            fi
             printf "\n"
         fi
     fi
 
-    # Next step instruction
-    printf "\n"
-    printf "${BOLD}========================================${RESET}\n"
-    printf "${BOLD}📌 Next Step${RESET}\n"
-    printf "${BOLD}========================================${RESET}\n"
-    printf "\n"
-    printf "Run ${GREEN}./check_this_branch.sh${RESET} and follow any instructions it provides.\n"
-    printf "\n"
+    printf "Re-run ${GREEN}agents-tool --task${RESET} at any time to recheck WIP status.\n\n"
 }
 
 # ============================================================================
 # MAIN
 # ============================================================================
 
+if [ "$TASK_MODE" = true ]; then
+    printf "${BOLD}=== agents-tool --task ===${RESET}\n"
+    printf "${YELLOW}⚠️  You MUST act on all items marked ${BOLD}⚡ ACTION${RESET}${YELLOW} in this output.${RESET}\n\n"
+fi
+
 run_project_mode
 
 if [ "$TASK_MODE" = true ]; then
-    printf "\n${BOLD}🔧 Task Mode${RESET}\n\n"
     run_task_mode
     printf "\n${GREEN}Done!${RESET} ${BLUE}(Script is idempotent - run as frequently as needed)${RESET}\n"
 fi

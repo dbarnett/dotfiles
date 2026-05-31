@@ -79,7 +79,6 @@ WHY: If you ignore those instructions you'll end up reading and editing complete
 
 **True Exceptions (safe for sensitive info):**
 - Only files in `.gitignore` or `.git/info/exclude` are truly untracked
-- `THIS_BRANCH.md` (designed to be removed before push)
 
 **Common Mistakes - AVOID THESE:**
 - `.chezmoiignore` files are TRACKED and PUBLIC - they only prevent copying to $HOME

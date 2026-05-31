@@ -23,7 +23,6 @@ Located in `rules/` subdirectory:
 
 - **`shell-scripts.md`** - Shell scripting best practices (POSIX compliance, avoid bashisms)
 - **`testing.md`** - Testing principles and patterns
-- **`branch-metadata.md`** - THIS_BRANCH.md and check_this_branch.sh conventions
 - **`obsidian.md`** - Working with Obsidian vault (`~/.myvault`)
 
 ---
@@ -39,7 +38,6 @@ When `~/AGENTS.global.md` or a project's `AGENTS.local.md` says **"you MUST read
 - Working with version control in a `.jj/` repo → Read `jj-howto.md`
 - Writing shell scripts → Read `rules/shell-scripts.md`
 - Writing tests → Read `rules/testing.md`
-- Starting branch work → Read `rules/branch-metadata.md`
 - Setting up AGENTS.md files → Read `agents-files-howto.md`
 
 ### For Humans

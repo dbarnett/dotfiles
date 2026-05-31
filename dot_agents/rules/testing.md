@@ -12,6 +12,44 @@
 
 ---
 
+## Assertion Patterns: Avoid Field-by-Field
+
+**Prefer asserting complete values over individual fields.**
+
+❌ **Bad — splits one logical check into multiple expects:**
+```ts
+expect(result.map(h => h.text)).toEqual(['A', 'B']);
+expect(result.map(h => h.lineIndex)).toEqual([1, 3]);
+// or
+expect(result.ok).toBe(false);
+expect(result.error).toMatch(/something/);
+```
+
+✅ **Good — assert the whole value at once:**
+```ts
+expect(result).toEqual([
+  { lineIndex: 1, level: 2, text: 'A' },
+  { lineIndex: 3, level: 2, text: 'B' },
+]);
+// or
+expect(result).toMatchObject({ ok: false, error: expect.stringMatching(/something/) });
+```
+
+**Why:** Field-by-field failures lose context ("expected 'foo' to be 'bar'" vs seeing the full object). Multiple `expect` calls on properties of the same value almost always collapse into one `toEqual` or `toMatchObject`.
+
+**For partial matching (vitest/jest):**
+- `toMatchObject({ a: 'x' })` — subset of object properties; **prefer for top-level partial matching**
+- `expect.objectContaining({ a: 'x' })` — use only nested inside `toEqual` (e.g. array of partial objects); at top level `toEqual(objectContaining(...))` hides unexpected fields in failure output
+- `expect.stringMatching(/pattern/)` — string field within `toMatchObject`
+
+**For deterministic but complex string output, prefer inline snapshots** over hand-coding expected strings:
+```ts
+expect(store.get('foo.md')).toMatchInlineSnapshot(`"## Keep\\nkeep body"`);
+```
+Vitest fills in the value on first run; subsequent runs assert it hasn't changed.
+
+---
+
 ## Test Doubles: Avoid Overmocking
 
 **CRITICAL: Test real behavior, not mocks**
