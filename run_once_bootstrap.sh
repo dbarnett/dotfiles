@@ -82,6 +82,12 @@ setup_keyd() {
   sudo systemctl enable --now keyd
 }
 
+setup_sleep() {
+  # Hibernate after 15min of suspend (battery idle → suspend → hibernate)
+  sudo mkdir -p /etc/systemd/sleep.conf.d
+  printf '[Sleep]\nHibernateDelaySec=15min\n' | sudo tee /etc/systemd/sleep.conf.d/hibernate-delay.conf
+}
+
 install_rust() {
   echo "Installing Rust..." 1>&2
   rustc_path=$(which rustc)
@@ -105,5 +111,6 @@ configure_vim() {
 
 install_essential_pkgs
 install_rust
+setup_sleep
 
 configure_vim
