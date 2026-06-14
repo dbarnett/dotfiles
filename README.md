@@ -120,14 +120,17 @@ nix profile upgrade --all  # nix packages
 
 ## 🖥️ Desktop environment
 
-On Arch Linux, this setup includes [HyDE](https://github.com/prasanthrangan/HyDE) (Hyprland Desktop Environment) with customized configs for:
-- 🪟 Hyprland compositor
-- 🔔 swaync (notification daemon)
-- 🚀 Various startup applications and workflows
+On Arch Linux, this setup uses **GNOME** (previously Hyprland/HyDE — see `~/hypr.md` for legacy config).
 
-HyDE configs are located in `~/.config/hypr/` and `~/.config/hyde/`.
+GNOME-specific setup runs automatically via `run_once_setup_gnome.sh` when `chezmoi apply` is run inside an active GNOME session. This configures:
+- **Caps Lock → vicinae** (clipboard/snippet manager): Caps Lock remapped to F19 via keyd, F19 bound to `vicinae toggle` in GNOME keybindings
 
-See details in `~/hypr.md`.
+**Note:** `run_once_setup_gnome.sh` is a no-op on macOS and non-GNOME desktops.
+
+### GNOME manual steps (not easily automatable)
+
+- **WiFi backend**: create `/etc/NetworkManager/conf.d/iwd.conf` with `[device]\nwifi.backend=iwd` and disable `wpa_supplicant` (conflicts with iwd on Intel BE200 Wi-Fi 7)
+- **keyd**: installed by bootstrap, enabled via systemd — verify with `systemctl status keyd`
 
 ### 🔧 Configuration architecture
 
