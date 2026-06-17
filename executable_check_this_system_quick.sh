@@ -20,66 +20,127 @@ printf "\n"
 
 if [ "$OS" = "Linux" ]; then
     ERRORS=0
+    WARNINGS=0
 
-    # Check notification daemon state
-    printf "%b📬 Notification Daemon Check%b\n" "${BLUE}" "${NC}"
+    DE="${XDG_CURRENT_DESKTOP:-unknown}"
+
+    # --- Notification daemon ---
+    printf "%b📬 Notification Daemon%b\n" "${BLUE}" "${NC}"
     printf "%s\n" "--------------------------------"
+    DUNST_RUNNING=0; SWAYNC_RUNNING=0
+    pgrep -x dunst >/dev/null 2>&1 && DUNST_RUNNING=1
+    pgrep -x swaync >/dev/null 2>&1 && SWAYNC_RUNNING=1
 
-    if pgrep -x dunst >/dev/null 2>&1; then
-        DUNST_RUNNING=1
+    if [ "$DE" = "GNOME" ]; then
+        # GNOME Shell handles notifications natively; third-party daemons conflict
+        if [ "$DUNST_RUNNING" -eq 1 ] || [ "$SWAYNC_RUNNING" -eq 1 ]; then
+            printf "%b❌ Under GNOME, dunst/swaync are redundant and conflicting%b\n" "${RED}" "${NC}"
+            printf "   Kill with: pkill dunst; pkill swaync\n"
+            ERRORS=$((ERRORS + 1))
+        else
+            printf "%b✅ OK: no conflicting notification daemons under GNOME%b\n" "${GREEN}" "${NC}"
+        fi
+    elif pgrep -x Hyprland >/dev/null 2>&1; then
+        # Hyprland needs an external notification daemon
+        if [ "$DUNST_RUNNING" -eq 1 ] && [ "$SWAYNC_RUNNING" -eq 1 ]; then
+            printf "%b❌ CONFLICT: both dunst and swaync running%b\n" "${RED}" "${NC}"
+            printf "   Fix: pkill dunst && swaync-client --reload-config\n"
+            ERRORS=$((ERRORS + 1))
+        elif [ "$SWAYNC_RUNNING" -eq 1 ]; then
+            printf "%b✅ OK: swaync running%b\n" "${GREEN}" "${NC}"
+        elif [ "$DUNST_RUNNING" -eq 1 ]; then
+            printf "%b⚠️  dunst running (expected swaync under HyDE)%b\n" "${YELLOW}" "${NC}"
+            WARNINGS=$((WARNINGS + 1))
+        else
+            printf "%b❌ No notification daemon running under Hyprland%b\n" "${RED}" "${NC}"
+            printf "   Fix: swaync &\n"
+            ERRORS=$((ERRORS + 1))
+        fi
     else
-        DUNST_RUNNING=0
-    fi
-
-    if pgrep -x swaync >/dev/null 2>&1; then
-        SWAYNC_RUNNING=1
-    else
-        SWAYNC_RUNNING=0
-    fi
-
-    if [ "$DUNST_RUNNING" -eq 1 ] && [ "$SWAYNC_RUNNING" -eq 1 ]; then
-        printf "%b❌ CONFLICT: Both dunst and swaync are running!%b\n" "${RED}" "${NC}"
-        printf "   %bFix this by running:%b\n" "${YELLOW}" "${NC}"
-        printf "   %bpkill dunst && swaync-client --reload-config%b\n" "${GREEN}" "${NC}"
-        ERRORS=$((ERRORS + 1))
-    elif [ "$DUNST_RUNNING" -eq 1 ]; then
-        printf "%b❌ WRONG: dunst is running (should be swaync)%b\n" "${RED}" "${NC}"
-        printf "   %bFix this by running:%b\n" "${YELLOW}" "${NC}"
-        printf "   %bpkill dunst && swaync &%b\n" "${GREEN}" "${NC}"
-        ERRORS=$((ERRORS + 1))
-    elif [ "$SWAYNC_RUNNING" -eq 1 ]; then
-        printf "%b✅ OK: swaync is running%b\n" "${GREEN}" "${NC}"
-    else
-        printf "%b⚠️  WARNING: No notification daemon running%b\n" "${YELLOW}" "${NC}"
-        printf "   %bStart swaync by running:%b\n" "${YELLOW}" "${NC}"
-        printf "   %bswaync &%b\n" "${GREEN}" "${NC}"
-        ERRORS=$((ERRORS + 1))
+        printf "%b  (skipping — DE '%s' not recognized)%b\n" "${YELLOW}" "$DE" "${NC}"
     fi
     printf "\n"
 
-    # Check Hyprland config if running Hyprland
-    if pgrep -x Hyprland >/dev/null 2>&1; then
-        printf "%b🪟 Hyprland Config Check%b\n" "${BLUE}" "${NC}"
-        printf "%s\n" "--------------------------------"
+    # --- Networking conflicts ---
+    # Multiple tools managing the same interface causes route churn, disconnects, drain.
+    # Rule: NetworkManager is sole manager; everything else must be inactive.
+    printf "%b🌐 Networking Conflict Check%b\n" "${BLUE}" "${NC}"
+    printf "%s\n" "--------------------------------"
 
-        CONFIG_ERRORS=$(hyprctl configerrors 2>&1)
-        if [ $? -ne 0 ]; then
-            printf "%b❌ ERROR: Failed to check hyprctl configerrors%b\n" "${RED}" "${NC}"
-            ERRORS=$((ERRORS + 1))
-        elif [ -n "$CONFIG_ERRORS" ]; then
-            printf "%b❌ Config errors found:%b\n" "${RED}" "${NC}"
-            printf "%s\n" "$CONFIG_ERRORS"
-            printf "   %bFix errors in your Hyprland config files%b\n" "${YELLOW}" "${NC}"
+    NM_ACTIVE=0
+    systemctl is-active --quiet NetworkManager 2>/dev/null && NM_ACTIVE=1
+
+    if [ "$NM_ACTIVE" -eq 1 ]; then
+        # dhcpcd conflicts with NM's built-in DHCP client
+        if systemctl is-active --quiet dhcpcd 2>/dev/null; then
+            printf "%b❌ dhcpcd is running alongside NetworkManager (DHCP conflict)%b\n" "${RED}" "${NC}"
+            printf "   Fix: sudo systemctl disable --now dhcpcd\n"
             ERRORS=$((ERRORS + 1))
         else
-            printf "%b✅ OK: No config errors%b\n" "${GREEN}" "${NC}"
+            printf "%b✅ OK: dhcpcd not running%b\n" "${GREEN}" "${NC}"
+        fi
+
+        # wpa_supplicant conflicts when NM is configured to use iwd backend
+        NM_IWD=0
+        grep -qr 'wifi.backend=iwd' /etc/NetworkManager/conf.d/ 2>/dev/null && NM_IWD=1
+        if [ "$NM_IWD" -eq 1 ] && pgrep -x wpa_supplicant >/dev/null 2>&1; then
+            printf "%b❌ wpa_supplicant running but NM is using iwd backend (conflict)%b\n" "${RED}" "${NC}"
+            printf "   Fix: sudo systemctl disable --now wpa_supplicant\n"
+            ERRORS=$((ERRORS + 1))
+        else
+            printf "%b✅ OK: no wpa_supplicant conflict%b\n" "${GREEN}" "${NC}"
+        fi
+
+        # systemd-networkd conflicts with NM for interface management
+        if systemctl is-active --quiet systemd-networkd 2>/dev/null; then
+            printf "%b❌ systemd-networkd is active alongside NetworkManager%b\n" "${RED}" "${NC}"
+            printf "   Fix: sudo systemctl disable --now systemd-networkd\n"
+            ERRORS=$((ERRORS + 1))
+        else
+            printf "%b✅ OK: systemd-networkd not active%b\n" "${GREEN}" "${NC}"
+        fi
+
+        # WiFi power save causes AP inactivity disconnects on some hardware
+        WIFI_DEV=$(iw dev 2>/dev/null | awk '/Interface/{print $2}' | head -1)
+        if [ -n "$WIFI_DEV" ]; then
+            PS=$(iw dev "$WIFI_DEV" get power_save 2>/dev/null)
+            if echo "$PS" | grep -q "Power save: on"; then
+                printf "%b⚠️  WiFi power save ON (%s) — can cause AP inactivity disconnects%b\n" "${YELLOW}" "$WIFI_DEV" "${NC}"
+                printf "   Fix: sudo iw dev %s set power_save off\n" "$WIFI_DEV"
+                printf "   Persist: /etc/NetworkManager/conf.d/wifi-powersave.conf → wifi.powersave = 2\n"
+                WARNINGS=$((WARNINGS + 1))
+            else
+                printf "%b✅ OK: WiFi power save off (%s)%b\n" "${GREEN}" "$WIFI_DEV" "${NC}"
+            fi
+        fi
+    else
+        printf "%b  (skipping — NetworkManager not active)%b\n" "${YELLOW}" "${NC}"
+    fi
+    printf "\n"
+
+    # --- Hyprland config (only when running) ---
+    if pgrep -x Hyprland >/dev/null 2>&1; then
+        printf "%b🪟 Hyprland Config%b\n" "${BLUE}" "${NC}"
+        printf "%s\n" "--------------------------------"
+        CONFIG_ERRORS=$(hyprctl configerrors 2>&1)
+        if [ $? -ne 0 ]; then
+            printf "%b❌ Failed to check hyprctl configerrors%b\n" "${RED}" "${NC}"
+            ERRORS=$((ERRORS + 1))
+        elif [ -n "$CONFIG_ERRORS" ]; then
+            printf "%b❌ Config errors:%b\n%s\n" "${RED}" "${NC}" "$CONFIG_ERRORS"
+            ERRORS=$((ERRORS + 1))
+        else
+            printf "%b✅ OK: no config errors%b\n" "${GREEN}" "${NC}"
         fi
         printf "\n"
     fi
 
     if [ "$ERRORS" -gt 0 ]; then
-        printf "%b❌ %d error(s) found%b\n" "${RED}" "$ERRORS" "${NC}"
+        printf "%b❌ %d error(s), %d warning(s)%b\n" "${RED}" "$ERRORS" "$WARNINGS" "${NC}"
         exit 1
+    elif [ "$WARNINGS" -gt 0 ]; then
+        printf "%b⚠️  %d warning(s) (no critical errors)%b\n" "${YELLOW}" "$WARNINGS" "${NC}"
+        exit 0
     else
         printf "%b✨ All checks passed!%b\n" "${GREEN}" "${NC}"
         exit 0
