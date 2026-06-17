@@ -95,6 +95,29 @@ setup_sleep() {
   sudo systemctl reload systemd-logind 2>/dev/null || true
 }
 
+setup_networking() {
+  if [ "$system_type" != "Linux" ]; then return; fi
+  if ! command -v nmcli >/dev/null 2>&1; then return; fi
+
+  # Disable WiFi power saving — kernel enables it by default; causes AP to kick
+  # client for "inactivity" (reason code 4) on otherwise-healthy connections.
+  sudo mkdir -p /etc/NetworkManager/conf.d
+  printf '[connection]\nwifi.powersave = 2\n' | sudo tee /etc/NetworkManager/conf.d/wifi-powersave.conf
+
+  # systemd-networkd conflicts with NM for DHCP/routing — disable if NM is present.
+  sudo systemctl disable --now systemd-networkd systemd-networkd.socket 2>/dev/null || true
+  sudo systemctl stop \
+    systemd-networkd-varlink.socket \
+    systemd-networkd-varlink-metrics.socket \
+    systemd-networkd-resolve-hook.socket 2>/dev/null || true
+
+  # wpa_supplicant conflicts with iwd — only disable if iwd backend is configured.
+  # (wpa_supplicant is the correct NM backend on setups not using iwd.)
+  if [ -f /etc/NetworkManager/conf.d/iwd.conf ]; then
+    sudo systemctl disable --now wpa_supplicant 2>/dev/null || true
+  fi
+}
+
 install_rust() {
   echo "Installing Rust..." 1>&2
   rustc_path=$(which rustc)
@@ -108,3 +131,4 @@ install_rust() {
 install_essential_pkgs
 install_rust
 setup_sleep
+setup_networking

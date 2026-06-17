@@ -129,7 +129,7 @@ GNOME-specific setup runs automatically via `run_once_setup_gnome.sh` when `chez
 
 ### GNOME manual steps (not easily automatable)
 
-- **WiFi backend**: create `/etc/NetworkManager/conf.d/iwd.conf` with `[device]\nwifi.backend=iwd` and disable `wpa_supplicant` (conflicts with iwd on Intel BE200 Wi-Fi 7)
+- **WiFi backend**: create `/etc/NetworkManager/conf.d/iwd.conf` with `[device]\nwifi.backend=iwd` and disable `wpa_supplicant` (conflicts with iwd on Intel BE200 Wi-Fi 7). Once this file exists, bootstrap's `setup_networking()` will handle disabling wpa_supplicant on future runs.
 - **keyd**: installed by bootstrap, enabled via systemd — verify with `systemctl status keyd`
 
 ### 🔧 Configuration architecture
