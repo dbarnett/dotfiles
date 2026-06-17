@@ -1,0 +1,13 @@
+#!/bin/sh
+# Wrapper that blocks 'jj git push' when 'jj push' is aliased (i.e. jj-hooks is
+# configured). No-op on machines without the alias — safe to install everywhere.
+_dir=$(dirname "$0")
+_path=$(printf '%s' "$PATH" | tr ':' '\n' | grep -vxF "$_dir" | tr '\n' ':')
+
+if [ "${1-}" = "git" ] && [ "${2-}" = "push" ]; then
+    if PATH="$_path" jj config get aliases.push >/dev/null 2>&1; then
+        printf 'jj git push skips pre-push hooks. Use: jj push\n' >&2
+        exit 1
+    fi
+fi
+exec env PATH="$_path" jj "$@"

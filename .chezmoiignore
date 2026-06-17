@@ -21,3 +21,7 @@ projects/*/
 .cargo/
 .dotfiles/
 .steam/
+
+# jj machine-local config (jj-hooks aliases etc.) — lives in conf.d/ so it
+# doesn't conflict with chezmoi-managed config.toml; jj merges both.
+.config/jj/conf.d/local.toml

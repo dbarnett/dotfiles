@@ -132,6 +132,22 @@ GNOME-specific setup runs automatically via `run_once_setup_gnome.sh` when `chez
 - **WiFi backend**: create `/etc/NetworkManager/conf.d/iwd.conf` with `[device]\nwifi.backend=iwd` and disable `wpa_supplicant` (conflicts with iwd on Intel BE200 Wi-Fi 7). Once this file exists, bootstrap's `setup_networking()` will handle disabling wpa_supplicant on future runs.
 - **keyd**: installed by bootstrap, enabled via systemd — verify with `systemctl status keyd`
 
+### jj machine-local config
+
+`~/.config/jj/config.toml` is managed by chezmoi (base config). jj also reads `~/.config/jj/conf.d/*.toml`; that directory is ignored by chezmoi so it's safe for machine-local additions.
+
+`~/.local/bin/jj` (tracked by chezmoi) is a shell-agnostic wrapper that blocks `jj git push` when `jj push` is aliased — no-op otherwise, safe on all machines.
+
+On machines with `jj-hooks`/`jj-hp` installed:
+
+```sh
+JJ_CONFIG=$XDG_CONFIG_HOME/jj/conf.d/local.toml jj-hooks init
+```
+
+Writes config directly into `conf.d/local.toml` (ignored by chezmoi). Once the alias exists, the wrapper automatically activates the `jj git push` block.
+
+For `hk` global git hooks: `hk install --global` writes to `~/.gitconfig` (chezmoi-tracked). Instead, append the hook sections to `~/.gitconfig.d/local.conf` (already included, not tracked by chezmoi).
+
 ### 🔧 Configuration architecture
 
 This dotfiles repo supports multiple environments through two main strategies:
