@@ -105,19 +105,6 @@ install_rust() {
   fi
 }
 
-configure_vim() {
-  # Install vim-plug for Vim
-  curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
-    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-  vim +'PlugInstall --sync' +qa
-  # Set up language servers for vim/neovim
-  vim +'set ft=sh' +'set cmdheight=9' +'call LspInstallServerThenQuit("bash-language-server")'
-  vim +'set ft=markdown' +'set cmdheight=9' +'call LspInstallServerThenQuit("marksman")'
-  vim +'set ft=yaml' +'set cmdheight=9' +'call LspInstallServerThenQuit("yaml-language-server")'
-}
-
 install_essential_pkgs
 install_rust
 setup_sleep
-
-configure_vim
