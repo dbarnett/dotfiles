@@ -711,7 +711,7 @@ This signals intentional new work and will create branch metadata files.
         # === Inline WIP checks (description-driven) ===
         CURRENT_FIRST_CHECK=$(jj log -r @ --no-graph -T 'description.first_line()' 2>/dev/null || echo "")
         if echo "$CURRENT_FIRST_CHECK" | grep -q "^WIP:"; then
-            printf "${BLUE}--- WIP Checks ---${RESET}\n\n"
+            printf "%b" "${BLUE}--- WIP Checks ---${RESET}\n\n"
             WIP_ERRORS=0
 
             CHANGED_FILES=$(jj diff --name-only 2>/dev/null || echo "")
@@ -814,7 +814,7 @@ This signals intentional new work and will create branch metadata files.
 
         # === Inline WIP checks (git) ===
         if echo "$CURRENT_FIRST" | grep -q "^WIP:"; then
-            printf "${BLUE}--- WIP Checks ---${RESET}\n\n"
+            printf "%b" "${BLUE}--- WIP Checks ---${RESET}\n\n"
             WIP_ERRORS=0
 
             CHANGED_FILES=$(git diff --name-only HEAD 2>/dev/null || echo "")
