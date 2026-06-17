@@ -102,8 +102,10 @@ setup_networking() {
 
   # Disable WiFi power saving — kernel enables it by default; causes AP to kick
   # client for "inactivity" (reason code 4) on otherwise-healthy connections.
-  sudo mkdir -p /etc/NetworkManager/conf.d
-  printf '[connection]\nwifi.powersave = 2\n' | sudo tee /etc/NetworkManager/conf.d/wifi-powersave.conf
+  # NM's wifi.powersave is ignored with iwd backend; use udev rule instead.
+  printf 'ACTION=="add", SUBSYSTEM=="net", KERNEL=="wlan*", RUN+="/usr/bin/iw dev %%k set power_save off"\n' \
+    | sudo tee /etc/udev/rules.d/81-wifi-powersave.rules
+  sudo udevadm control --reload-rules
 
   # systemd-networkd conflicts with NM for DHCP/routing — disable if NM is present.
   sudo systemctl disable --now systemd-networkd systemd-networkd.socket 2>/dev/null || true
