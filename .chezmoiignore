@@ -6,6 +6,7 @@ CLAUDE.md
 .env
 _dev/
 _dev/**
+/hk.pkl
 
 # Ignore yadm-specific files
 .config/yadm/
