@@ -17,6 +17,9 @@ if status is-interactive
   type -q pyenv; and pyenv init - | source
   type -q starship; and starship init fish | source
 
+  # Re-prepend after brew/pyenv have inserted their paths
+  fish_add_path --move ~/.local/bin
+
   if type -q keychain
     # Override $SHELL for fish-shell/fish-shell#4583.
     set -lx SHELL fish
