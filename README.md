@@ -141,7 +141,7 @@ GNOME-specific setup runs automatically via `run_once_setup_gnome.sh` when `chez
 On machines with `jj-hooks`/`jj-hp` installed:
 
 ```sh
-JJ_CONFIG=$XDG_CONFIG_HOME/jj/conf.d/local.toml jj-hooks init
+JJ_CONFIG=~/.config/jj/conf.d/local.toml jj-hooks init
 ```
 
 Writes config directly into `conf.d/local.toml` (ignored by chezmoi). Once the alias exists, the wrapper automatically activates the `jj git push` block.
