@@ -83,16 +83,17 @@ setup_keyd() {
 }
 
 setup_sleep() {
-  # Hibernate after 15min of suspend (battery idle → suspend → hibernate)
-  sudo mkdir -p /etc/systemd/sleep.conf.d
-  printf '[Sleep]\nHibernateDelaySec=15min\n' | sudo tee /etc/systemd/sleep.conf.d/hibernate-delay.conf
-
-  # Lid close: hibernate on battery (NVMe fast enough ~15s), suspend on AC (no drain concern).
-  # Avoids suspend-then-hibernate EFI var bugs. No suspend on battery at all.
-  sudo mkdir -p /etc/systemd/logind.conf.d
-  printf '[Login]\nHandleLidSwitch=hibernate\nHandleLidSwitchExternalPower=suspend\n' \
-    | sudo tee /etc/systemd/logind.conf.d/lid.conf
-  sudo systemctl reload systemd-logind 2>/dev/null || true
+  if [ "$system_type" != "Linux" ]; then return; fi
+  # One sudo: create dirs, write configs, reload logind.
+  # Hibernate after 15min of suspend (battery idle → suspend → hibernate).
+  # Lid close: hibernate on battery (NVMe ~15s), suspend on AC.
+  # Avoids suspend-then-hibernate EFI var bugs.
+  sudo sh -c '
+    mkdir -p /etc/systemd/sleep.conf.d /etc/systemd/logind.conf.d
+    printf "[Sleep]\nHibernateDelaySec=15min\n" > /etc/systemd/sleep.conf.d/hibernate-delay.conf
+    printf "[Login]\nHandleLidSwitch=hibernate\nHandleLidSwitchExternalPower=suspend\n" > /etc/systemd/logind.conf.d/lid.conf
+    systemctl reload systemd-logind
+  '
 }
 
 setup_networking() {
