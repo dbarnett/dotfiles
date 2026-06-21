@@ -48,5 +48,8 @@ if test -d $PNPM_HOME
   if not string match -q -- $PNPM_HOME $PATH
     set -gx PATH "$PNPM_HOME" $PATH
   end
+  if not string match -q -- "$PNPM_HOME/bin" $PATH
+    set -gx PATH "$PNPM_HOME/bin" $PATH
+  end
 end
 # pnpm end
