@@ -43,13 +43,8 @@ else
 end
 
 # pnpm
-if test -d $PNPM_HOME
-  set -gx PNPM_HOME $PNPM_HOME
-  if not string match -q -- $PNPM_HOME $PATH
-    set -gx PATH "$PNPM_HOME" $PATH
-  end
-  if not string match -q -- "$PNPM_HOME/bin" $PATH
-    set -gx PATH "$PNPM_HOME/bin" $PATH
-  end
+set -gx PNPM_HOME "/home/david/.local/share/pnpm"
+if not string match -q -- "$PNPM_HOME/bin" $PATH
+  set -gx PATH "$PNPM_HOME/bin" $PATH
 end
 # pnpm end
